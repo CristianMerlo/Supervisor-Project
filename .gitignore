@@ -1,0 +1,39 @@
+# Entorno
+venv/
+.env
+**/venv/
+**/.env
+.chrome_session/
+__pycache__/
+**/__pycache__/
+
+# Credenciales y Sesiones de Telegram
+credentials.json
+*.session
+*.session-journal
+
+# Bases de datos y archivos CSV locales
+*.db
+*.db-journal
+locales.csv
+sucursales.txt
+sucursales_nuevas.json
+
+# Logs y reportes
+*.log
+ingestor.log
+cloudflared.log
+userbot.log
+diagnose_output.log
+grupo_aprendizaje.log
+
+# Archivos descargados y procesados temporalmente
+temp_audios/
+entrantes/
+procesados/
+errores/
+*.pdf
+
+# Archivos de sistema / OS
+.DS_Store
+Thumbs.db

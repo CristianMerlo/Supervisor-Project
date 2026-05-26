@@ -1,47 +1,50 @@
 import os
-import sys
 import sqlite3
+import sys
 import requests
-from pathlib import Path
 from telethon import TelegramClient, events
 from dotenv import load_dotenv
 
-# Cargar variables de entorno locales
+import logging
+
+logging.basicConfig(filename='userbot.log', level=logging.INFO, 
+                    format='%(asctime)s - %(message)s')
+
+# Cargar variables de entorno
 load_dotenv()
 
-# Credenciales de Telegram MTProto
-API_ID = int(os.getenv("TELEGRAM_API_ID", 0))
-API_HASH = os.getenv("TELEGRAM_API_HASH", "")
-PHONE = os.getenv("TELEGRAM_PHONE", "")
-MI_TELEGRAM_ID = 215173956  # ID de Cristian
+api_id_env = os.getenv("TELEGRAM_API_ID")
+api_hash_env = os.getenv("TELEGRAM_API_HASH")
+phone_env = os.getenv("TELEGRAM_PHONE")
 
-# APIs de Inteligencia Artificial (Costo Cero / Free Tier)
+if not api_id_env or not api_hash_env or not phone_env:
+    print("❌ ERROR: TELEGRAM_API_ID, TELEGRAM_API_HASH o TELEGRAM_PHONE no configurados en .env")
+    print("Por favor, edita tu archivo .env y completa estos campos antes de iniciar el userbot.")
+    sys.exit(1)
+
+try:
+    API_ID = int(api_id_env)
+except ValueError:
+    print(f"❌ ERROR: TELEGRAM_API_ID debe ser un número entero válido. Valor actual: '{api_id_env}'")
+    sys.exit(1)
+
+API_HASH = api_hash_env
+PHONE = phone_env
+MI_TELEGRAM_ID = 215173956  # ID de Telegram de Cristian
+
+# Inicializar cliente de Telethon (Userbot)
+client = TelegramClient('supervisor', API_ID, API_HASH)
+
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
-NOSE_PORTAL_API_KEY = os.getenv("NOSE_PORTAL_API_KEY", "")
-NOSE_PORTAL_URL = "https://api.noseportal.com/v1/chat/completions" # URL de inferencia de Nose Portal
-
-# API de Antigravity (Pro / Gemini)
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-
-# Directorios de trabajo
+from pathlib import Path
 DIR_AUDIOS = Path("temp_audios")
 DIR_AUDIOS.mkdir(exist_ok=True)
 
-# Iniciar el cliente de Telethon (Userbot)
-client = TelegramClient('supervisor', API_ID, API_HASH)
-
 def transcribir_audio_groq(audio_path):
-    """
-    Usa la API gratuita de Groq (Whisper-Large-V3) para transcribir el audio de forma veloz y a costo cero.
-    """
     if not GROQ_API_KEY:
-        return "[Error: Falta GROQ_API_KEY en las variables de entorno]"
-        
+        return "[Error: Falta GROQ_API_KEY]"
     url = "https://api.groq.com/openai/v1/audio/transcriptions"
     headers = {"Authorization": f"Bearer {GROQ_API_KEY}"}
-    
-    # Intentamos convertir si pydub está disponible, de lo contrario enviamos el archivo original
-    # (Groq acepta .ogg y .opus directamente, por lo que la conversión a veces es opcional)
     try:
         with open(audio_path, "rb") as audio_file:
             files = {
@@ -51,147 +54,43 @@ def transcribir_audio_groq(audio_path):
             }
             response = requests.post(url, headers=headers, files=files)
             if response.status_code == 200:
-                transcripcion = response.json().get("text", "")
-                print(f"[TRANSCRIBCIÓN GROQ] {transcripcion}")
-                return transcripcion
-            else:
-                print(f"[ERROR GROQ WHISPER] Código {response.status_code}: {response.text}")
-                return f"[Error en transcripción: Código {response.status_code}]"
+                return response.json().get("text", "")
     except Exception as e:
-        print(f"[ERROR AUDIO] Falla al leer/enviar el archivo: {e}")
-        return f"[Error al procesar archivo de audio: {str(e)}]"
+        logging.info(f"[ERROR AUDIO] Falla: {e}")
+    return "[Error en la API de transcripción]"
 
-def consultar_deepseek_nose_portal(prompt_sistema, consulta_usuario):
-    """
-    Intenta consultar DeepSeek V4 Flash en Nose Portal de forma gratuita. Retorna None si falla.
-    """
-    if not NOSE_PORTAL_API_KEY:
-        return None
-    headers = {
-        "Authorization": f"Bearer {NOSE_PORTAL_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model": "deepseek-v4-flash",
-        "messages": [
-            {"role": "system", "content": prompt_sistema},
-            {"role": "user", "content": consulta_usuario}
-        ],
-        "temperature": 0.3
-    }
+import datetime
+
+BOT_USER_ID = None
+
+def obtener_lista_locales():
     try:
-        response = requests.post(NOSE_PORTAL_URL, headers=headers, json=payload, timeout=12)
-        if response.status_code == 200:
-            return response.json()["choices"][0]["message"]["content"]
+        conn = sqlite3.connect("supervisor_local.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT sigla, nombre FROM locales")
+        filas = cursor.fetchall()
+        conn.close()
+        locales = []
+        for sigla, nombre in filas:
+            if sigla:
+                locales.append(sigla.lower())
+            if nombre:
+                locales.append(nombre.lower())
+        return locales
     except Exception as e:
-        print(f"[FALLBACK DEEPSEEK] Error: {e}")
-    return None
+        logging.info(f"[ERROR DB locales] No se pudo cargar: {e}")
+        return []
 
-def consultar_groq_llm(prompt_sistema, consulta_usuario):
-    """
-    Intenta consultar Llama 3 70B en Groq de forma gratuita. Retorna None si falla.
-    """
-    if not GROQ_API_KEY:
-        return None
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "model": "llama3-70b-8192",
-        "messages": [
-            {"role": "system", "content": prompt_sistema},
-            {"role": "user", "content": consulta_usuario}
-        ],
-        "temperature": 0.3
-    }
+def guardar_mensaje_aprendizaje(remitente_id, remitente_nombre, mensaje, es_grupo):
+    log_path = "grupo_aprendizaje.log"
+    fecha_str = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    tipo_chat = "Grupo" if es_grupo else "Privado"
+    log_line = f"[{fecha_str}] [{tipo_chat}] ID: {remitente_id} ({remitente_nombre}) -> {mensaje}\n"
     try:
-        response = requests.post(url, headers=headers, json=payload, timeout=10)
-        if response.status_code == 200:
-            return response.json()["choices"][0]["message"]["content"]
+        with open(log_path, "a", encoding="utf-8") as f:
+            f.write(log_line)
     except Exception as e:
-        print(f"[FALLBACK GROQ LLM] Error: {e}")
-    return None
-
-def consultar_gemini_free(prompt_sistema, consulta_usuario):
-    """
-    Intenta consultar Gemini 1.5 Flash (Free Tier) usando la API Key de Gemini. Retorna None si falla.
-    """
-    if not GEMINI_API_KEY:
-        return None
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
-    headers = {"Content-Type": "application/json"}
-    payload = {
-        "contents": [
-            {
-                "role": "user",
-                "parts": [
-                    {"text": f"SYSTEM INSTRUCTION: {prompt_sistema}\n\nUSER MESSAGE: {consulta_usuario}"}
-                ]
-            }
-        ]
-    }
-    try:
-        response = requests.post(url, headers=headers, json=payload, timeout=12)
-        if response.status_code == 200:
-            return response.json()["candidates"][0]["content"]["parts"][0]["text"]
-    except Exception as e:
-        print(f"[FALLBACK GEMINI FREE] Error: {e}")
-    return None
-
-def consultar_gemini_antigravity_pro(prompt_sistema, consulta_usuario):
-    """
-    Consulta Gemini 1.5 Pro (Antigravity Pro) de forma garantizada.
-    """
-    if not GEMINI_API_KEY:
-        return "[Error: Falta GEMINI_API_KEY]"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-pro:generateContent?key={GEMINI_API_KEY}"
-    headers = {"Content-Type": "application/json"}
-    payload = {
-        "contents": [
-            {
-                "role": "user",
-                "parts": [
-                    {"text": f"SYSTEM INSTRUCTION: {prompt_sistema}\n\nUSER MESSAGE: {consulta_usuario}"}
-                ]
-            }
-        ]
-    }
-    try:
-        response = requests.post(url, headers=headers, json=payload, timeout=15)
-        if response.status_code == 200:
-            return response.json()["candidates"][0]["content"]["parts"][0]["text"]
-    except Exception as e:
-        return f"[Error al conectar con Gemini Pro: {str(e)}]"
-    return "[Error en la respuesta de Gemini Pro]"
-
-def consultar_hermes_resiliente(prompt_sistema, consulta_usuario):
-    """
-    Bucle de fallback dinámico para Hermes:
-    1. Intenta Nose Portal (DeepSeek V4 Flash) - Costo Cero
-    2. Si falla, intenta Groq (Llama 3 70B) - Costo Cero
-    3. Si falla, intenta Gemini 1.5 Flash - Costo Cero / Free Tier
-    4. Si falla, cae a Gemini 1.5 Pro - Paid / Pro Tokens
-    """
-    res = consultar_deepseek_nose_portal(prompt_sistema, consulta_usuario)
-    if res:
-        print("[Hermes Engine] Respondido vía Nose Portal (DeepSeek)")
-        return res
-        
-    res = consultar_groq_llm(prompt_sistema, consulta_usuario)
-    if res:
-        print("[Hermes Engine] Respondido vía Groq (Llama 3)")
-        return res
-        
-    res = consultar_gemini_free(prompt_sistema, consulta_usuario)
-    if res:
-        print("[Hermes Engine] Respondido vía Gemini Free (Flash)")
-        return res
-        
-    print("[Hermes Engine] Todos los canales gratuitos fallaron. Usando Gemini Pro (Antigravity).")
-    return consultar_gemini_antigravity_pro(prompt_sistema, consulta_usuario)
-
+        logging.info(f"[ERROR APRENDIZAJE LOG] {e}")
 
 def buscar_direccion_local(termino):
     conn = sqlite3.connect("supervisor_local.db")
@@ -204,6 +103,7 @@ def buscar_direccion_local(termino):
 def buscar_pendientes_local(termino):
     conn = sqlite3.connect("supervisor_local.db")
     cursor = conn.cursor()
+    # Buscar pendientes por sigla o nombre del local
     cursor.execute("""
         SELECT p.detalle, p.fecha 
         FROM pendientes p 
@@ -214,111 +114,203 @@ def buscar_pendientes_local(termino):
     conn.close()
     return resultados
 
-async def enrutar_mensaje(event, mensaje_texto):
-    """
-    Enrutador principal de los 4 Niveles de Inteligencia.
-    """
+def consultar_api_local(mensaje_usuario, chat_id):
+    """Consulta la API local de Supervisor para obtener respuestas asistidas por IA de Gemini"""
+    try:
+        url = "http://127.0.0.1:8000/v1/chat/completions"
+        payload = {
+            "model": "gemini-2.0-flash",
+            "messages": [
+                {"role": "user", "content": mensaje_usuario}
+            ],
+            "user": str(chat_id)
+        }
+        res = requests.post(url, json=payload, timeout=30)
+        if res.status_code == 200:
+            data = res.json()
+            return data["choices"][0]["message"]["content"]
+    except Exception as e:
+        logging.info(f"⚠️ Error de conexión con API local: {e}")
+    return None
+
+def filtrar_palabras(mensaje):
+    """Limpia y filtra palabras muy cortas o vacías para evitar falsos positivos en las búsquedas"""
+    palabras = mensaje.split()
+    palabras_filtradas = []
+    stop_words = {'de', 'del', 'la', 'las', 'el', 'los', 'con', 'para', 'una', 'uno', 'unos', 'unas', 'por', 'que', 'como', 'este', 'esta'}
+    for p in palabras:
+        p_clean = p.strip().lower()
+        # Eliminar signos de puntuación comunes al final
+        p_clean = p_clean.rstrip(',.?!;:')
+        if len(p_clean) > 2 and p_clean not in stop_words:
+            palabras_filtradas.append(p_clean)
+    return palabras_filtradas
+
+@client.on(events.NewMessage(incoming=True))
+async def on_new_message(event):
+    # En Telethon, event.is_channel es True tanto para canales de difusión como para supergrupos.
+    # Queremos ignorar canales de difusión, pero SÍ procesar supergrupos.
+    if event.is_channel and not event.is_group:
+        return
+
     remitente_id = event.sender_id
     
-    # NIVEL 4: Asistente del Jefe (Chat Libre con Gemini Pro)
-    if remitente_id == MI_TELEGRAM_ID:
-        if mensaje_texto.startswith("/status"):
-            await event.respond("⚡ [Antigravity] Servidor local Ubuntu operativo. Todos los servicios systemd en orden.")
-            return
-        else:
-            prompt_jefe = "Actúas como Antigravity, un asistente de sistemas e IA avanzado de Cristian. Responde sus dudas de forma clara, técnica y concisa."
-            respuesta = consultar_gemini_antigravity_pro(prompt_jefe, mensaje_texto)
-            await event.respond(f"🧠 [Antigravity] {respuesta}")
-            return
+    mensaje = ""
+    if event.message.media and hasattr(event.message.media, 'document') and event.message.voice:
+        logging.info("Descargando nota de voz...")
+        archivo = await event.message.download_media(file=DIR_AUDIOS)
+        texto = transcribir_audio_groq(archivo)
+        logging.info(f"Transcripción: {texto}")
+        mensaje = texto.strip()
+        try:
+            os.remove(archivo)
+        except:
+            pass
+    else:
+        mensaje = event.text.strip() if event.text else ""
 
-    # MODO ESCUCHA GRUPOS: Silencio inteligente en grupos
-    if event.is_group:
-        # Solo responde en grupos si el mensaje tiene intenciones de falla Y pregunta técnica ("alguien sabe", "falla", "error")
-        if not ("falla" in mensaje_texto.lower() or "error" in mensaje_texto.lower() or "alguien sabe" in mensaje_texto.lower()):
-            return # Ignorar conversaciones casuales
+    if not mensaje:
+        return
+        
+    logging.info(f"💬 Mensaje recibido de ID {remitente_id}: '{mensaje}'")
+
+    es_grupo = event.is_group
+    m_lower = mensaje.lower()
+
+    # Obtener nombre del remitente y guardar para aprendizaje pasivo
+    remitente_nombre = "Usuario desconocido"
+    try:
+        sender = await event.get_sender()
+        if sender:
+            first_name = getattr(sender, 'first_name', '') or ''
+            last_name = getattr(sender, 'last_name', '') or ''
+            username = getattr(sender, 'username', '') or ''
+            parts = [p for p in [first_name, last_name] if p]
+            remitente_nombre = " ".join(parts)
+            if username:
+                remitente_nombre += f" (@{username})"
+    except Exception as e:
+        logging.info(f"[ERROR OBTENER SENDER] {e}")
+
+    guardar_mensaje_aprendizaje(remitente_id, remitente_nombre, mensaje, es_grupo)
+
+    # 1. IDENTIDAD DUAL: Cristian (Solicita herramientas de Antigravity)
+    if remitente_id == MI_TELEGRAM_ID:
+        if mensaje.startswith("/status"):
+            await event.respond("⚡ [Antigravity] Servidor local operativo. Todo en orden, Cristian.")
+            return
+        elif mensaje.startswith("/buscar"):
+            await event.respond("🔍 [Antigravity] Iniciando barrido web de novedades...")
+            return
             
-    # INTERFAZ HERMES PARA TÉCNICOS (Nivel 1, 2 y 3)
-    # Nivel 1: Datos Maestros (Estático)
-    if "direccion" in mensaje_texto.lower() or "dónde queda" in mensaje_texto.lower():
-        palabras = mensaje_texto.replace("?", "").replace(",", "").split()
-        for palabra in palabras:
+    # 2. IDENTIDAD DUAL: Técnico / General (Habla Supervisor)
+    # Detectar mención o respuesta al bot
+    global BOT_USER_ID
+    me_menciono = False
+    if event.message.mentioned:
+        me_menciono = True
+    elif event.is_reply:
+        try:
+            reply_msg = await event.get_reply_message()
+            if reply_msg and reply_msg.sender_id == BOT_USER_ID:
+                me_menciono = True
+        except Exception as e:
+            logging.info(f"[ERROR VERIFICAR REPLY] {e}")
+
+    if "supervisor" in m_lower or "hermes" in m_lower:
+        me_menciono = True
+
+    # Cargar lista de locales dinámicos
+    locales_conocidos = obtener_lista_locales()
+    palabras_clave = filtrar_palabras(mensaje)
+    menciona_local = any(p in locales_conocidos for p in palabras_clave)
+
+    # Filtro flexible para intervenir en el grupo
+    if es_grupo:
+        # Si fue mencionado o respondido directamente, respondemos
+        if me_menciono:
+            debe_responder = True
+        else:
+            # Pregunta de dirección (local específico + palabra de dirección/pregunta, o palabras clave de dirección)
+            palabras_direccion = {"direccion", "dirección", "queda", "ubicación", "ubicacion", "dire", "direc"}
+            palabras_pregunta_dir = {"alguien", "conocen", "saben", "dónde", "donde", "cuál", "cual", "pasa", "pasame", "pásame", "pasar", "dirección", "direccion"}
+            
+            tiene_kw_direccion = any(w in m_lower for w in palabras_direccion)
+            tiene_kw_pregunta_dir = any(w in m_lower for w in palabras_pregunta_dir)
+            
+            pregunta_direccion = menciona_local and (tiene_kw_direccion or tiene_kw_pregunta_dir)
+            pregunta_direccion_generica = tiene_kw_direccion and tiene_kw_pregunta_dir
+            
+            # Pregunta de falla/error técnico
+            palabras_tecnicas = {"error", "falla", "roto", "no anda", "no funciona", "alarma", "problema", "cimbali", "ablandador", "filtrando", "pérdida", "manómetro", "presión", "presion", "caldera", "temperatura"}
+            palabras_pregunta_tecnica = {"alguien", "sabe", "saben", "cómo", "como", "quién", "quien", "ayuda", "conoce", "solución", "solucion", "limpiar", "purga", "reparar", "arreglar", "que le pasa", "qué le pasa"}
+            
+            tiene_kw_tecnica = any(w in m_lower for w in palabras_tecnicas)
+            tiene_kw_pregunta_tecnica = any(w in m_lower for w in palabras_pregunta_tecnica)
+            
+            pregunta_falla = tiene_kw_tecnica and tiene_kw_pregunta_tecnica
+            
+            debe_responder = pregunta_direccion or pregunta_direccion_generica or pregunta_falla
+
+        if not debe_responder:
+            return  # Silencio en el grupo
+            
+    # Filtrar palabras significativas para buscar local (ya definido arriba)
+    
+    # Nivel 1: Consulta Estática (Dirección de locales)
+    if "direccion" in m_lower or "dirección" in m_lower or "donde queda" in m_lower or "dónde queda" in m_lower:
+        for palabra in palabras_clave:
             res = buscar_direccion_local(palabra)
             if res:
                 await event.respond(f"📍 [Supervisor] La dirección de {res[0]} es: {res[1]}")
                 return
-        await event.respond("📍 [Supervisor] No localicé esa sucursal en la base SQLite. ¿Puedes darme la sigla?")
+        await event.respond("📍 [Supervisor] No encontré el local solicitado. ¿Me indicas la sigla o nombre?")
         return
-
-    # Nivel 2: Tareas Pendientes (Mantenimiento)
-    elif "pendiente" in mensaje_texto.lower() or "tarea" in mensaje_texto.lower():
-        palabras = mensaje_texto.replace("?", "").replace(",", "").split()
-        for palabra in palabras:
+        
+    # Nivel 2: Consulta Dinámica (Pendientes)
+    elif "pendiente" in m_lower or "pendientes" in m_lower or "tarea" in m_lower or "tareas" in m_lower:
+        for palabra in palabras_clave:
             pendientes = buscar_pendientes_local(palabra)
             if pendientes:
-                respuesta = f"📋 [Supervisor] Pendientes críticos de {palabra.upper()}:\n"
+                respuesta = f"📋 [Supervisor] Pendientes registrados para {palabra.upper()}:\n"
                 for p in pendientes:
                     respuesta += f"- {p[0]} (Registrado: {p[1]})\n"
                 await event.respond(respuesta)
                 return
-        await event.respond("📋 [Supervisor] No hay pendientes de mantenimiento críticos registrados para este local.")
+        await event.respond("📋 [Supervisor] No hay pendientes críticos registrados para ese local en este momento.")
         return
 
-    # Nivel 3: Diagnóstico y Fallas (IA DeepSeek V4 Flash de Nose Portal + RAG local)
-    elif any(x in mensaje_texto.lower() for x in ["error", "falla", "cimbali", "ablandador"]):
-        msg_espera = await event.respond("🛠️ [Supervisor] Buscando diagnóstico en los manuales de servicio...")
+    # Nivel 3: Consultas Complejas / Errores técnicos (Manuales / RAG)
+    elif "error" in m_lower or "falla" in m_lower or "cimbali" in m_lower or "ablandador" in m_lower:
+        msg_espera = await event.respond("🛠️ [Supervisor] Buscando en los manuales de servicio. Aguarda un instante...")
         
-        # Cargar manuales / contexto RAG local si existe, sino pasar la consulta directa
-        # (Aquí puedes leer archivos de manuales en Markdown locales)
-        contexto_manuales = "Manual Cafetera Cimbali: Error 58 indica falla de llenado de agua en caldera tras 3 minutos de intentar. Verificar presión de red, filtro y bomba."
+        # Intentar usar la API local inteligente (Gemini)
+        respuesta_ia = consultar_api_local(mensaje, remitente_id)
+        if not respuesta_ia:
+            # Fallback estático en caso de fallo
+            respuesta_ia = "El error indica problemas de presión en la caldera o filtro saturado. Por favor, realiza la purga de la válvula de entrada y verifica el manómetro."
         
-        prompt_hermes = (
-            "Eres Hermes, el subagente de mantenimiento. Tu tarea es ayudar al técnico a resolver la falla. "
-            "Usa el siguiente contexto técnico para responder la duda de forma clara y directa.\n\n"
-            f"CONTEXTO DE MANUALES:\n{contexto_manuales}"
-        )
-        
-        respuesta_hermes = consultar_hermes_resiliente(prompt_hermes, mensaje_texto)
-        await msg_espera.edit(f"🛠️ [Supervisor] {respuesta_hermes}")
+        await msg_espera.edit(f"🛠️ [Supervisor] {respuesta_ia}")
         return
 
-    # Mensaje casual de técnico no capturado por filtros
-    await event.respond("📋 [Supervisor] Entendido. Si es un reporte formal, recuerda enviar el PDF con prefijo MTZ_ o detallar la falla/error para revisarlo en el manual.")
-
-@client.on(events.NewMessage(incoming=True))
-async def manejador_principal(event):
-    """
-    Captura todos los mensajes entrantes (texto o notas de voz).
-    """
-    # 1. Procesamiento de Notas de Voz / Audio (Whisper en Groq - Capa de Ahorro de Tokens)
-    if event.message.voice or event.message.audio:
-        nombre_archivo = f"audio_{event.sender_id}_{event.message.id}.ogg"
-        ruta_archivo = DIR_AUDIOS / nombre_archivo
-        
-        # Descarga rápida del audio
-        print(f"[AUDIO ENTRANTE] Descargando de {event.sender_id}...")
-        await event.download_media(file=str(ruta_archivo))
-        
-        # Transcripción a texto usando la API gratuita de Groq (Whisper)
-        texto_transcrito = transcribir_audio_groq(str(ruta_archivo))
-        
-        # Eliminar archivo temporal local para cuidar disco
-        if ruta_archivo.exists():
-            os.remove(ruta_archivo)
-            
-        if texto_transcrito and not texto_transcrito.startswith("[Error"):
-            # Enrutar el texto transcrito
-            await enrutar_mensaje(event, texto_transcrito)
-        else:
-            await event.respond("⚠️ [Supervisor] No pude procesar tu audio. Por favor escribe la consulta en texto.")
-            
-    # 2. Procesamiento de Texto Estándar
-    elif event.text:
-        await enrutar_mensaje(event, event.text)
+    # Nivel 4: Asistente General (Solo en privado y solo para el Jefe)
+    if not es_grupo and remitente_id == MI_TELEGRAM_ID:
+        respuesta_ia = consultar_api_local(mensaje, remitente_id)
+        if respuesta_ia:
+            await event.respond(f"🧠 [Supervisor] {respuesta_ia}")
+        return
 
 async def main():
-    print("Iniciando conexión con Telegram MTProto...")
+    global BOT_USER_ID
+    logging.info("Iniciando conexión con Telegram MTProto...")
     await client.start(phone=PHONE)
-    print("--- [CONECTADO] El Supervisor (Antigravity & Hermes) está en línea ---")
+    try:
+        me = await client.get_me()
+        BOT_USER_ID = me.id
+        logging.info(f"--- [CONECTADO] El Supervisor (ID: {BOT_USER_ID}) está escuchando chats de forma activa ---")
+    except Exception as e:
+        logging.info(f"Error al obtener ID propio: {e}")
+        logging.info("--- [CONECTADO] El Supervisor está escuchando chats de forma activa ---")
     await client.run_until_disconnected()
 
 if __name__ == '__main__':

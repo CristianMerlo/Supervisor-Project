@@ -22,7 +22,7 @@ try:
 except Exception:
     model = None
 
-# --- CONSTANTES DE NEGOCIO (Idealmente vendrían de Google Sheets) ---
+# --- CONSTANTES DE NEGOCIO (Umbrales del sistema) ---
 UMBRAL_PPM_CRITICO = 200
 UMBRAL_SHOTS_PREVENTIVO = 150000
 
@@ -37,7 +37,7 @@ def extraer_texto_pdf(pdf_path):
     return texto_completo
 
 def parser_hibrido(pdf_path):
-    """Fase 1: Extrae los datos del PDF."""
+    """Fase 1: Extrae los datos del PDF usando Expresiones Regulares ultrarrápidas."""
     texto = extraer_texto_pdf(pdf_path)
     
     datos = {
@@ -78,13 +78,12 @@ def parser_hibrido(pdf_path):
     if m_shots:
         datos["shots"] = int(m_shots.group(1))
     
-    # Aquí iría el bloque de Gemini para Diagnóstico y Repuestos si hay Token disponible.
     return datos
 
 def evaluar_reglas_negocio(datos):
     """
     Fase 2: Motor de Reglas.
-    Evalúa los datos parseados y aplica la Jerarquía Hídrica y de Predictibilidad.
+    Aplica la Jerarquía Hídrica y de Mantenimiento Predictivo.
     """
     alertas = []
     estado_general = "VERDE_NORMAL"
@@ -126,20 +125,7 @@ def evaluar_reglas_negocio(datos):
 def procesar_reporte(pdf_path):
     print(f"--- PROCESANDO: {Path(pdf_path).name} ---")
     
-    # Fase 1: Parseo
     datos_extraidos = parser_hibrido(pdf_path)
-    print("\n[✓] FASE 1: Datos Extraídos:")
-    print(json.dumps(datos_extraidos, indent=4, ensure_ascii=False))
-    
-    # Fase 2: Auditoría y Reglas
     resultado_auditoria = evaluar_reglas_negocio(datos_extraidos)
-    print(f"\n[✓] FASE 2: Auditoría Completada -> ESTADO: {resultado_auditoria['estado_general']}")
-    for alerta in resultado_auditoria['alertas_activas']:
-        print(f"  🚨 [{alerta['nivel']}] {alerta['mensaje']}")
-
-if __name__ == "__main__":
-    pdf_prueba = "/Users/CR1S714N/Downloads/Informes Tecnicos/MTZ_F3DF_2026-05-16.pdf"
-    if os.path.exists(pdf_prueba):
-        procesar_reporte(pdf_prueba)
-    else:
-        print("Archivo de prueba no encontrado.")
+    
+    return datos_extraidos, resultado_auditoria

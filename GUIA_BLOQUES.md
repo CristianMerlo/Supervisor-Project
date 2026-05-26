@@ -80,10 +80,13 @@ Este bloque contiene la inteligencia técnica y evolutiva extraída automáticam
 ## 📁 Paquetes Adicionales de Despliegue
 
 ### 📄 [paquete_hermes_agent_deepseek.md](file:///Users/CR1S714N/Documents/Repositorios%20GitHub/PROYECTOS/SUPERVISOR%20AGENTE/paquete_hermes_agent_deepseek.md)
-Guía secuencial e interactiva paso a paso para la instalación de "Hermes Agent" utilizando el modelo gratuito "DeepSeek V4 Flash" provisto por "Nose Portal", bajo estrictas reglas de validación y control de TUI.
+Guía secuencial e interactiva paso a paso para la instalación oficial de la CLI de Hermes Agent. Incluye la integración de proveedores gratuitos mediante el uso de "Nose Portal" para cargar el modelo de "DeepSeek-V4".
 
 ### 📄 [metodologia_gsd.md](file:///Users/CR1S714N/Documents/Repositorios%20GitHub/PROYECTOS/SUPERVISOR%20AGENTE/metodologia_gsd.md)
-Documento conceptual del protocolo de orquestación GSD (Get Shit Done), estructurado como máquina de estados con persistencia local y límites de reintentos autónomos de depuración.
+Metodología GSD (Get Shit Done) - Protocolo conceptual de orquestación y máquina de estados para el desarrollo ordenado y modular del proyecto mediante prompt commands.
+
+### 📄 [paquete_github_ubuntu.md](file:///Users/CR1S714N/Documents/Repositorios%20GitHub/PROYECTOS/SUPERVISOR%20AGENTE/paquete_github_ubuntu.md)
+Guía automatizada para el agente de Ubuntu para configurar credenciales de Git, instalar la CLI de GitHub (gh) y clonar el repositorio de forma desatendida.
 
 ### 📄 [paquete_obsidian_cerebro.md](file:///Users/CR1S714N/Documents/Repositorios%20GitHub/PROYECTOS/SUPERVISOR%20AGENTE/paquete_obsidian_cerebro.md)
 Propuesta de integración para utilizar Obsidian como segundo cerebro local del Supervisor, organizando de forma automática diálogos de técnicos, resúmenes e incidentes en archivos Markdown y Canvas dinámicos.

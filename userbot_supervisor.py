@@ -92,6 +92,39 @@ def guardar_mensaje_aprendizaje(remitente_id, remitente_nombre, mensaje, es_grup
     except Exception as e:
         logging.info(f"[ERROR APRENDIZAJE LOG] {e}")
 
+from aiohttp import web
+
+async def notify_handler(request):
+    try:
+        message = ""
+        if request.has_body:
+            try:
+                data = await request.post()
+                message = data.get("message", "").strip()
+            except Exception:
+                pass
+            if not message:
+                message = (await request.text()).strip()
+        
+        if message:
+            logging.info(f"[UPS ALERTA LOCAL] Enviando: {message}")
+            await client.send_message(MI_TELEGRAM_ID, f"🔌 [Supervisor UPS] {message}")
+            return web.Response(text="Enviado con éxito\n")
+        else:
+            return web.Response(text="Mensaje vacío\n", status=400)
+    except Exception as e:
+        logging.info(f"[ERROR NOTIFICACIÓN LOCAL] {e}")
+        return web.Response(text=f"Error: {e}\n", status=500)
+
+async def start_notification_server():
+    app = web.Application()
+    app.router.add_post('/notify', notify_handler)
+    runner = web.AppRunner(app)
+    await runner.setup()
+    site = web.TCPSite(runner, '127.0.0.1', 8088)
+    await site.start()
+    logging.info("--- [SERVER LOCAL] Notificador local escuchando en 127.0.0.1:8088/notify ---")
+
 def buscar_direccion_local(termino):
     conn = sqlite3.connect("supervisor_local.db")
     cursor = conn.cursor()
@@ -304,6 +337,10 @@ async def main():
     global BOT_USER_ID
     logging.info("Iniciando conexión con Telegram MTProto...")
     await client.start(phone=PHONE)
+    
+    # Iniciar el servidor local de notificaciones
+    await start_notification_server()
+    
     try:
         me = await client.get_me()
         BOT_USER_ID = me.id

@@ -18,7 +18,7 @@ GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 # Configurar Gemini
 if GEMINI_API_KEY:
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-1.5-pro')
+    model = genai.GenerativeModel('gemini-2.5-flash')
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 AGENDAS_DIR = os.path.join(PROJECT_ROOT, "agendas_contactos")
@@ -167,15 +167,15 @@ def notificar_telegram(remitente, asunto):
 def ejecutar_scraping_outlook():
     print("🚀 Iniciando Motor de Extracción de Outlook Web...")
     
-    # Ruta del perfil por defecto en Ubuntu. Cambiar si usas Chromium (ej. ~/.config/chromium)
-    user_data_dir = os.path.expanduser("~/.config/google-chrome")
+    # Ruta del perfil dedicada a automatización para evitar bloqueos
+    user_data_dir = os.path.expanduser("~/.config/google-chrome-automation")
     url_bandeja = "https://outlook.cloud.microsoft/mail/0/inbox"
     
     with sync_playwright() as p:
-        # Usamos launch_persistent_context para montar el perfil logueado real
         try:
             browser = p.chromium.launch_persistent_context(
                 user_data_dir=user_data_dir,
+                executable_path="/usr/bin/google-chrome",
                 headless=True,  # Ejecutar en segundo plano sin molestar
                 args=["--disable-blink-features=AutomationControlled"]
             )
@@ -199,8 +199,7 @@ def ejecutar_scraping_outlook():
             page.wait_for_timeout(5000)
             
             # Localizar correos no leídos en la lista de mensajes
-            # El botón de no leído o aria-label suele decir "Mensaje no leído" o "Unread"
-            mensajes_no_leidos = page.locator("div[aria-label*='Unread'], div[aria-label*='no leído']").all()
+            mensajes_no_leidos = page.locator("div[aria-label*='unread' i], div[aria-label*='no leíd' i], div[aria-label*='no leid' i]").all()
             
             if not mensajes_no_leidos:
                 # Intento alternativo de selector por clase
@@ -222,8 +221,47 @@ def ejecutar_scraping_outlook():
                     
                     # Extraer información del panel de lectura
                     # Outlook usa atributos aria generosos
-                    remitente = page.locator("div[aria-label*='De']").first.inner_text() if page.locator("div[aria-label*='De']").count() > 0 else "Remitente Desconocido"
-                    asunto = page.locator("span.title").first.inner_text() if page.locator("span.title").count() > 0 else "Asunto Desconocido"
+                    # Intentar obtener remitente con selectores alternativos tolerantes
+                    remitente = "Remitente Desconocido"
+                    selectors_remitente = [
+                        "div[aria-label*='De ' i]", 
+                        "div[aria-label*='From' i]",
+                        "span[class*='Persona' i]", 
+                        "div[class*='Persona' i]",
+                        "button[aria-label*='De ' i]",
+                        "button[aria-label*='From' i]",
+                        "span[title*='@']"
+                    ]
+                    for sel in selectors_remitente:
+                        try:
+                            loc = page.locator(sel)
+                            if loc.count() > 0:
+                                txt = loc.first.inner_text().strip()
+                                if txt:
+                                    remitente = txt.split('\n')[0] # Quedarse con la primera línea
+                                    break
+                        except Exception:
+                            continue
+
+                    # Intentar obtener asunto con selectores alternativos
+                    asunto = "Asunto Desconocido"
+                    selectors_asunto = [
+                        "span.title", 
+                        "div[role='heading']", 
+                        "h1", 
+                        "div[class*='subject' i]", 
+                        "span[class*='subject' i]"
+                    ]
+                    for sel in selectors_asunto:
+                        try:
+                            loc = page.locator(sel)
+                            if loc.count() > 0:
+                                txt = loc.first.inner_text().strip()
+                                if txt:
+                                    asunto = txt
+                                    break
+                        except Exception:
+                            continue
                     
                     # Cuerpo del correo (buscamos el div principal de lectura)
                     cuerpo_locator = page.locator("div.BodyFragment, div.x_WordSection1, div[aria-label='Cuerpo del mensaje']")

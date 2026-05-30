@@ -16,7 +16,7 @@ os.makedirs(ENTRANTES_DIR, exist_ok=True)
 # Grupos a monitorear (exactamente como están en WhatsApp)
 GRUPOS = [
     "Fichada ingreso - egreso",
-    "Equipo Mto Franquicias",
+    "Equipo Mto. Franquicias",
     "Informes técnicos Diarios"
 ]
 
@@ -72,22 +72,53 @@ def procesar_mensajes_grupo(page, grupo, estado_actual):
     print(f"\n🔍 Revisando grupo: {grupo}")
     
     # Intentar hacer click en el grupo en el panel izquierdo
-    # Usamos un selector flexible que busque el título exacto
     try:
-        chat_locator = page.locator(f"span[title='{grupo}']")
+        # En la lista lateral (sin buscar), ¿está ya visible?
+        # Aseguramos que es de la lista lateral excluyendo el encabezado del chat activo
+        chat_locator = page.locator(f"#pane-side span[title='{grupo}']")
         if chat_locator.count() > 0:
             chat_locator.first.click()
             page.wait_for_timeout(2000) # Esperar a que cargue el chat
         else:
-            print(f"   [!] El grupo '{grupo}' no está visible en pantalla. Usando buscador...")
-            # Buscar la caja de búsqueda. Los atributos cambian, pero contenteditable suele ser fijo
-            search_box = page.locator("div[contenteditable='true'][data-tab='3']")
-            search_box.fill(grupo)
-            page.wait_for_timeout(1500)
+            print(f"   [!] El grupo '{grupo}' no está visible en la lista lateral. Usando buscador...")
+            
+            # Buscar el input de búsqueda
+            search_box_locator = page.locator("input[data-tab='3'], div[contenteditable='true'][data-tab='3']")
+            if search_box_locator.count() == 0:
+                print("   [❌] No se pudo encontrar el buscador de chats.")
+                return estado_actual
+                
+            search_box = search_box_locator.first
+            search_box.click()
+            page.wait_for_timeout(500)
+            
+            # Limpiar buscador
+            search_box.fill("")
+            page.wait_for_timeout(500)
+            
+            # Escribir el grupo secuencialmente para disparar React
+            search_box.press_sequentially(grupo, delay=100)
+            page.wait_for_timeout(3000) # Esperar que carguen los resultados
             
             # Clic en el primer resultado que coincida
-            page.locator(f"span[title='{grupo}']").first.click()
-            page.wait_for_timeout(2000)
+            result_locator = page.locator(f"span[title='{grupo}']")
+            if result_locator.count() > 0:
+                result_locator.first.click()
+                page.wait_for_timeout(2000)
+                print(f"   [+] Grupo '{grupo}' seleccionado con éxito.")
+            else:
+                print(f"   [⚠️] El grupo '{grupo}' no se encontró en los resultados de búsqueda.")
+                # Limpiar buscador y salir
+                search_box.click()
+                search_box.fill("")
+                page.wait_for_timeout(1000)
+                return estado_actual
+                
+            # Limpiar buscador para restaurar la lista normal
+            search_box_locator.first.click()
+            search_box_locator.first.fill("")
+            page.wait_for_timeout(1000)
+            
     except Exception as e:
         print(f"   [❌] Error navegando al grupo {grupo}: {e}")
         return estado_actual
@@ -117,9 +148,13 @@ def procesar_mensajes_grupo(page, grupo, estado_actual):
         
         # Extraer texto del mensaje
         try:
-            texto = msg.locator("span.selectable-text").inner_text()
+            text_locator = msg.locator("span.selectable-text")
+            if text_locator.count() > 0:
+                texto = text_locator.first.inner_text()
+            else:
+                texto = "[Multimedia o Archivo sin texto]"
         except:
-            texto = "[Multimedia o Archivo sin texto]"
+            texto = "[Error leyendo texto]"
             
         # Extraer hora (metadata)
         try:
@@ -193,13 +228,13 @@ def ejecutar_motor():
             whatsapp_page.wait_for_timeout(5000)
             
             # Si vemos el QR, la sesión no está iniciada
-            if whatsapp_page.locator("canvas").count() > 0 and "QR" in whatsapp_page.inner_text():
+            if whatsapp_page.locator("canvas").count() > 0 and "QR" in whatsapp_page.locator("body").inner_text():
                 print("❌ ERROR CRÍTICO: La sesión de WhatsApp no está iniciada (Pide QR).")
                 print("   Por favor, escanea el código en el servidor y vuelve a correr el motor.")
                 return
 
             # Resiliencia: Cartel de desconexión
-            if "Computadora sin conexión" in whatsapp_page.inner_text():
+            if "Computadora sin conexión" in whatsapp_page.locator("body").inner_text():
                 print("⚠️ Detectado cartel de 'Sin conexión'. Recargando página...")
                 whatsapp_page.reload()
                 whatsapp_page.wait_for_timeout(10000)

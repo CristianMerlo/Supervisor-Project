@@ -5,6 +5,7 @@ import shutil
 import glob
 from pathlib import Path
 from playwright.sync_api import sync_playwright
+import notificador_telegram
 
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 STATE_FILE = os.path.join(PROJECT_ROOT, "whatsapp_last_read.json")
@@ -242,8 +243,9 @@ def ejecutar_motor():
             
             # Si vemos el QR, la sesión no está iniciada
             if whatsapp_page.locator("canvas").count() > 0 and "QR" in whatsapp_page.locator("body").inner_text():
-                print("❌ ERROR CRÍTICO: La sesión de WhatsApp no está iniciada (Pide QR).")
-                print("   Por favor, escanea el código en el servidor y vuelve a correr el motor.")
+                msg_err = "❌ ERROR CRÍTICO [WhatsApp Bot]: La sesión de WhatsApp no está iniciada (Pide código QR). Escanea el código en la pantalla del servidor."
+                print(msg_err)
+                notificador_telegram.enviar_alerta(msg_err)
                 return
 
             # Resiliencia: Cartel de desconexión
@@ -263,7 +265,9 @@ def ejecutar_motor():
             print("\n✅ Ciclo del Motor WhatsApp terminado.")
 
         except Exception as e:
-            print(f"❌ Error al conectar con Chrome (¿Está abierto con --remote-debugging-port=9222?): {e}")
+            msg_err = f"❌ ERROR [WhatsApp Bot]: Error al conectar con Chrome (¿Está abierto en puerto 9222?): {e}"
+            print(msg_err)
+            notificador_telegram.enviar_alerta(msg_err)
 
 if __name__ == "__main__":
     ejecutar_motor()

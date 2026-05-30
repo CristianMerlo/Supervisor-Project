@@ -6,6 +6,7 @@ from email.header import decode_header
 import shutil
 from pathlib import Path
 import socket
+import notificador_telegram
 
 # Establecer timeout por defecto de 15 segundos para evitar cuelgues de red
 socket.setdefaulttimeout(15)
@@ -123,13 +124,17 @@ def procesar_carpeta_entrantes():
             if exito_drive:
                 print(f"[✓] Archivo subido a Google Drive y eliminado localmente.")
             else:
-                print(f"[!] No se pudo subir a Google Drive (o no se detectó sigla). Moviendo a errores para resguardo.")
+                msg_err = f"⚠️ [Ingestor] Alerta: No se pudo subir el archivo {pdf_path.name} a Google Drive (o no se detectó la sigla del local). Se movió a 'errores/' para resguardo manual."
+                print(msg_err)
+                notificador_telegram.enviar_alerta(msg_err)
                 # Asegurar que el archivo de origen sigue existiendo antes de moverlo
                 if pdf_path.exists():
                     shutil.move(str(pdf_path), str(DIR_ERRORES / pdf_path.name))
             
         except Exception as e:
-            print(f"[ERROR] Falla al procesar {pdf_path.name}: {e}")
+            msg_err = f"❌ [Ingestor] ERROR al procesar reporte {pdf_path.name}: {e}"
+            print(msg_err)
+            notificador_telegram.enviar_alerta(msg_err)
             if pdf_path.exists():
                 shutil.move(str(pdf_path), str(DIR_ERRORES / pdf_path.name))
 

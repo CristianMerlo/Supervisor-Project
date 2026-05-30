@@ -15,6 +15,8 @@ socket.setdefaulttimeout(15)
 import motor_supervisor
 import fase3_sheets
 import archivador_drive
+import motor_whatsapp_web
+import motor_outlook_web
 
 
 # Carga de variables de entorno locales desde archivo .env si existe
@@ -140,6 +142,29 @@ def procesar_carpeta_entrantes():
 
 if __name__ == "__main__":
     print("Iniciando Ingestor Automático...")
-    descargar_adjuntos_gmail()
-    procesar_carpeta_entrantes()
-    print("Ciclo finalizado.")
+    
+    try:
+        print("\n--- Ejecutando IMAP (Gmail) ---")
+        descargar_adjuntos_gmail()
+    except Exception as e:
+        print(f"[ERROR] Falla en motor IMAP Gmail: {e}")
+        
+    try:
+        print("\n--- Ejecutando Motor WhatsApp Web ---")
+        motor_whatsapp_web.ejecutar_motor()
+    except Exception as e:
+        print(f"[ERROR] Falla en Motor WhatsApp Web: {e}")
+        
+    try:
+        print("\n--- Ejecutando Motor Outlook Web ---")
+        motor_outlook_web.ejecutar_scraping_outlook()
+    except Exception as e:
+        print(f"[ERROR] Falla en Motor Outlook Web: {e}")
+        
+    try:
+        print("\n--- Procesando Carpeta Entrantes ---")
+        procesar_carpeta_entrantes()
+    except Exception as e:
+        print(f"[ERROR] Falla al procesar carpeta de entrantes: {e}")
+        
+    print("\nCiclo finalizado.")

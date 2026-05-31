@@ -6,6 +6,7 @@ from email.header import decode_header
 import shutil
 from pathlib import Path
 import socket
+import json
 import notificador_telegram
 
 # Establecer timeout por defecto de 15 segundos para evitar cuelgues de red
@@ -157,7 +158,29 @@ if __name__ == "__main__":
         
     try:
         print("\n--- Ejecutando Motor Outlook Web ---")
-        motor_outlook_web.ejecutar_scraping_outlook()
+        # Controlar ejecución espaciada a 2 horas (7200 segundos) para Outlook
+        last_run_file = BASE_DIR / "outlook_last_run.json"
+        ejecutar_outlook = True
+        ahora = time.time()
+        
+        if last_run_file.exists():
+            try:
+                with open(last_run_file, "r") as f:
+                    data = json.load(f)
+                    ultimo_run = data.get("last_run", 0)
+                    tiempo_transcurrido = ahora - ultimo_run
+                    if tiempo_transcurrido < 7200:
+                        ejecutar_outlook = False
+                        minutos_restantes = int((7200 - tiempo_transcurrido) / 60)
+                        print(f"   [SKIP] Omitiendo Outlook Web (se ejecuta cada 2 horas). Próxima ejecución en {minutos_restantes} min.")
+            except Exception as e_run:
+                print(f"   [WARN] Error leyendo outlook_last_run.json: {e_run}")
+                
+        if ejecutar_outlook:
+            motor_outlook_web.ejecutar_scraping_outlook()
+            # Guardar el timestamp de la ejecución
+            with open(last_run_file, "w") as f:
+                json.dump({"last_run": ahora}, f)
     except Exception as e:
         print(f"[ERROR] Falla en Motor Outlook Web: {e}")
         

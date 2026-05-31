@@ -274,6 +274,25 @@ def ejecutar_scraping_outlook():
                     print(f"De: {remitente}")
                     print(f"Asunto: {asunto}")
                     
+                    # Intentar obtener la dirección de correo real para validar el dominio
+                    email_real = ""
+                    try:
+                        email_loc = page.locator("span[title*='@'], div[title*='@'], a[title*='@']")
+                        if email_loc.count() > 0:
+                            email_real = email_loc.first.get_attribute("title").strip()
+                    except Exception:
+                        pass
+                        
+                    es_mostaza = False
+                    if email_real and "mostaza" in email_real.lower():
+                        es_mostaza = True
+                    elif "mostaza" in remitente.lower():
+                        es_mostaza = True
+                        
+                    if not es_mostaza:
+                        print(f"⏭️ Filtrado: Remitente fuera de dominio Mostaza (De: {remitente}, Email: {email_real}). Omitiendo IA.")
+                        continue
+                        
                     # Pasa a la IA
                     es_relevante, borrador, nueva_agenda = procesar_con_ia(remitente, asunto, cuerpo)
                     

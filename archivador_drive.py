@@ -33,12 +33,40 @@ def buscar_carpeta_por_nombre(servicio, nombre_carpeta, parent_id=None):
         return None
     return archivos[0].get('id')
 
+def obtener_sigla_sistema(sigla_ticket):
+    """Mapea una SIGLA TICKETS a su correspondiente SIGLA SISTEMA usando locales.csv."""
+    try:
+        import csv
+        ruta_csv = Path(__file__).parent / "locales.csv"
+        if not ruta_csv.exists():
+            return sigla_ticket
+            
+        with open(ruta_csv, mode="r", encoding="utf-8") as f:
+            reader = csv.reader(f)
+            next(reader)  # Omitir cabecera
+            for row in reader:
+                if len(row) > 1:
+                    sigla_sis = row[0].strip()
+                    sigla_tic = row[1].strip()
+                    if sigla_tic.upper() == sigla_ticket.upper():
+                        if sigla_sis and sigla_sis != "-":
+                            return sigla_sis
+    except Exception as e:
+        print(f"[WARN] Error mapeando sigla: {e}")
+    return sigla_ticket
+
 def archivar_reporte_en_drive(pdf_path, sigla_local):
     """
     Toma un archivo local, busca la carpeta del local en Drive (por la sigla),
     y lo sube allí, borrando el archivo local al terminar.
     Soporta subida por Web App (cuotas seguras) o cuenta de servicio directamente (fallback).
     """
+    # Mapear la sigla de ticket (ej: FLINR) a la sigla de sistema (ej: FLIN) para encontrar la carpeta en Drive
+    sigla_mapeada = obtener_sigla_sistema(sigla_local)
+    if sigla_mapeada != sigla_local:
+        print(f"[DRIVE-MAP] Mapeando sigla de ticket '{sigla_local}' a sigla de sistema '{sigla_mapeada}' para Google Drive")
+        sigla_local = sigla_mapeada
+
     webapp_url = os.getenv("DRIVE_WEBAPP_URL")
     
     if webapp_url:

@@ -126,6 +126,33 @@ def procesar_carpeta_entrantes():
             
             if exito_drive:
                 print(f"[✓] Archivo subido a Google Drive y eliminado localmente.")
+                
+                # Actualizar ficha local en el cerebro de Hermes
+                try:
+                    import re
+                    import gestion_locales
+                    import ingestor_formulario
+                    # Extraer estado de la cafetera y nro de serie del texto del PDF
+                    texto_pdf = motor_supervisor.extraer_texto_pdf(str(pdf_path))
+                    estado_caf = ingestor_formulario.extraer_estado_cafetera(texto_pdf)
+                    sn_match = re.search(r"SN:\s*(\w+)", texto_pdf)
+                    
+                    gestion_locales.actualizar_ficha_local(
+                        sigla=sigla,
+                        nombre_local=datos_extraidos.get("local", ""),
+                        tecnico=datos_extraidos.get("tecnico", ""),
+                        ticket=datos_extraidos.get("ticket", ""),
+                        ppm=datos_extraidos.get("ppm", 0),
+                        shots=datos_extraidos.get("shots", 0),
+                        maquina=datos_extraidos.get("maquina", ""),
+                        sn=sn_match.group(1) if sn_match else "",
+                        estado_cafetera=estado_caf,
+                        estado_general=alertas_negocio.get("estado_general", "VERDE_NORMAL"),
+                        repuestos=datos_extraidos.get("repuestos", ""),
+                        fecha_reporte=datos_extraidos.get("fecha", None)
+                    )
+                except Exception as e_ficha:
+                    print(f"[ORQUESTADOR] Error al actualizar ficha local de {sigla}: {e_ficha}")
             else:
                 msg_err = f"⚠️ [Ingestor] Alerta: No se pudo subir el archivo {pdf_path.name} a Google Drive (o no se detectó la sigla del local). Se movió a 'errores/' para resguardo manual."
                 print(msg_err)
@@ -141,51 +168,32 @@ def procesar_carpeta_entrantes():
             if pdf_path.exists():
                 shutil.move(str(pdf_path), str(DIR_ERRORES / pdf_path.name))
 
+import ingestor_formulario
+
 if __name__ == "__main__":
     print("Iniciando Ingestor Automático...")
     
     try:
-        print("\n--- Ejecutando IMAP (Gmail) ---")
-        descargar_adjuntos_gmail()
+        print("\n--- Ejecutando Ingestor de Formulario Google ---")
+        ingestor_formulario.ejecutar_ingesta_formulario()
     except Exception as e:
-        print(f"[ERROR] Falla en motor IMAP Gmail: {e}")
+        print(f"[ERROR] Falla en Ingestor de Formulario Google: {e}")
         
+    # Ejecutar el motor de WhatsApp Web cada 20 minutos (minutos múltiplos de 20: 0, 20, 40)
+    import datetime
+    minuto_actual = datetime.datetime.now().minute
+    if minuto_actual % 20 == 0:
+        try:
+            print("\n--- Ejecutando Motor WhatsApp Web (Cada 20 min) ---")
+            import motor_whatsapp_web
+            motor_whatsapp_web.ejecutar_motor()
+        except Exception as e:
+            print(f"[ERROR] Falla en Motor WhatsApp Web: {e}")
+    else:
+        print(f"\n--- Omitiendo Motor WhatsApp Web (Minuto {minuto_actual} no es múltiplo de 20) ---")
+
     try:
-        print("\n--- Ejecutando Motor WhatsApp Web ---")
-        motor_whatsapp_web.ejecutar_motor()
-    except Exception as e:
-        print(f"[ERROR] Falla en Motor WhatsApp Web: {e}")
-        
-    try:
-        print("\n--- Ejecutando Motor Outlook Web ---")
-        # Controlar ejecución espaciada a 2 horas (7200 segundos) para Outlook
-        last_run_file = BASE_DIR / "outlook_last_run.json"
-        ejecutar_outlook = True
-        ahora = time.time()
-        
-        if last_run_file.exists():
-            try:
-                with open(last_run_file, "r") as f:
-                    data = json.load(f)
-                    ultimo_run = data.get("last_run", 0)
-                    tiempo_transcurrido = ahora - ultimo_run
-                    if tiempo_transcurrido < 7200:
-                        ejecutar_outlook = False
-                        minutos_restantes = int((7200 - tiempo_transcurrido) / 60)
-                        print(f"   [SKIP] Omitiendo Outlook Web (se ejecuta cada 2 horas). Próxima ejecución en {minutos_restantes} min.")
-            except Exception as e_run:
-                print(f"   [WARN] Error leyendo outlook_last_run.json: {e_run}")
-                
-        if ejecutar_outlook:
-            motor_outlook_web.ejecutar_scraping_outlook()
-            # Guardar el timestamp de la ejecución
-            with open(last_run_file, "w") as f:
-                json.dump({"last_run": ahora}, f)
-    except Exception as e:
-        print(f"[ERROR] Falla en Motor Outlook Web: {e}")
-        
-    try:
-        print("\n--- Procesando Carpeta Entrantes ---")
+        print("\n--- Procesando Carpeta Entrantes (Fallback Local) ---")
         procesar_carpeta_entrantes()
     except Exception as e:
         print(f"[ERROR] Falla al procesar carpeta de entrantes: {e}")

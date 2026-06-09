@@ -24,11 +24,45 @@ else:
     genai.configure(api_key=GEMINI_API_KEY)
 
 # Importar las herramientas para Function Calling
-from herramientas_hermes import consultar_datos_maestros_local, consultar_ultimo_mantenimiento, listar_alertas_activas
-herramientas = [
+from herramientas_hermes import (
     consultar_datos_maestros_local,
     consultar_ultimo_mantenimiento,
-    listar_alertas_activas
+    listar_alertas_activas,
+    ejecutar_consulta_db_local,
+    leer_datos_pestana,
+    leer_archivo_codigo_servidor,
+    listar_archivos_servidor,
+    obtener_estado_servicios,
+    consultar_archivos_google_drive,
+    obtener_resumen_carpetas_ingesta,
+    leer_ultimas_lineas_log,
+    consultar_brain_hermes,
+    consultar_ficha_local
+)
+
+# Herramientas de consulta básicas para técnicos (seguro)
+herramientas_tecnico = [
+    consultar_datos_maestros_local,
+    consultar_ultimo_mantenimiento,
+    listar_alertas_activas,
+    consultar_ficha_local
+]
+
+# Herramientas de acceso completo al sistema para el desarrollador (Cristian)
+herramientas_desarrollador = [
+    consultar_datos_maestros_local,
+    consultar_ultimo_mantenimiento,
+    listar_alertas_activas,
+    ejecutar_consulta_db_local,
+    leer_datos_pestana,
+    leer_archivo_codigo_servidor,
+    listar_archivos_servidor,
+    obtener_estado_servicios,
+    consultar_archivos_google_drive,
+    obtener_resumen_carpetas_ingesta,
+    leer_ultimas_lineas_log,
+    consultar_brain_hermes,
+    consultar_ficha_local
 ]
 
 app = FastAPI(title="Antigravity Supervisor API")
@@ -47,19 +81,28 @@ def get_supervisor_prompt(chat_id: str = None):
     """Contexto maestro: Identidad Dual basada en el usuario"""
     
     # Identidad 1: Asistente / Ingeniero (Para Cristian)
-    if chat_id == "215173956":
+    if str(chat_id) == "215173956":
         return (
             "Eres Antigravity, un Ingeniero de Software Senior y Asistente de IA personal de Cristian. "
             "Tu objetivo es ayudarlo a administrar, desarrollar y optimizar el sistema 'Supervisor' y toda la "
-            "infraestructura relacionada. Tienes un profundo conocimiento técnico. Responde de forma analítica, "
-            "extensa, y asume el rol de un colega experto. Usa Markdown para estructurar tus respuestas."
+            "infraestructura relacionada. Tienes acceso completo a herramientas para leer y listar archivos del "
+            "servidor local, ejecutar consultas SQLite en 'supervisor_local.db', inspeccionar servicios de systemd, "
+            "obtener el resumen de carpetas de ingesta (entrantes, procesados, errores), ver logs recientes, "
+            "buscar archivos en Google Drive y leer cualquier pestaña de Google Sheets (La Sábana). "
+            "Úsalas para responder de forma técnica, precisa y con datos reales. Responde de forma analítica y profesional. "
+            "IMPORTANTE: Eres un modelo multimodal y tienes plena capacidad para recibir y entender notas de voz (archivos de audio). "
+            "Si recibes un audio, escúchalo con atención y responde la consulta que el usuario hace en él. "
+            "Usa Markdown para estructurar tus respuestas."
         )
     
     # Identidad 2: Supervisor de Mantenimiento (Para los Técnicos)
     return (
         "Eres el Agente Supervisor, una IA diseñada para asistir a técnicos de mantenimiento "
         "en campo de cafeteras comerciales e infraestructura. Responde de manera profesional, concisa "
-        "y resolutiva. NO digas que eres un bot genérico. Usa Markdown para estructurar tus respuestas (negritas, viñetas)."
+        "y resolutiva. NO digas que eres un bot genérico. "
+        "IMPORTANTE: Eres un modelo multimodal y tienes plena capacidad para recibir y entender notas de voz (archivos de audio). "
+        "Si recibes un audio, escúchalo con atención y responde la consulta que el usuario hace en él. "
+        "Usa Markdown para estructurar tus respuestas (negritas, viñetas)."
     )
 
 @app.get("/health")
@@ -99,6 +142,15 @@ async def chat_completions(req: ChatCompletionRequest):
 
         print(f"📩 Consulta entrante (ID: {req.user})")
 
+        # Determinar las herramientas permitidas según el usuario
+        chat_id_str = str(req.user) if req.user else ""
+        if chat_id_str == "215173956":
+            herramientas_usuario = herramientas_desarrollador
+            print("👨‍💻 Modo desarrollador habilitado para Cristian.")
+        else:
+            herramientas_usuario = herramientas_tecnico
+            print("🛠️ Modo consulta estándar habilitado para técnico.")
+
         # --- ARQUITECTURA FUTURA: ENRUTADOR (ROUTER) ---
         # Aquí determinaremos qué modelo usar. 
         # Ejemplo futuro: if req.model == "groq" or (es_solo_texto and quiere_velocidad):
@@ -112,7 +164,7 @@ async def chat_completions(req: ChatCompletionRequest):
             model = genai.GenerativeModel(
                 model_name=model_used, 
                 system_instruction=get_supervisor_prompt(req.user),
-                tools=herramientas
+                tools=herramientas_usuario
             )
             chat = model.start_chat(enable_automatic_function_calling=True)
             response = chat.send_message(mensaje_usuario)
@@ -134,7 +186,7 @@ async def chat_completions(req: ChatCompletionRequest):
                 model = genai.GenerativeModel(
                     model_name=model_used, 
                     system_instruction=get_supervisor_prompt(req.user),
-                    tools=herramientas
+                    tools=herramientas_usuario
                 )
                 chat = model.start_chat(enable_automatic_function_calling=True)
                 response = chat.send_message(mensaje_usuario)

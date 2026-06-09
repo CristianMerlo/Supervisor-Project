@@ -3,6 +3,8 @@ import urllib.parse
 
 def enviar_alerta(mensaje):
     """Envía un mensaje de alerta a Telegram a través del Userbot local."""
+    if "[Antigravity]" not in mensaje and "[Supervisor]" not in mensaje and "Antigravity" not in mensaje:
+        mensaje = f"[Antigravity] {mensaje}"
     url = "http://127.0.0.1:8088/notify"
     try:
         data = mensaje.encode("utf-8")

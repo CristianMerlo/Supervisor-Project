@@ -27,6 +27,19 @@ def inyectar_en_sabana(datos_extraidos, alertas_negocio, sheet_url):
         # Escribir Headers
         hoja_historial.append_row(["FECHA_REPORTE", "TICKET", "SIGLA", "TECNICO", "PPM_AGUA", "SHOTS", "ESTADO", "REPUESTOS"])
         
+    ticket_nuevo = str(datos_extraidos.get("ticket", "")).strip()
+    sigla_nueva = str(datos_extraidos.get("sigla", "")).strip()
+    
+    if ticket_nuevo and sigla_nueva:
+        try:
+            registros = hoja_historial.get_all_records()
+            for r in registros:
+                if str(r.get("TICKET", "")).strip() == ticket_nuevo and str(r.get("SIGLA", "")).strip() == sigla_nueva:
+                    print(f"[SKIP-DUPLICATE] El ticket {ticket_nuevo} para el local {sigla_nueva} ya existe en el Historial_Mantenimiento. Omitiendo.")
+                    return
+        except Exception as e_dup:
+            print(f"[WARN] Error comprobando duplicados en Historial_Mantenimiento: {e_dup}")
+
     fecha_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     fila_historial = [
         fecha_actual,

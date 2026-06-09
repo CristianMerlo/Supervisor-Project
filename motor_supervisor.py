@@ -53,10 +53,31 @@ def parser_hibrido(pdf_path):
         "repuestos": ""
     }
     
-    m_local = re.search(r"Local:\s*(.+?)\s*\((\w+)\)", texto)
+    m_local = re.search(r"Local:\s*(.+?)\s*\((.*?)\)", texto)
     if m_local:
         datos["local"] = m_local.group(1).strip()
         datos["sigla"] = m_local.group(2).strip()
+        
+    # Fallback lookup in local SQLite database if sigla is missing
+    if not datos["sigla"] and datos["local"]:
+        try:
+            import sqlite3
+            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "supervisor_local.db")
+            if os.path.exists(db_path):
+                conn = sqlite3.connect(db_path)
+                cursor = conn.cursor()
+                local_name_clean = datos["local"].lower().replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u").strip()
+                cursor.execute("SELECT sigla, nombre FROM locales")
+                for db_sigla, db_nombre in cursor.fetchall():
+                    db_nombre_clean = db_nombre.lower().replace("á", "a").replace("é", "e").replace("í", "i").replace("ó", "o").replace("ú", "u").strip()
+                    if local_name_clean == db_nombre_clean or local_name_clean in db_nombre_clean or db_nombre_clean in local_name_clean:
+                        datos["sigla"] = db_sigla
+                        datos["local"] = db_nombre
+                        print(f"   [Fallback DB] Resolved sigla '{db_sigla}' for local name '{datos['local']}'")
+                        break
+                conn.close()
+        except Exception as e_db:
+            print(f"   [!] Error performing fallback DB lookup: {e_db}")
         
     m_tecnico = re.search(r"Técnico:\s*(.+?)Ticket", texto)
     if m_tecnico:

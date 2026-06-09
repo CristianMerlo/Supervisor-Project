@@ -27,7 +27,7 @@ function doPost(e) {
     
     // 3. Search for the store folder containing the sigla
     let targetFolder = null;
-    let query = "title contains '" + sigla + "' and trashed = false";
+    let query = "name contains '" + sigla + "' and trashed = false";
     if (rootFolder) {
       query += " and '" + rootFolder.getId() + "' in parents";
     }
@@ -39,7 +39,7 @@ function doPost(e) {
     
     // Fallback: Search all of Drive for the sigla if not found under "Mostaza Locales"
     if (!targetFolder) {
-      const fallbackIterator = DriveApp.searchFolders("title contains '" + sigla + "' and trashed = false");
+      const fallbackIterator = DriveApp.searchFolders("name contains '" + sigla + "' and trashed = false");
       if (fallbackIterator.hasNext()) {
         targetFolder = fallbackIterator.next();
       }

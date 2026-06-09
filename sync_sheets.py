@@ -33,9 +33,9 @@ def sync_locales():
             if not sigla or sigla == "-":
                 continue
                 
-        nombre = row[4].strip()
-        direccion = f"{row[6].strip()}, {row[7].strip()}, {row[8].strip()}"
-        supervisor = row[3].strip()
+        nombre = row[6].strip()
+        direccion = f"{row[8].strip()}, {row[9].strip()}, {row[10].strip()}"
+        supervisor = row[4].strip()
         telefono = "N/A" # No está en la planilla
         
         # Upsert: Inserta o actualiza

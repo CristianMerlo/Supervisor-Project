@@ -118,7 +118,7 @@ os.makedirs(ENTRANTES_DIR, exist_ok=True)
 
 # Grupos a monitorear (exactamente como están en WhatsApp)
 GRUPOS = [
-    "Fichada ingreso - egreso",
+    # "Fichada ingreso - egreso",  # Suspendido temporalmente a pedido de Cristian
     "Equipo Mto. Franquicias",
     "Informes técnicos Diarios"
 ]

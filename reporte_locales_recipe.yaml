@@ -1,0 +1,7 @@
+name: "reporte_informes_drive"
+title: "Reporte de Informes en Google Drive"
+version: "1.0.0"
+description: "Analiza las carpetas de Drive para contar informes por local, enviando resumen por Telegram y detalle por Mail"
+instructions: |
+  Ejecuta el siguiente comando para generar y enviar el reporte de informes de Drive:
+  python3 /home/cristian/Documentos/Supervisor/generar_reporte_locales.py

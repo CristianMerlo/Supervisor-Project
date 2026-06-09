@@ -23,6 +23,10 @@ if not GEMINI_API_KEY or GEMINI_API_KEY == "ACA_VA_TU_CLAVE":
 else:
     genai.configure(api_key=GEMINI_API_KEY)
 
+# Estado global para fallback de clave de API (conmutación temporal por 10 minutos)
+use_backup_until = 0.0
+
+
 # Importar las herramientas para Function Calling
 from herramientas_hermes import (
     consultar_datos_maestros_local,
@@ -110,9 +114,33 @@ async def health():
     return {"status": "ok"}
 
 @app.post("/v1/chat/completions")
-async def chat_completions(req: ChatCompletionRequest):
+async def chat_completions(req: ChatCompletionRequest, request: Request):
+    global use_backup_until
+    
     if not GEMINI_API_KEY or GEMINI_API_KEY == "ACA_VA_TU_CLAVE":
         raise HTTPException(status_code=500, detail="Gemini API Key no configurada en el servidor.")
+        
+    # Extraer la clave nativa (si la hay) de la cabecera Authorization
+    native_key = None
+    auth_header = request.headers.get("Authorization")
+    if auth_header and auth_header.startswith("Bearer "):
+        parts = auth_header.split(" ")
+        if len(parts) > 1:
+            native_key = parts[1].strip()
+            
+    # La clave principal será la nativa (si viene en el header) o la de respaldo (si no hay nativa)
+    primary_key = native_key if native_key else GEMINI_API_KEY
+    
+    import time
+    current_time = time.time()
+    is_fallback_active = current_time < use_backup_until
+    
+    # Determinar qué clave usar de entrada
+    if is_fallback_active:
+        print("🔄 [FALLBACK] Modo de conmutación temporal activo. Usando clave de respaldo de Google AI Studio (backup).")
+        active_key = GEMINI_API_KEY
+    else:
+        active_key = primary_key
         
     try:
         # Extraer el mensaje del usuario
@@ -133,15 +161,15 @@ async def chat_completions(req: ChatCompletionRequest):
                             parts.append({
                                 "mime_type": f"audio/{audio_format}",
                                 "data": audio_bytes
-                            })
+                             })
                     mensaje_usuario = parts
                 break
                 
         if not mensaje_usuario:
             raise HTTPException(status_code=400, detail="No se encontró mensaje del usuario.")
-
+ 
         print(f"📩 Consulta entrante (ID: {req.user})")
-
+ 
         # Determinar las herramientas permitidas según el usuario
         chat_id_str = str(req.user) if req.user else ""
         if chat_id_str == "215173956":
@@ -150,50 +178,66 @@ async def chat_completions(req: ChatCompletionRequest):
         else:
             herramientas_usuario = herramientas_tecnico
             print("🛠️ Modo consulta estándar habilitado para técnico.")
-
-        # --- ARQUITECTURA FUTURA: ENRUTADOR (ROUTER) ---
-        # Aquí determinaremos qué modelo usar. 
-        # Ejemplo futuro: if req.model == "groq" or (es_solo_texto and quiere_velocidad):
-        #   return enviar_a_groq(...)
-        # -----------------------------------------------
-
-        # Generar respuesta con reintentos y fallback a gemini-1.5-flash para alta disponibilidad
+ 
+        # Generar respuesta con reintentos y fallback
         texto_respuesta = ""
         model_used = 'gemini-2.0-flash'
-        try:
+        
+        def run_generation(model_name, api_key_to_use):
+            genai.configure(api_key=api_key_to_use)
             model = genai.GenerativeModel(
-                model_name=model_used, 
+                model_name=model_name, 
                 system_instruction=get_supervisor_prompt(req.user),
                 tools=herramientas_usuario
             )
             chat = model.start_chat(enable_automatic_function_calling=True)
             response = chat.send_message(mensaje_usuario)
-            texto_respuesta = response.text
+            return response.text
+
+        try:
+            texto_respuesta = run_generation(model_used, active_key)
         except Exception as e:
             err_msg = str(e)
-            print(f"⚠️ Error con gemini-2.0-flash: {err_msg}")
+            print(f"⚠️ Error con {model_used} usando clave activa: {err_msg}")
             
-            # Si es un error de cuota (429) o de red, esperamos un momento y reintentamos o hacemos fallback
-            if "429" in err_msg or "quota" in err_msg.lower():
-                import time
-                print("⏳ Límite de cuota detectado. Esperando 3 segundos para reintentar con gemini-2.5-flash...")
-                time.sleep(3)
-            
-            # Fallback a gemini-2.5-flash
-            try:
-                model_used = 'gemini-2.5-flash'
-                print(f"🔄 Intentando fallback con {model_used}...")
-                model = genai.GenerativeModel(
-                    model_name=model_used, 
-                    system_instruction=get_supervisor_prompt(req.user),
-                    tools=herramientas_usuario
-                )
-                chat = model.start_chat(enable_automatic_function_calling=True)
-                response = chat.send_message(mensaje_usuario)
-                texto_respuesta = response.text
-            except Exception as e_fallback:
-                print(f"❌ Error también en fallback {model_used}: {str(e_fallback)}")
-                raise HTTPException(status_code=500, detail=f"Error en Gemini principal y fallback: {str(e_fallback)}")
+            # Si el error es de cuota agotada en la clave primaria (nativa)
+            # y NO estábamos usando ya la de respaldo:
+            if not is_fallback_active and active_key == native_key and ("429" in err_msg or "quota" in err_msg.lower() or "limit" in err_msg.lower()):
+                use_backup_until = time.time() + 600  # 10 minutos
+                print(f"⚠️ [FALLBACK] Límite de cuota detectado en clave nativa. Conmutando a clave de respaldo de Google AI Studio por 10 minutos.")
+                # Reintentamos con la clave de respaldo
+                try:
+                    texto_respuesta = run_generation(model_used, GEMINI_API_KEY)
+                except Exception as e_backup:
+                    print(f"❌ Error también con clave de respaldo en {model_used}: {e_backup}")
+                    # Si falla la de respaldo con gemini-2.0, intentamos con gemini-2.5-flash
+                    try:
+                        model_used = 'gemini-2.5-flash'
+                        print(f"🔄 Intentando con clave de respaldo y modelo {model_used}...")
+                        texto_respuesta = run_generation(model_used, GEMINI_API_KEY)
+                    except Exception as e_fallback_all:
+                        print(f"❌ Fallo absoluto en clave nativa, respaldo y modelos: {e_fallback_all}")
+                        raise HTTPException(status_code=500, detail=f"Fallo absoluto en clave nativa y de respaldo: {str(e_fallback_all)}")
+            else:
+                # Si ya estábamos usando la clave de respaldo o no fue un error de cuota,
+                # aplicamos el fallback normal del modelo (ej. probar con gemini-2.5-flash)
+                try:
+                    model_used = 'gemini-2.5-flash'
+                    print(f"🔄 Intentando fallback de modelo con {model_used} usando clave activa...")
+                    texto_respuesta = run_generation(model_used, active_key)
+                except Exception as e_model_fallback:
+                    print(f"❌ Error en fallback de modelo con clave activa: {e_model_fallback}")
+                    # Si falla y la clave activa era la nativa, y el error es de cuota:
+                    if not is_fallback_active and active_key == native_key and ("429" in str(e_model_fallback) or "quota" in str(e_model_fallback).lower() or "limit" in str(e_model_fallback).lower()):
+                        use_backup_until = time.time() + 600
+                        print(f"⚠️ [FALLBACK] Límite de cuota detectado en clave nativa durante fallback de modelo. Conmutando a clave de respaldo por 10 minutos.")
+                        try:
+                            texto_respuesta = run_generation('gemini-2.5-flash', GEMINI_API_KEY)
+                        except Exception as e_backup_fallback:
+                            print(f"❌ Error en clave de respaldo en fallback: {e_backup_fallback}")
+                            raise HTTPException(status_code=500, detail=f"Error en clave nativa y de respaldo: {str(e_backup_fallback)}")
+                    else:
+                        raise HTTPException(status_code=500, detail=f"Error en modelo principal y fallback: {str(e_model_fallback)}")
         
         print(f"🤖 Respuesta generada ({model_used}): {texto_respuesta[:100]}...")
         
@@ -223,6 +267,7 @@ async def chat_completions(req: ChatCompletionRequest):
     except Exception as e:
         print(f"❌ Error en Gemini: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     print("🚀 Levantando Antigravity Supervisor API en el puerto 8000...")

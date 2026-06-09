@@ -1,0 +1,6 @@
+name: "limpieza_imagenes"
+version: "1.0.0"
+description: "Ejecuta el script de limpieza de capturas de pantalla acumuladas y envía una notificación por Telegram"
+instructions: |
+  Ejecuta el siguiente comando en la terminal para limpiar las imágenes y notificar:
+  python3 /home/cristian/Documentos/Supervisor/limpiar_imagenes.py

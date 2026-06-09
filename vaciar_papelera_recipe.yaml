@@ -1,0 +1,6 @@
+name: "vaciar_papelera"
+version: "1.0.0"
+description: "Vacía por completo la papelera de reciclaje del sistema"
+instructions: |
+  Ejecuta el siguiente comando para vaciar la papelera de reciclaje:
+  gio trash --empty

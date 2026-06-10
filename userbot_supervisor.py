@@ -2,6 +2,7 @@ import os
 import sqlite3
 import sys
 import requests
+import asyncio
 from telethon import TelegramClient, events
 from dotenv import load_dotenv
 
@@ -108,7 +109,11 @@ async def notify_handler(request):
         
         if message:
             logging.info(f"[UPS ALERTA LOCAL] Enviando: {message}")
-            await client.send_message(MI_TELEGRAM_ID, f"🔌 [Supervisor UPS] {message}")
+            # Si ya contiene un tag de agente con formato unificado, lo enviamos directo
+            if any(tag in message for tag in ["[Hermes]", "[Goose]", "[Antigravity]"]):
+                await client.send_message(MI_TELEGRAM_ID, message)
+            else:
+                await client.send_message(MI_TELEGRAM_ID, f"🔌 [Supervisor UPS] {message}")
             return web.Response(text="Enviado con éxito\n")
         else:
             return web.Response(text="Mensaje vacío\n", status=400)
@@ -333,6 +338,21 @@ async def on_new_message(event):
             await event.respond(f"🧠 [Supervisor] {respuesta_ia}")
         return
 
+async def watchdog_loop():
+    logging.info("--- [WATCHDOG] Iniciando perro guardián de conexión Telegram ---")
+    while True:
+        await asyncio.sleep(300)  # Verificar cada 5 minutos
+        try:
+            if not client.is_connected():
+                logging.info("--- [WATCHDOG] Detectado: Cliente no conectado localmente. Forzando reinicio... ---")
+                os._exit(1)
+            # Ping ligero a Telegram
+            await client.get_me()
+            logging.info("[WATCHDOG] Conexión validada con éxito.")
+        except Exception as e:
+            logging.info(f"--- [WATCHDOG ERROR] Falló validación de conexión: {e}. Forzando reinicio... ---")
+            os._exit(1)
+
 async def main():
     global BOT_USER_ID
     logging.info("Iniciando conexión con Telegram MTProto...")
@@ -340,6 +360,9 @@ async def main():
     
     # Iniciar el servidor local de notificaciones
     await start_notification_server()
+    
+    # Iniciar el perro guardián de conexión
+    asyncio.create_task(watchdog_loop())
     
     try:
         me = await client.get_me()

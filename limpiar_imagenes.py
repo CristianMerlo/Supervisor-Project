@@ -44,7 +44,7 @@ def main():
     deleted_mb = deleted_bytes / (1024 * 1024)
     
     mensaje = (
-        f"[Supervisor] Limpieza semanal de capturas completada.\n"
+        f"🪿 *[Goose] Limpieza semanal de capturas completada.*\n"
         f"Se enviaron {deleted_count} capturas de pantalla a la papelera del sistema.\n"
         f"Espacio total enviado a papelera: {deleted_mb:.2f} MB.\n"
         f"Nota: Los archivos permanecerán en la papelera por un mes antes de ser borrados definitivamente."

@@ -278,6 +278,10 @@ def main():
         folder_name = folder['name']
         folder_id = folder['id']
         
+        # Ignorar la carpeta de la bandeja de entrada
+        if folder_name == "001_Bandeja_de_Entrada":
+            continue
+            
         # Extraer sigla
         m = re.match(r"^\[(.*?)\]", folder_name)
         if m:
@@ -418,7 +422,7 @@ def main():
         sin_inf_str += f" y {len(sin_inf_siglas)-10} más"
         
     mensaje_telegram = (
-        f"📊 *[Supervisor] Resumen de Informes en Google Drive*\n\n"
+        f"🧠 *[Hermes] Resumen de Informes en Google Drive*\n\n"
         f"• *Total de informes*: {total_informes}\n"
         f"• *Locales con informes*: {locales_con_informes}\n"
         f"• *Locales sin informes*: {locales_sin_informes}\n\n"

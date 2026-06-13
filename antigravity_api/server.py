@@ -320,6 +320,72 @@ async def transcribe_image(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+def extraer_frame_de_video(video_path):
+    import cv2
+    import base64
+    
+    cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        raise Exception("No se pudo abrir el archivo de video.")
+        
+    total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+    # Seleccionar el frame medio
+    middle_frame = total_frames // 2 if total_frames > 0 else 0
+    
+    cap.set(cv2.CAP_PROP_POS_FRAMES, middle_frame)
+    ret, frame = cap.read()
+    cap.release()
+    
+    if not ret:
+        raise Exception("No se pudo leer el frame del video.")
+        
+    _, buffer = cv2.imencode('.jpg', frame)
+    jpg_as_text = base64.b64encode(buffer).decode('utf-8')
+    return jpg_as_text
+
+
+def analizar_frame_con_groq(image_b64, prompt):
+    groq_key = os.getenv("GROQ_API_KEY")
+    if not groq_key:
+        raise Exception("GROQ_API_KEY no configurada en .env")
+        
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {groq_key}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": "llama-3.2-11b-vision-preview",
+        "messages": [
+            {
+                "role": "user",
+                "content": [
+                    {"type": "text", "text": prompt},
+                    {
+                        "type": "image_url",
+                        "image_url": {
+                            "url": f"data:image/jpeg;base64,{image_b64}"
+                        }
+                    }
+                ]
+            }
+        ],
+        "temperature": 0.2
+    }
+    
+    import requests
+    res = requests.post(url, headers=headers, json=payload, timeout=30)
+    if res.status_code == 200:
+        return res.json()["choices"][0]["message"]["content"]
+    else:
+        payload["model"] = "llama-3.2-90b-vision-preview"
+        res = requests.post(url, headers=headers, json=payload, timeout=30)
+        if res.status_code == 200:
+            return res.json()["choices"][0]["message"]["content"]
+        else:
+            raise Exception(f"Fallo en Groq Vision: {res.text}")
+
+
 def generar_diagnostico_groq(prompt_final):
     groq_key = os.getenv("GROQ_API_KEY")
     if not groq_key:
@@ -355,9 +421,7 @@ def generar_diagnostico_groq(prompt_final):
 @app.post("/v1/analyze_video")
 async def analyze_video(file: UploadFile = File(...)):
     global use_backup_until
-    if not GEMINI_API_KEY or GEMINI_API_KEY == "ACA_VA_TU_CLAVE":
-        raise HTTPException(status_code=500, detail="Gemini API Key no configurada en el servidor.")
-        
+    
     import tempfile
     import json
     import time
@@ -378,51 +442,74 @@ async def analyze_video(file: UploadFile = File(...)):
             
         print(f"🔄 Video guardado temporalmente en: {temp_path} ({len(content)} bytes)")
         
-        # 2. Configurar Gemini
-        current_time = time.time()
-        is_fallback_active = current_time < use_backup_until
-        active_key = GEMINI_API_KEY
-        
-        genai.configure(api_key=active_key)
-        
-        # 3. Subir el archivo usando la API de archivos
-        print(f"📤 Subiendo video {file.filename} a los servidores de Gemini...")
-        file_ref = genai.upload_file(path=temp_path)
-        
-        # 4. Esperar el procesamiento del archivo
-        print(f"⏳ Esperando procesamiento del archivo {file_ref.name}...")
-        while file_ref.state.name == "PROCESSING":
-            time.sleep(2)
-            file_ref = genai.get_file(file_ref.name)
-            
-        if file_ref.state.name == "FAILED":
-            raise Exception("El procesamiento del video en Gemini falló.")
-            
-        print("✅ Archivo procesado y listo en Gemini.")
+        # 2. Configurar y subir a Gemini (con fallback si falla)
+        usar_gemini = False
+        if GEMINI_API_KEY and GEMINI_API_KEY != "ACA_VA_TU_CLAVE":
+            try:
+                current_time = time.time()
+                is_fallback_active = current_time < use_backup_until
+                active_key = GEMINI_API_KEY
+                
+                genai.configure(api_key=active_key)
+                
+                # 3. Subir el archivo usando la API de archivos
+                print(f"📤 Subiendo video {file.filename} a los servidores de Gemini...")
+                file_ref = genai.upload_file(path=temp_path)
+                
+                # 4. Esperar el procesamiento del archivo
+                print(f"⏳ Esperando procesamiento del archivo {file_ref.name}...")
+                while file_ref.state.name == "PROCESSING":
+                    time.sleep(2)
+                    file_ref = genai.get_file(file_ref.name)
+                    
+                if file_ref.state.name == "FAILED":
+                    raise Exception("El procesamiento del video en Gemini falló.")
+                
+                print("✅ Archivo procesado y listo en Gemini.")
+                usar_gemini = True
+            except Exception as e_upload:
+                print(f"⚠️ Falló la carga en Gemini o límites excedidos: {e_upload}. Se usará Groq Vision.")
         
         # 5. Generar análisis visual inicial
-        model_name = "gemini-2.0-flash"
         analysis_prompt = (
-            "Analiza este video de una máquina comercial (cafetera, molino, etc.) mostrando una falla o un código de error. "
+            "Analiza esta imagen (un frame extraído de un video de falla técnica) de una máquina comercial (cafetera, molino, etc.) mostrando una falla o un código de error. "
             "Identifica el tipo de máquina, la marca/modelo si es posible, y describe el problema o código de error visualizado. "
             "Responde en un formato JSON estructurado con las siguientes claves y valores en español: "
             "\"tipo_equipo\": \"...\", \"marca\": \"...\", \"modelo\": \"...\", \"error_detectado\": \"...\", \"descripcion_falla\": \"...\""
         )
         
-        try:
-            print(f"🤖 Consultando análisis visual a {model_name}...")
-            model = genai.GenerativeModel(model_name=model_name)
-            response = model.generate_content([file_ref, analysis_prompt])
-            analysis_text = response.text
-        except Exception as e:
-            if "429" in str(e) or "quota" in str(e).lower() or "limit" in str(e).lower():
-                model_name = "gemini-2.5-flash"
-                print(f"🔄 [FALLBACK] Límite de cuota en gemini-2.0-flash. Reintentando análisis con {model_name}...")
+        analysis_text = None
+        model_name = "gemini-2.0-flash"
+        
+        if usar_gemini:
+            try:
+                print(f"🤖 Consultando análisis visual a {model_name}...")
                 model = genai.GenerativeModel(model_name=model_name)
                 response = model.generate_content([file_ref, analysis_prompt])
                 analysis_text = response.text
-            else:
-                raise e
+            except Exception as e:
+                if "429" in str(e) or "quota" in str(e).lower() or "limit" in str(e).lower():
+                    try:
+                        model_name = "gemini-2.5-flash"
+                        print(f"🔄 [FALLBACK] Límite de cuota en gemini-2.0-flash. Reintentando análisis con {model_name}...")
+                        model = genai.GenerativeModel(model_name=model_name)
+                        response = model.generate_content([file_ref, analysis_prompt])
+                        analysis_text = response.text
+                    except Exception as e2:
+                        print(f"⚠️ Cuota de Gemini agotada para análisis visual: {e2}. Iniciando fallback con Groq Vision...")
+                else:
+                    print(f"⚠️ Error en Gemini: {e}. Iniciando fallback con Groq Vision...")
+        
+        if not analysis_text:
+            # Fallback con Groq Vision
+            try:
+                print("🎬 Extrayendo frame del video local...")
+                image_b64 = extraer_frame_de_video(temp_path)
+                print("🤖 Consultando análisis visual a Groq Vision (Llama-3.2)...")
+                analysis_text = analizar_frame_con_groq(image_b64, analysis_prompt)
+            except Exception as groq_err:
+                print(f"❌ Falló también en Groq Vision: {groq_err}")
+                raise groq_err
                 
         print(f"Resultado análisis visual: {analysis_text[:200]}...")
         

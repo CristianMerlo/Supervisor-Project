@@ -320,6 +320,131 @@ async def transcribe_image(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@app.post("/v1/analyze_video")
+async def analyze_video(file: UploadFile = File(...)):
+    global use_backup_until
+    if not GEMINI_API_KEY or GEMINI_API_KEY == "ACA_VA_TU_CLAVE":
+        raise HTTPException(status_code=500, detail="Gemini API Key no configurada en el servidor.")
+        
+    import tempfile
+    import json
+    import time
+    
+    temp_path = None
+    file_ref = None
+    
+    try:
+        content = await file.read()
+        suffix = os.path.splitext(file.filename)[1] if file.filename else ".mp4"
+        if not suffix:
+            suffix = ".mp4"
+            
+        # 1. Guardar localmente de forma temporal
+        with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+            tmp.write(content)
+            temp_path = tmp.name
+            
+        print(f"🔄 Video guardado temporalmente en: {temp_path} ({len(content)} bytes)")
+        
+        # 2. Configurar Gemini
+        current_time = time.time()
+        is_fallback_active = current_time < use_backup_until
+        active_key = GEMINI_API_KEY
+        
+        genai.configure(api_key=active_key)
+        
+        # 3. Subir el archivo usando la API de archivos
+        print(f"📤 Subiendo video {file.filename} a los servidores de Gemini...")
+        file_ref = genai.upload_file(path=temp_path)
+        
+        # 4. Esperar el procesamiento del archivo
+        print(f"⏳ Esperando procesamiento del archivo {file_ref.name}...")
+        while file_ref.state.name == "PROCESSING":
+            time.sleep(2)
+            file_ref = genai.get_file(file_ref.name)
+            
+        if file_ref.state.name == "FAILED":
+            raise Exception("El procesamiento del video en Gemini falló.")
+            
+        print("✅ Archivo procesado y listo en Gemini.")
+        
+        # 5. Generar análisis visual inicial
+        model = genai.GenerativeModel(model_name="gemini-2.0-flash")
+        analysis_prompt = (
+            "Analiza este video de una máquina comercial (cafetera, molino, etc.) mostrando una falla o un código de error. "
+            "Identifica el tipo de máquina, la marca/modelo si es posible, y describe el problema o código de error visualizado. "
+            "Responde en un formato JSON estructurado con las siguientes claves y valores en español: "
+            "\"tipo_equipo\": \"...\", \"marca\": \"...\", \"modelo\": \"...\", \"error_detectado\": \"...\", \"descripcion_falla\": \"...\""
+        )
+        
+        print("🤖 Consultando análisis visual a Gemini-2.0-flash...")
+        response = model.generate_content([file_ref, analysis_prompt])
+        analysis_text = response.text
+        print(f"Resultado análisis visual: {analysis_text[:200]}...")
+        
+        # Parsear JSON
+        try:
+            clean_text = analysis_text.strip()
+            if "```json" in clean_text:
+                clean_text = clean_text.split("```json")[1].split("```")[0]
+            elif "```" in clean_text:
+                clean_text = clean_text.split("```")[1].split("```")[0]
+            data = json.loads(clean_text.strip())
+        except Exception as json_err:
+            print(f"⚠️ No se pudo parsear el resultado como JSON: {json_err}. Usando fallback.")
+            data = {
+                "tipo_equipo": "Equipamiento comercial",
+                "marca": "",
+                "modelo": "",
+                "error_detectado": "Falla visual",
+                "descripcion_falla": analysis_text
+            }
+            
+        # 6. Consultar base de conocimiento (RAG)
+        query_parts = [data.get("marca"), data.get("modelo"), data.get("error_detectado")]
+        query_str = " ".join([p for p in query_parts if p])
+        print(f"🔍 Buscando manuales para: '{query_str}'...")
+        rag_response = consultar_brain_hermes(query=query_str.strip())
+        
+        # 7. Generar diagnóstico integrado
+        prompt_final = (
+            f"Como el Agente Supervisor (con la identidad de 🧠 [Hermes]), responde de manera profesional y resolutiva al técnico. "
+            f"Combina el siguiente análisis visual del video:\n"
+            f"- Tipo de equipo: {data.get('tipo_equipo')}\n"
+            f"- Marca y modelo: {data.get('marca')} {data.get('modelo')}\n"
+            f"- Error/Síntoma detectado: {data.get('error_detectado')}\n"
+            f"- Descripción visual de la falla: {data.get('descripcion_falla')}\n\n"
+            f"Con la información técnica extraída de nuestra base de conocimiento:\n"
+            f"{rag_response}\n\n"
+            f"Por favor, genera un diagnóstico integrado en español redactado en un tono técnico, estructurado en Markdown, "
+            f"que empiece con el prefijo '🧠 [Hermes]' y enumere detalladamente los pasos de reparación recomendados."
+        )
+        
+        print("🤖 Generando diagnóstico final integrado...")
+        response_final = model.generate_content(prompt_final)
+        print("✅ Diagnóstico completado.")
+        
+        return {"diagnosis": response_final.text}
+        
+    except Exception as e:
+        print(f"❌ Error en análisis de video: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+        
+    finally:
+        # 8. Limpiar recursos
+        if file_ref:
+            try:
+                print(f"🧹 Eliminando archivo temporal en Gemini: {file_ref.name}")
+                genai.delete_file(file_ref.name)
+            except Exception as e_del:
+                print(f"Error eliminando archivo en Gemini: {e_del}")
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+            except Exception as e_unl:
+                print(f"Error eliminando archivo local temporal: {e_unl}")
+
+
 if __name__ == "__main__":
     print("🚀 Levantando Antigravity Supervisor API en el puerto 8000...")
     uvicorn.run(app, host="0.0.0.0", port=8000)

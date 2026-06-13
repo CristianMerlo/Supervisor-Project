@@ -151,6 +151,39 @@ def transcribir_y_guardar_imagen(image_path, md_path):
     except Exception as e:
         print(f"❌ Error transcribiendo imagen en segundo plano: {e}")
 
+def procesar_y_diagnosticar_video(file_id, file_name, chat_id):
+    temp_path = os.path.join("/tmp/tg_videos_temp", file_name)
+    os.makedirs(os.path.dirname(temp_path), exist_ok=True)
+    
+    try:
+        success = descargar_documento_telegram(file_id, temp_path)
+        if not success:
+            responder_a_telegram(chat_id, "⚠️ No se pudo descargar el video para su análisis. Reintenta.")
+            return
+            
+        print(f"🎬 Enviando video a la API local de diagnóstico...")
+        import requests
+        with open(temp_path, "rb") as f:
+            files = {"file": (file_name, f, "video/mp4")}
+            res = requests.post("http://localhost:8000/v1/analyze_video", files=files, timeout=180)
+            
+        if res.status_code == 200:
+            diagnosis = res.json().get("diagnosis", "No se obtuvo diagnóstico.")
+            responder_a_telegram(chat_id, diagnosis)
+        else:
+            print(f"Error en endpoint /v1/analyze_video: {res.text}")
+            responder_a_telegram(chat_id, f"⚠️ Lo siento, ocurrió un error en los servidores al procesar tu video (código {res.status_code}).")
+            
+    except Exception as e:
+        print(f"Error procesando video en segundo plano: {e}")
+        responder_a_telegram(chat_id, "⚠️ Ocurrió un error inesperado al analizar el video.")
+    finally:
+        if os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+            except:
+                pass
+
 ALLOWED_CHAT_IDS = os.getenv("ALLOWED_CHAT_IDS", "").split(",")
 
 @app.route("/webhook", methods=["POST"])
@@ -256,6 +289,32 @@ def webhook():
             else:
                 responder_a_telegram(chat_id, "⚠️ Ocurrió un error al intentar mover los archivos del lote.")
             return jsonify({"status": "ok"}), 200
+
+    # Soporte de Videos (Análisis de fallas en video)
+    is_video_msg = "video" in datos["message"]
+    is_video_doc = False
+    if "document" in datos["message"]:
+        doc = datos["message"]["document"]
+        mime = doc.get("mime_type", "")
+        f_name = doc.get("file_name", "")
+        is_video_doc = mime.startswith("video/") or f_name.lower().endswith(('.mp4', '.mov', '.avi', '.3gp', '.webm', '.mkv'))
+        
+    if is_video_msg or is_video_doc:
+        if is_video_msg:
+            vid = datos["message"]["video"]
+            file_id = vid["file_id"]
+            file_name = vid.get("file_name", f"video_{file_id[-8:]}.mp4")
+            if not file_name.lower().endswith(('.mp4', '.mov', '.avi', '.3gp', '.webm', '.mkv')):
+                file_name += ".mp4"
+        else:
+            doc = datos["message"]["document"]
+            file_id = doc["file_id"]
+            file_name = doc.get("file_name", f"video_{file_id[-8:]}.mp4")
+            
+        responder_a_telegram(chat_id, "🛠️ He recibido tu video. Estoy descargándolo y analizándolo con el Supervisor, aguarda un momento...")
+        hilo = threading.Thread(target=procesar_y_diagnosticar_video, args=(file_id, file_name, chat_id))
+        hilo.start()
+        return jsonify({"status": "ok"}), 200
 
     # Soporte de Fotos (Imágenes de Telegram comprimidas)
     is_photo = "photo" in datos["message"]

@@ -323,6 +323,61 @@ async def on_new_message(event):
                 await event.respond("⚠️ Ocurrió un error al intentar mover los archivos del lote.")
             return
 
+    # Soporte de Videos (Análisis de fallas en video)
+    is_video = (event.message.video is not None) or (event.message.media and hasattr(event.message.media, 'document') and (event.message.media.document.mime_type or "").startswith("video/"))
+    if is_video:
+        file_name = f"video_{event.message.id}.mp4"
+        for attr in event.message.media.document.attributes:
+            if hasattr(attr, 'file_name'):
+                file_name = attr.file_name
+                break
+        if not file_name.lower().endswith(('.mp4', '.mov', '.avi', '.3gp', '.webm', '.mkv')):
+            file_name += ".mp4"
+            
+        temp_dir = "/tmp/tg_videos_temp"
+        os.makedirs(temp_dir, exist_ok=True)
+        dest_path = os.path.join(temp_dir, file_name)
+        
+        msg_espera = await event.respond("🛠️ [Supervisor] He recibido tu video. Estoy descargándolo y analizándolo, por favor aguarda...")
+        
+        async def procesar_video_async():
+            print("🎬 Iniciando procesar_video_async...", flush=True)
+            try:
+                archivo = await event.message.download_media(file=dest_path)
+                if not archivo:
+                    print("❌ download_media no devolvió archivo", flush=True)
+                    await msg_espera.edit("⚠️ No se pudo descargar el video para su análisis.")
+                    return
+                
+                print(f"🎬 Video descargado en: {dest_path}, enviando a API...", flush=True)
+                import requests
+                with open(dest_path, "rb") as f:
+                    files = {"file": (file_name, f, "video/mp4")}
+                    res = requests.post("http://localhost:8000/v1/analyze_video", files=files, timeout=180)
+                    
+                print(f"🎬 API respondió con código: {res.status_code}", flush=True)
+                if res.status_code == 200:
+                    diagnosis = res.json().get("diagnosis", "No se obtuvo diagnóstico.")
+                    await msg_espera.delete()
+                    await event.respond(diagnosis)
+                else:
+                    await msg_espera.edit(f"⚠️ Ocurrió un error en los servidores al procesar tu video (código {res.status_code}).")
+            except Exception as e:
+                import traceback
+                print(f"❌ Excepción en procesar_video_async: {e}", flush=True)
+                traceback.print_exc()
+                logging.info(f"Error procesando video en userbot: {e}")
+                await msg_espera.edit("⚠️ Ocurrió un error inesperado al analizar el video.")
+            finally:
+                if os.path.exists(dest_path):
+                    try:
+                        os.unlink(dest_path)
+                    except:
+                        pass
+                        
+        asyncio.create_task(procesar_video_async())
+        return
+
     # Soporte de Fotos e Imágenes
     is_photo = event.message.photo is not None
     is_doc = event.message.media and hasattr(event.message.media, 'document') and not event.message.voice

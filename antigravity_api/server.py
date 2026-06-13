@@ -355,7 +355,7 @@ def analizar_frame_con_groq(image_b64, prompt):
         "Content-Type": "application/json"
     }
     payload = {
-        "model": "llama-3.2-11b-vision-preview",
+        "model": "llama-3.2-11b-vision-instant",
         "messages": [
             {
                 "role": "user",
@@ -378,7 +378,7 @@ def analizar_frame_con_groq(image_b64, prompt):
     if res.status_code == 200:
         return res.json()["choices"][0]["message"]["content"]
     else:
-        payload["model"] = "llama-3.2-90b-vision-preview"
+        payload["model"] = "llama-3.2-90b-vision-instant"
         res = requests.post(url, headers=headers, json=payload, timeout=30)
         if res.status_code == 200:
             return res.json()["choices"][0]["message"]["content"]

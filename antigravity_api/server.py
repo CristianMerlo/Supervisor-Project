@@ -369,7 +369,7 @@ async def analyze_video(file: UploadFile = File(...)):
         print("✅ Archivo procesado y listo en Gemini.")
         
         # 5. Generar análisis visual inicial
-        model = genai.GenerativeModel(model_name="gemini-2.0-flash")
+        model_name = "gemini-2.0-flash"
         analysis_prompt = (
             "Analiza este video de una máquina comercial (cafetera, molino, etc.) mostrando una falla o un código de error. "
             "Identifica el tipo de máquina, la marca/modelo si es posible, y describe el problema o código de error visualizado. "
@@ -377,9 +377,21 @@ async def analyze_video(file: UploadFile = File(...)):
             "\"tipo_equipo\": \"...\", \"marca\": \"...\", \"modelo\": \"...\", \"error_detectado\": \"...\", \"descripcion_falla\": \"...\""
         )
         
-        print("🤖 Consultando análisis visual a Gemini-2.0-flash...")
-        response = model.generate_content([file_ref, analysis_prompt])
-        analysis_text = response.text
+        try:
+            print(f"🤖 Consultando análisis visual a {model_name}...")
+            model = genai.GenerativeModel(model_name=model_name)
+            response = model.generate_content([file_ref, analysis_prompt])
+            analysis_text = response.text
+        except Exception as e:
+            if "429" in str(e) or "quota" in str(e).lower() or "limit" in str(e).lower():
+                model_name = "gemini-2.5-flash"
+                print(f"🔄 [FALLBACK] Límite de cuota en gemini-2.0-flash. Reintentando análisis con {model_name}...")
+                model = genai.GenerativeModel(model_name=model_name)
+                response = model.generate_content([file_ref, analysis_prompt])
+                analysis_text = response.text
+            else:
+                raise e
+                
         print(f"Resultado análisis visual: {analysis_text[:200]}...")
         
         # Parsear JSON
@@ -420,10 +432,20 @@ async def analyze_video(file: UploadFile = File(...)):
             f"que empiece con el prefijo '🧠 [Hermes]' y enumere detalladamente los pasos de reparación recomendados."
         )
         
-        print("🤖 Generando diagnóstico final integrado...")
-        response_final = model.generate_content(prompt_final)
+        try:
+            print(f"🤖 Generando diagnóstico final integrado con {model_name}...")
+            model = genai.GenerativeModel(model_name=model_name)
+            response_final = model.generate_content(prompt_final)
+        except Exception as e:
+            if model_name == "gemini-2.0-flash" and ("429" in str(e) or "quota" in str(e).lower() or "limit" in str(e).lower()):
+                model_name = "gemini-2.5-flash"
+                print(f"🔄 [FALLBACK] Límite de cuota en diagnóstico. Reintentando con {model_name}...")
+                model = genai.GenerativeModel(model_name=model_name)
+                response_final = model.generate_content(prompt_final)
+            else:
+                raise e
+                
         print("✅ Diagnóstico completado.")
-        
         return {"diagnosis": response_final.text}
         
     except Exception as e:

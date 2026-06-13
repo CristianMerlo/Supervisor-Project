@@ -238,7 +238,7 @@ def obtener_estado_servicios(servicio: str = None) -> str:
         return f"Error consultando los servicios de Linux: {str(e)}"
 
 def consultar_archivos_google_drive(nombre_carpeta_o_archivo: str = None) -> str:
-    """Lista o busca archivos y carpetas en el Google Drive asociado al Supervisor."""
+    """Lista, busca o cuenta archivos y carpetas en el Google Drive asociado al Supervisor (carpeta raíz 'Mostaza Locales')."""
     print(f"[TOOL-CALL] consultar_archivos_google_drive con argumento: '{nombre_carpeta_o_archivo}'", flush=True)
     try:
         from googleapiclient.discovery import build
@@ -252,22 +252,119 @@ def consultar_archivos_google_drive(nombre_carpeta_o_archivo: str = None) -> str
         creds = Credentials.from_service_account_file(str(ruta_credenciales), scopes=['https://www.googleapis.com/auth/drive'])
         servicio = build('drive', 'v3', credentials=creds)
         
-        if nombre_carpeta_o_archivo:
-            query = f"name contains '{nombre_carpeta_o_archivo}' and trashed = false"
-        else:
-            query = "trashed = false"
-            
-        resultados = servicio.files().list(q=query, spaces='drive', fields='files(id, name, mimeType, parents)', pageSize=30).execute()
-        archivos = resultados.get('files', [])
+        MOSTAZA_LOCALES_FOLDER_ID = "1iOGWgu04vtGRv2QBpmxhT5b5NROkJHR8"
         
-        if not archivos:
-            return "No se encontraron archivos o carpetas con ese nombre en Drive."
+        # Función auxiliar para contar PDFs en una carpeta y su subcarpeta "Reportes"
+        def contar_pdfs(folder_id):
+            query_sub = f"mimeType='application/vnd.google-apps.folder' and '{folder_id}' in parents and name = 'Reportes' and trashed = false"
+            try:
+                res_sub = servicio.files().list(q=query_sub, fields='files(id)').execute()
+                subs = res_sub.get('files', [])
+            except Exception:
+                subs = []
+                
+            parent_ids = [folder_id]
+            if subs:
+                parent_ids.append(subs[0]['id'])
+                
+            total_pdfs = 0
+            for pid in parent_ids:
+                query_files = f"mimeType='application/pdf' and '{pid}' in parents and trashed = false"
+                page_token = None
+                while True:
+                    try:
+                        res_files = servicio.files().list(
+                            q=query_files,
+                            fields='nextPageToken, files(id)',
+                            pageSize=100,
+                            pageToken=page_token
+                        ).execute()
+                        total_pdfs += len(res_files.get('files', []))
+                        page_token = res_files.get('nextPageToken')
+                        if not page_token:
+                            break
+                    except Exception:
+                        break
+            return total_pdfs
+
+        # Identificar si es una consulta general de conteo/resumen
+        es_resumen = False
+        if not nombre_carpeta_o_archivo:
+            es_resumen = True
+        else:
+            term_clean = nombre_carpeta_o_archivo.lower().strip()
+            if term_clean in ["total", "cantidad", "cuantos", "resumen", "todos", "informes", "archivos", "drive"]:
+                es_resumen = True
+                
+        if es_resumen:
+            # Recuperar todas las carpetas bajo "Mostaza Locales"
+            query_folders = f"mimeType='application/vnd.google-apps.folder' and '{MOSTAZA_LOCALES_FOLDER_ID}' in parents and trashed = false"
+            carpetas = []
+            page_token = None
+            while True:
+                res = servicio.files().list(q=query_folders, fields='nextPageToken, files(id, name)', pageSize=100, pageToken=page_token).execute()
+                carpetas.extend(res.get('files', []))
+                page_token = res.get('nextPageToken')
+                if not page_token:
+                    break
             
-        res = "Archivos encontrados en Google Drive:\n"
-        for a in archivos:
+            resumen_locales = []
+            total_global = 0
+            for f in carpetas:
+                if f['name'] == "001_Bandeja_de_Entrada":
+                    continue
+                cant = contar_pdfs(f['id'])
+                total_global += cant
+                resumen_locales.append((f['name'], cant))
+                
+            # Ordenar por cantidad
+            resumen_locales.sort(key=lambda x: x[1], reverse=True)
+            
+            respuesta = f"📊 **Resumen de Informes en Google Drive (Carpeta Raíz 'Mostaza Locales')**\n"
+            respuesta += f"• **Cantidad total de informes registrados (PDFs):** {total_global}\n\n"
+            respuesta += "📂 **Detalle por local (Top 15):**\n"
+            for name, cant in resumen_locales[:15]:
+                respuesta += f"- **{name}**: {cant} informes\n"
+            if len(resumen_locales) > 15:
+                respuesta += f"*(y {len(resumen_locales) - 15} locales más)*\n"
+            return respuesta
+            
+        # Si busca un archivo o carpeta específica
+        # Primero buscar si coincide con una sucursal/local en la carpeta raíz
+        query_sucursales = f"mimeType='application/vnd.google-apps.folder' and '{MOSTAZA_LOCALES_FOLDER_ID}' in parents and name contains '{nombre_carpeta_o_archivo}' and trashed = false"
+        res_suc = servicio.files().list(q=query_sucursales, fields='files(id, name)').execute()
+        sucursales_match = res_suc.get('files', [])
+        
+        if sucursales_match:
+            # Devolver conteo y detalles de las sucursales que coincidieron
+            respuesta = f"🔍 Coincidencias de locales encontradas para '{nombre_carpeta_o_archivo}':\n"
+            for s in sucursales_match:
+                cant = contar_pdfs(s['id'])
+                respuesta += f"- 📁 Local: **{s['name']}** (ID: {s['id']}) | **{cant}** informes PDF registrados.\n"
+            return respuesta
+            
+        # Búsqueda general de archivos por nombre en todo el Drive
+        query = f"name contains '{nombre_carpeta_o_archivo}' and trashed = false"
+        resultados = []
+        page_token = None
+        for _ in range(5): # Limitar a 5 páginas max (500 resultados)
+            res = servicio.files().list(q=query, spaces='drive', fields='nextPageToken, files(id, name, mimeType, parents)', pageSize=100, pageToken=page_token).execute()
+            resultados.extend(res.get('files', []))
+            page_token = res.get('nextPageToken')
+            if not page_token:
+                break
+                
+        if not resultados:
+            return f"No se encontraron archivos o carpetas con el término '{nombre_carpeta_o_archivo}' en Google Drive."
+            
+        res_str = f"Resultados de búsqueda para '{nombre_carpeta_o_archivo}' en Google Drive:\n"
+        for a in resultados[:50]: # Mostrar máximo 50
             tipo = "📁 Carpeta" if a.get('mimeType') == 'application/vnd.google-apps.folder' else "📄 Archivo"
-            res += f"- {tipo}: {a.get('name')} (ID: {a.get('id')})\n"
-        return res
+            res_str += f"- {tipo}: {a.get('name')} (ID: {a.get('id')})\n"
+        if len(resultados) > 50:
+            res_str += f"\n*(mostrando primeros 50 resultados de {len(resultados)} encontrados)*\n"
+        return res_str
+        
     except Exception as e:
         print(f"[TOOL-ERROR] Error en consultar_archivos_google_drive: {e}", flush=True)
         return f"Error consultando Google Drive: {str(e)}"
@@ -324,25 +421,32 @@ def consultar_brain_hermes(query: str = None) -> str:
         return "El cerebro (carpeta brain/) aún no contiene documentación."
         
     try:
-        files = [f for f in os.listdir(brain_dir) if f.endswith(".md")]
+        paths_to_search = [brain_dir, brain_dir / "manuales"]
+        files = []
+        for path in paths_to_search:
+            if path.exists():
+                for f in os.listdir(path):
+                    if f.endswith(".md"):
+                        rel_name = f if path == brain_dir else f"manuales/{f}"
+                        files.append((path / f, rel_name))
+                        
         if not files:
             return "No se encontraron manuales ni archivos Markdown en el cerebro."
             
         if not query:
-            return f"Archivos disponibles en el cerebro:\n" + "\n".join([f"- {f}" for f in files])
+            return f"Archivos disponibles en el cerebro:\n" + "\n".join([f"- {f[1]}" for f in files])
             
         # Buscar coincidencias en los títulos o contenido de los archivos
         matching_docs = []
-        for file in files:
-            file_path = brain_dir / file
+        for file_path, rel_name in files:
             with open(file_path, "r", encoding="utf-8") as f:
                 content = f.read()
-            if query.lower() in file.lower() or query.lower() in content.lower():
-                matching_docs.append((file, content[:3000])) # Devolver los primeros 3000 chars
+            if query.lower() in rel_name.lower() or query.lower() in content.lower():
+                matching_docs.append((rel_name, content[:3000])) # Devolver los primeros 3000 chars
                 
         if not matching_docs:
             # Si no hay match específico, listar qué archivos hay para guiar al bot
-            return f"No se encontró match específico para '{query}'. Manuales disponibles en el cerebro:\n" + "\n".join([f"- {f}" for f in files])
+            return f"No se encontró match específico para '{query}'. Manuales disponibles en el cerebro:\n" + "\n".join([f"- {f[1]}" for f in files])
             
         res = "Documentación encontrada en el Brain:\n"
         for doc_name, doc_content in matching_docs[:3]:

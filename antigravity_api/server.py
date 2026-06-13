@@ -1,7 +1,7 @@
 import os
 import uvicorn
 import google.generativeai as genai
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File
 from pydantic import BaseModel
 import base64
 from typing import List, Optional, Union, Dict, Any
@@ -84,29 +84,38 @@ class ChatCompletionRequest(BaseModel):
 def get_supervisor_prompt(chat_id: str = None):
     """Contexto maestro: Identidad Dual basada en el usuario"""
     
-    # Identidad 1: Asistente / Ingeniero (Para Cristian)
+    # Identidad 1: Enrutamiento Dinámico de Agentes (Para Cristian)
     if str(chat_id) == "215173956":
         return (
-            "Eres Antigravity, un Ingeniero de Software Senior y Asistente de IA personal de Cristian. "
-            "Tu objetivo es ayudarlo a administrar, desarrollar y optimizar el sistema 'Supervisor' y toda la "
-            "infraestructura relacionada. Tienes acceso completo a herramientas para leer y listar archivos del "
-            "servidor local, ejecutar consultas SQLite en 'supervisor_local.db', inspeccionar servicios de systemd, "
-            "obtener el resumen de carpetas de ingesta (entrantes, procesados, errores), ver logs recientes, "
-            "buscar archivos en Google Drive y leer cualquier pestaña de Google Sheets (La Sábana). "
-            "Úsalas para responder de forma técnica, precisa y con datos reales. Responde de forma analítica y profesional. "
-            "IMPORTANTE: Eres un modelo multimodal y tienes plena capacidad para recibir y entender notas de voz (archivos de audio). "
-            "Si recibes un audio, escúchalo con atención y responde la consulta que el usuario hace en él. "
-            "Usa Markdown para estructurar tus respuestas."
+            "Eres un sistema multiagente que asiste a Cristian en la supervisión de locales y mantenimiento. "
+            "Debes analizar la consulta de Cristian y adoptar OBLIGATORIAMENTE uno de los siguientes roles, "
+            "comenzando tu respuesta siempre con su prefijo y emoji correspondiente en la primera línea:\n\n"
+            "1. 🛠️ [Antigravity] (Desarrollo / DevOps / Infraestructura):\n"
+            "   - Cuándo adoptar: Si Cristian pregunta sobre el código de los scripts, logs recientes, estado del hardware (RAM, disco, CPU), "
+            "estado de los servicios de systemd o túneles de Porta/Cloudflare.\n"
+            "   - Firma en la primera línea: 🛠️ [Antigravity]\n\n"
+            "2. 🧠 [Hermes] (Operativo / Reportes / Sucursales):\n"
+            "   - Cuándo adoptar: Si Cristian pregunta sobre locales (ej. PPM de agua de una sucursal, datos maestros), actividad de técnicos "
+            "(check-ins, check-outs), reportes de mantenimiento guardados, viáticos o métricas de las sucursales.\n"
+            "   - Firma en la primera línea: 🧠 [Hermes]\n\n"
+            "3. 🪿 [Goose] (Mantenimiento de archivos / Limpieza):\n"
+            "   - Cuándo adoptar: Si Cristian pregunta sobre limpieza del disco, papelera del sistema, clasificar la bandeja de entrada o "
+            "el estado de las carpetas de ingesta (entrantes, procesados, errores).\n"
+            "   - Firma en la primera línea: 🪿 [Goose]\n\n"
+            "REGLAS DE TRANSPARENCIA:\n"
+            "- Debes firmar siempre con la identidad correcta en la primera línea (ej. '🧠 [Hermes]' o '🛠️ [Antigravity]' o '🪿 [Goose]'). No uses otra.\n"
+            "- Habla en primera persona como el agente seleccionado (ej: 'Como Hermes, he verificado que...' o 'Como Antigravity, el servidor...').\n"
+            "- Tienes acceso a herramientas avanzadas para consultar datos. Úsalas según corresponda y responde con precisión en Markdown.\n"
+            "- Eres un modelo multimodal y puedes entender notas de voz (archivos de audio). Si Cristian te habla por audio, clasifica su consulta igualmente y responde bajo el rol adecuado."
         )
     
     # Identidad 2: Supervisor de Mantenimiento (Para los Técnicos)
     return (
-        "Eres el Agente Supervisor, una IA diseñada para asistir a técnicos de mantenimiento "
-        "en campo de cafeteras comerciales e infraestructura. Responde de manera profesional, concisa "
-        "y resolutiva. NO digas que eres un bot genérico. "
-        "IMPORTANTE: Eres un modelo multimodal y tienes plena capacidad para recibir y entender notas de voz (archivos de audio). "
-        "Si recibes un audio, escúchalo con atención y responde la consulta que el usuario hace en él. "
-        "Usa Markdown para estructurar tus respuestas (negritas, viñetas)."
+        "Eres el Agente Supervisor (con la identidad de 🧠 [Hermes]), una IA diseñada para asistir a técnicos de mantenimiento "
+        "en campo de cafeteras comerciales e infraestructura. Responde de manera profesional, concisa y resolutiva.\n"
+        "Comienza tu respuesta siempre con el prefijo: 🧠 [Hermes]\n\n"
+        "IMPORTANTE: Eres un modelo multimodal y puedes recibir y entender notas de voz (archivos de audio). "
+        "Responde de forma clara y directa en Markdown (negritas, viñetas)."
     )
 
 @app.get("/health")
@@ -266,6 +275,48 @@ async def chat_completions(req: ChatCompletionRequest, request: Request):
         
     except Exception as e:
         print(f"❌ Error en Gemini: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+
+@app.post("/v1/transcribe")
+async def transcribe_image(file: UploadFile = File(...)):
+    global use_backup_until
+    if not GEMINI_API_KEY or GEMINI_API_KEY == "ACA_VA_TU_CLAVE":
+        raise HTTPException(status_code=500, detail="Gemini API Key no configurada en el servidor.")
+        
+    try:
+        content = await file.read()
+        mime_type = file.content_type or "image/jpeg"
+        
+        # Determinar si usar clave principal o fallback
+        import time
+        current_time = time.time()
+        is_fallback_active = current_time < use_backup_until
+        active_key = GEMINI_API_KEY
+        
+        genai.configure(api_key=active_key)
+        model = genai.GenerativeModel(model_name="gemini-2.0-flash")
+        
+        prompt = (
+            "Eres un experto en digitalización de manuales técnicos de cafeteras y equipamiento comercial. "
+            "Transcribe TODO el texto, tablas y estructura de esta imagen a un formato Markdown (.md) limpio, profesional y bien estructurado. "
+            "Si la imagen contiene diagramas, describe el diagrama en texto de forma técnica. "
+            "Devuelve ÚNICAMENTE el código Markdown resultante, sin bloques de código con triple comilla invertida (```markdown) "
+            "ni comentarios introductorios o explicativos. Es muy importante que no agregues explicaciones externas, solo la transcripción."
+        )
+        
+        image_part = {
+            "mime_type": mime_type,
+            "data": content
+        }
+        
+        print(f"🔄 Transcribiendo imagen ({len(content)} bytes, {mime_type}) con Gemini-2.0-flash...")
+        response = model.generate_content([image_part, prompt])
+        print(f"✅ Transcripción completada ({len(response.text)} caracteres)")
+        return {"markdown": response.text}
+    except Exception as e:
+        print(f"❌ Error en transcripción de imagen: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

@@ -3,6 +3,7 @@ import sqlite3
 import sys
 import requests
 import asyncio
+import threading
 from telethon import TelegramClient, events
 from dotenv import load_dotenv
 
@@ -10,6 +11,24 @@ import logging
 
 logging.basicConfig(filename='userbot.log', level=logging.INFO, 
                     format='%(asctime)s - %(message)s')
+
+def transcribir_y_guardar_imagen(image_path, md_path):
+    try:
+        with open(image_path, "rb") as img_file:
+            files = {"file": (os.path.basename(image_path), img_file, "image/jpeg")}
+            res = requests.post("http://localhost:8000/v1/transcribe", files=files, timeout=90)
+            if res.status_code == 200:
+                markdown_content = res.json().get("markdown", "")
+                if markdown_content:
+                    with open(md_path, "w", encoding="utf-8") as md_file:
+                        md_file.write(markdown_content)
+                    logging.info(f"✅ Transcripción guardada exitosamente en {md_path}")
+                else:
+                    logging.info("⚠️ La API de transcripción devolvió contenido vacío.")
+            else:
+                logging.info(f"❌ La API de transcripción devolvió status: {res.status_code}")
+    except Exception as e:
+        logging.info(f"❌ Error transcribiendo imagen en segundo plano: {e}")
 
 # Cargar variables de entorno
 load_dotenv()
@@ -39,7 +58,31 @@ client = TelegramClient('supervisor', API_ID, API_HASH)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 from pathlib import Path
 DIR_AUDIOS = Path("temp_audios")
-DIR_AUDIOS.mkdir(exist_ok=True)
+import json
+STATE_FILE = "/home/cristian/Documentos/Supervisor/telegram_bridge/bridge_state.json"
+
+def cargar_estado():
+    if os.path.exists(STATE_FILE):
+        try:
+            with open(STATE_FILE, "r") as f:
+                return json.load(f)
+        except Exception as e:
+            logging.info(f"Error cargando estado: {e}")
+    return {}
+
+def guardar_estado(estado):
+    try:
+        with open(STATE_FILE, "w") as f:
+            json.dump(estado, f)
+    except Exception as e:
+        logging.info(f"Error guardando estado: {e}")
+
+def limpiar_estado():
+    if os.path.exists(STATE_FILE):
+        try:
+            os.remove(STATE_FILE)
+        except Exception as e:
+            logging.info(f"Error eliminando estado: {e}")
 
 def transcribir_audio_groq(audio_path):
     if not GROQ_API_KEY:
@@ -192,8 +235,161 @@ async def on_new_message(event):
         return
 
     remitente_id = event.sender_id
+    chat_id_str = str(remitente_id)
     
-    mensaje = ""
+    # Cargar estado actual
+    estado = cargar_estado()
+
+    # Interceptar respuesta de texto si hay un flujo interactivo activo para este chat
+    mensaje = event.text.strip() if event.text else ""
+    
+    if estado.get("chat_id") == chat_id_str and mensaje:
+        status = estado.get("status")
+        files = estado.get("files", [])
+        
+        if status == "waiting_manual_confirm":
+            respuesta_clean = mensaje.lower().strip()
+            if respuesta_clean.startswith("s") or respuesta_clean in ["yes", "ok", "bueno", "dale"]:
+                # Cambiar de estado y pedir el nombre del equipo
+                estado["status"] = "waiting_equipment_name"
+                guardar_estado(estado)
+                await event.respond(f"☕ *¿Cómo le llaman regularmente a este equipo o máquina en el día a día?* (Ej: Cafetera Iberital, Molino Compak, Termotanque)\n\n*(Se aplicará a los {len(files)} archivos cargados)*")
+                return
+            elif respuesta_clean.startswith("n") or respuesta_clean in ["no", "cancelar", "cancela"]:
+                # Eliminar archivos temporales y limpiar estado
+                for f in files:
+                    temp_path = f.get("temp_path")
+                    if temp_path and os.path.exists(temp_path):
+                        try:
+                            os.remove(temp_path)
+                        except Exception:
+                            pass
+                limpiar_estado()
+                await event.respond(f"❌ Operación cancelada. Se descartó el lote de {len(files)} archivos.")
+                return
+            else:
+                nombres = ", ".join([f"`{f['file_name']}`" for f in files])
+                await event.respond(f"Por favor, responde con *Sí* o *No* para confirmar si el lote de archivos ({nombres}) son manuales.")
+                return
+                
+        elif status == "waiting_equipment_name":
+            equipo = mensaje.strip()
+            # Crear nombre seguro para el archivo
+            safe_equipo = "".join(c for c in equipo if c.isalnum() or c in " _-")
+            if not safe_equipo:
+                safe_equipo = "Equipo"
+            
+            # Directorio final
+            dest_dir = "/home/cristian/Documentos/Supervisor/brain/manuales"
+            os.makedirs(dest_dir, exist_ok=True)
+            
+            exitosos = []
+            fallidos = []
+            
+            for f in files:
+                f_name = f.get("file_name")
+                temp_path = f.get("temp_path")
+                nuevo_nombre = f"{safe_equipo} - {f_name}"
+                dest_path = os.path.join(dest_dir, nuevo_nombre)
+                
+                if temp_path and os.path.exists(temp_path):
+                    try:
+                        import shutil
+                        shutil.move(temp_path, dest_path)
+                        exitosos.append(f_name)
+                        
+                        # Si es una imagen, transcribirla a .md en segundo plano
+                        is_img = nuevo_nombre.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.bmp'))
+                        if is_img:
+                            nombre_sin_ext = os.path.splitext(dest_path)[0]
+                            md_dest_path = f"{nombre_sin_ext}.md"
+                            t = threading.Thread(target=transcribir_y_guardar_imagen, args=(dest_path, md_dest_path))
+                            t.start()
+                    except Exception as e:
+                        logging.info(f"Error moviendo archivo {f_name} en userbot: {e}")
+                        fallidos.append(f_name)
+                else:
+                    fallidos.append(f_name)
+                    
+            limpiar_estado()
+            
+            if exitosos:
+                archivos_str = "\n".join([f"• `{name}`" for name in exitosos])
+                msg = f"✅ *Manuales guardados y clasificados con éxito*:\n• *Equipo:* `{equipo}`\n• *Archivos clasificados:*\n{archivos_str}"
+                if fallidos:
+                    msg += f"\n\n⚠️ No se pudieron mover: {', '.join(fallidos)}"
+                await event.respond(msg)
+            else:
+                await event.respond("⚠️ Ocurrió un error al intentar mover los archivos del lote.")
+            return
+
+    # Soporte de Fotos e Imágenes
+    is_photo = event.message.photo is not None
+    is_doc = event.message.media and hasattr(event.message.media, 'document') and not event.message.voice
+    
+    if is_photo or is_doc:
+        if is_photo:
+            file_name = f"foto_{event.message.id}.jpg"
+        else:
+            file_name = "documento.bin"
+            for attr in event.message.media.document.attributes:
+                if hasattr(attr, 'file_name'):
+                    file_name = attr.file_name
+                    break
+                    
+            # Si es un reporte estándar de Mostaza
+            if file_name.upper().startswith("MTZ_") and file_name.upper().endswith(".PDF"):
+                dest_dir = "/home/cristian/Documentos/Supervisor/entrantes"
+                os.makedirs(dest_dir, exist_ok=True)
+                dest_path = os.path.join(dest_dir, file_name)
+                
+                # Descargar y guardar en entrantes/
+                await event.respond(f"📥 Descargando reporte `{file_name}`...")
+                archivo = await event.message.download_media(file=dest_path)
+                if archivo:
+                    await event.respond(f"📥 *Reporte PDF Recibido:* `{file_name}`.\nEntrando en cola de procesamiento...")
+                else:
+                    await event.respond(f"⚠️ Error al descargar el archivo `{file_name}`. Por favor, reintenta.")
+                return
+
+        # Es un manual potencial (documento no estándar o foto/imagen)
+        temp_dir = "/tmp/tg_manuals_temp"
+        os.makedirs(temp_dir, exist_ok=True)
+        dest_path = os.path.join(temp_dir, file_name)
+        
+        await event.respond(f"📥 Descargando archivo `{file_name}`...")
+        archivo = await event.message.download_media(file=dest_path)
+        if archivo:
+            is_image = is_photo or file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.bmp'))
+            tipo_desc = "la imagen" if is_image else "el documento"
+            
+            # Si ya hay un lote en curso esperando confirmación
+            if estado.get("chat_id") == chat_id_str and estado.get("status") == "waiting_manual_confirm":
+                if "files" not in estado:
+                    estado["files"] = []
+                estado["files"].append({
+                    "temp_path": dest_path,
+                    "file_name": file_name
+                })
+                guardar_estado(estado)
+                await event.respond(f"📥 Agregado `{file_name}` al lote actual (Total: {len(estado['files'])} archivos).\n¿Se trata de manuales técnicos para el sistema? Responde con *Sí* o *No*.")
+            else:
+                # Iniciar nuevo lote
+                nuevo_estado = {
+                    "chat_id": chat_id_str,
+                    "status": "waiting_manual_confirm",
+                    "files": [{
+                        "temp_path": dest_path,
+                        "file_name": file_name
+                    }]
+                }
+                guardar_estado(nuevo_estado)
+                await event.respond(f"📥 He recibido {tipo_desc} `{file_name}`.\n¿Se trata de un manual técnico para el sistema? Responde con *Sí* o *No*.")
+        else:
+            await event.respond(f"⚠️ Error al descargar el archivo `{file_name}`. Por favor, reintenta.")
+        return
+
+    # Soporte de Audio / Voice Notes
     if event.message.media and hasattr(event.message.media, 'document') and event.message.voice:
         logging.info("Descargando nota de voz...")
         archivo = await event.message.download_media(file=DIR_AUDIOS)
@@ -206,7 +402,7 @@ async def on_new_message(event):
             pass
     else:
         mensaje = event.text.strip() if event.text else ""
-
+        
     if not mensaje:
         return
         

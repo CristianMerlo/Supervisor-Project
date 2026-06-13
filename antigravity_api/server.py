@@ -320,6 +320,38 @@ async def transcribe_image(file: UploadFile = File(...)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+def generar_diagnostico_groq(prompt_final):
+    groq_key = os.getenv("GROQ_API_KEY")
+    if not groq_key:
+        raise Exception("GROQ_API_KEY no configurada en .env")
+        
+    url = "https://api.groq.com/openai/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {groq_key}",
+        "Content-Type": "application/json"
+    }
+    payload = {
+        "model": "llama3-70b-8192",
+        "messages": [
+            {"role": "user", "content": prompt_final}
+        ],
+        "temperature": 0.2
+    }
+    
+    import requests
+    res = requests.post(url, headers=headers, json=payload, timeout=30)
+    if res.status_code == 200:
+        return res.json()["choices"][0]["message"]["content"]
+    else:
+        # Retry with llama3-8b-8192
+        payload["model"] = "llama3-8b-8192"
+        res = requests.post(url, headers=headers, json=payload, timeout=30)
+        if res.status_code == 200:
+            return res.json()["choices"][0]["message"]["content"]
+        else:
+            raise Exception(f"Fallo en API de Groq: {res.text}")
+
+
 @app.post("/v1/analyze_video")
 async def analyze_video(file: UploadFile = File(...)):
     global use_backup_until
@@ -436,17 +468,46 @@ async def analyze_video(file: UploadFile = File(...)):
             print(f"🤖 Generando diagnóstico final integrado con {model_name}...")
             model = genai.GenerativeModel(model_name=model_name)
             response_final = model.generate_content(prompt_final)
+            diagnosis_text = response_final.text
         except Exception as e:
             if model_name == "gemini-2.0-flash" and ("429" in str(e) or "quota" in str(e).lower() or "limit" in str(e).lower()):
-                model_name = "gemini-2.5-flash"
-                print(f"🔄 [FALLBACK] Límite de cuota en diagnóstico. Reintentando con {model_name}...")
-                model = genai.GenerativeModel(model_name=model_name)
-                response_final = model.generate_content(prompt_final)
+                try:
+                    model_name = "gemini-2.5-flash"
+                    print(f"🔄 [FALLBACK] Límite de cuota en diagnóstico. Reintentando con {model_name}...")
+                    model = genai.GenerativeModel(model_name=model_name)
+                    response_final = model.generate_content(prompt_final)
+                    diagnosis_text = response_final.text
+                except Exception as e2:
+                    print(f"⚠️ Error también con {model_name}: {e2}. Intentando síntesis con Groq...")
+                    try:
+                        diagnosis_text = generar_diagnostico_groq(prompt_final)
+                    except Exception as groq_err:
+                        print(f"❌ Falló en Groq: {groq_err}. Usando formateo estructurado local.")
+                        diagnosis_text = (
+                            f"🧠 [Hermes] **Diagnóstico Técnico de Falla**\n\n"
+                            f"• **Tipo de Equipo:** {data.get('tipo_equipo', 'Desconocido')}\n"
+                            f"• **Marca/Modelo:** {data.get('marca', '')} {data.get('modelo', '')}\n"
+                            f"• **Falla Visual:** {data.get('error_detectado', 'Falla visual')}\n"
+                            f"• **Descripción:** {data.get('descripcion_falla', '')}\n\n"
+                            f"🔍 **Información Técnica Encontrada:**\n{rag_response}"
+                        )
             else:
-                raise e
+                print(f"⚠️ Error con {model_name}: {e}. Intentando síntesis con Groq...")
+                try:
+                    diagnosis_text = generar_diagnostico_groq(prompt_final)
+                except Exception as groq_err:
+                    print(f"❌ Falló en Groq: {groq_err}. Usando formateo estructurado local.")
+                    diagnosis_text = (
+                        f"🧠 [Hermes] **Diagnóstico Técnico de Falla**\n\n"
+                        f"• **Tipo de Equipo:** {data.get('tipo_equipo', 'Desconocido')}\n"
+                        f"• **Marca/Modelo:** {data.get('marca', '')} {data.get('modelo', '')}\n"
+                        f"• **Falla Visual:** {data.get('error_detectado', 'Falla visual')}\n"
+                        f"• **Descripción:** {data.get('descripcion_falla', '')}\n\n"
+                        f"🔍 **Información Técnica Encontrada:**\n{rag_response}"
+                    )
                 
         print("✅ Diagnóstico completado.")
-        return {"diagnosis": response_final.text}
+        return {"diagnosis": diagnosis_text}
         
     except Exception as e:
         print(f"❌ Error en análisis de video: {e}")

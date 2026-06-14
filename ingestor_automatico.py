@@ -151,6 +151,13 @@ def procesar_carpeta_entrantes():
                         repuestos=datos_extraidos.get("repuestos", ""),
                         fecha_reporte=datos_extraidos.get("fecha", None)
                     )
+                    
+                    # Sincronización en Tiempo Real a NotebookLM
+                    print(f"[NOTEBOOKLM] Iniciando actualización en la nube para {sigla}...")
+                    import subprocess
+                    script_nlm = str(Path(__file__).parent / "actualizar_notebook_local.py")
+                    subprocess.Popen(["python3", script_nlm, sigla])
+                    
                 except Exception as e_ficha:
                     print(f"[ORQUESTADOR] Error al actualizar ficha local de {sigla}: {e_ficha}")
             else:

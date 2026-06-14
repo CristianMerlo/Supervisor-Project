@@ -256,16 +256,11 @@ async def on_new_message(event):
                 await event.respond(f"☕ *¿Cómo le llaman regularmente a este equipo o máquina en el día a día?* (Ej: Cafetera Iberital, Molino Compak, Termotanque)\n\n*(Se aplicará a los {len(files)} archivos cargados)*")
                 return
             elif respuesta_clean.startswith("n") or respuesta_clean in ["no", "cancelar", "cancela"]:
-                # Eliminar archivos temporales y limpiar estado
-                for f in files:
-                    temp_path = f.get("temp_path")
-                    if temp_path and os.path.exists(temp_path):
-                        try:
-                            os.remove(temp_path)
-                        except Exception:
-                            pass
-                limpiar_estado()
-                await event.respond(f"❌ Operación cancelada. Se descartó el lote de {len(files)} archivos.")
+                # En lugar de cancelar, preguntamos si es un reporte de local
+                estado["status"] = "waiting_report_confirm"
+                guardar_estado(estado)
+                nombres = ", ".join([f"`{f['file_name']}`" for f in files])
+                await event.respond(f"📋 Los archivos ({nombres}) no son manuales.\n¿Se trata de un *Informe o Remito técnico* de un local? Responde con *Sí* o *No*.")
                 return
             else:
                 nombres = ", ".join([f"`{f['file_name']}`" for f in files])
@@ -321,6 +316,84 @@ async def on_new_message(event):
                 await event.respond(msg)
             else:
                 await event.respond("⚠️ Ocurrió un error al intentar mover los archivos del lote.")
+            return
+
+        elif status == "waiting_report_confirm":
+            respuesta_clean = mensaje.lower().strip()
+            if respuesta_clean.startswith("s") or respuesta_clean in ["yes", "ok", "bueno", "dale"]:
+                estado["status"] = "waiting_local_name"
+                guardar_estado(estado)
+                await event.respond(f"📍 *¿A qué local corresponde este informe?*\n(Ingresa la sigla exacta o el nombre, ej: FVDP o Villa del Parque)")
+                return
+            elif respuesta_clean.startswith("n") or respuesta_clean in ["no", "cancelar", "cancela"]:
+                for f in files:
+                    temp_path = f.get("temp_path")
+                    if temp_path and os.path.exists(temp_path):
+                        try:
+                            os.remove(temp_path)
+                        except Exception:
+                            pass
+                limpiar_estado()
+                await event.respond(f"❌ Operación cancelada. Se descartó el lote de {len(files)} archivos.")
+                return
+            else:
+                await event.respond(f"Por favor, responde con *Sí* o *No* para confirmar si el lote es un reporte.")
+                return
+
+        elif status == "waiting_local_name":
+            local = mensaje.strip()
+            # Validar local
+            res = buscar_direccion_local(local)
+            if not res:
+                await event.respond(f"⚠️ No encontré el local '{local}'. Por favor, intenta de nuevo escribiendo la sigla exacta o cancela enviando 'no'.")
+                return
+                
+            sigla = local.upper()
+            # Si buscar_direccion_local pudiera retornar la sigla, sería mejor. 
+            # Como retorna (nombre, direccion), asumimos que el usuario puso la sigla, 
+            # o intentaremos extraerla buscando en la DB (búsqueda inversa).
+            # Para simplificar, buscamos la sigla exacta.
+            conn = sqlite3.connect("supervisor_local.db")
+            cursor = conn.cursor()
+            cursor.execute("SELECT sigla, nombre FROM locales WHERE sigla = ? OR nombre LIKE ?", (local.upper(), f"%{local}%"))
+            resultado_db = cursor.fetchone()
+            conn.close()
+            
+            if resultado_db:
+                sigla_real = resultado_db[0]
+                nombre_real = resultado_db[1]
+            else:
+                sigla_real = local.upper()
+                nombre_real = local
+            
+            dest_dir = "/home/cristian/Documentos/Supervisor/entrantes"
+            os.makedirs(dest_dir, exist_ok=True)
+            
+            import shutil
+            import datetime
+            fecha_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+            exitosos = []
+            
+            for i, f in enumerate(files):
+                f_name = f.get("file_name")
+                temp_path = f.get("temp_path")
+                ext = os.path.splitext(f_name)[1]
+                nuevo_nombre = f"MTZ_{sigla_real}_{fecha_str}_{i}{ext}"
+                dest_path = os.path.join(dest_dir, nuevo_nombre)
+                
+                if temp_path and os.path.exists(temp_path):
+                    try:
+                        shutil.move(temp_path, dest_path)
+                        exitosos.append(nuevo_nombre)
+                    except Exception as e:
+                        logging.info(f"Error moviendo a entrantes: {e}")
+            
+            limpiar_estado()
+            if exitosos:
+                arch_str = "\n".join([f"• `{n}`" for n in exitosos])
+                await event.respond(f"✅ *Reporte asignado exitosamente a {nombre_real} ({sigla_real})*.\nArchivos enviados a la cola de Ingesta Automática:\n{arch_str}")
+            else:
+                await event.respond("⚠️ Ocurrió un error al enviar los archivos a la cola de ingesta.")
             return
 
     # Soporte de Videos (Análisis de fallas en video)

@@ -90,12 +90,15 @@ def archivar_reporte_en_drive(pdf_path, sigla_local):
                 res_data = response.json()
                 if res_data.get("status") == "success":
                     print(f"[✓] Archivo subido exitosamente a Drive vía Web App. ID: {res_data.get('fileId')}")
-                    # Limpieza local
+                    # Guardar archivo local en lugar de eliminarlo
+                    import shutil
+                    dir_destino = Path("/home/cristian/PROYECTOS/Supervisor-Project/brain/locales/PDFs_Originales")
+                    dir_destino.mkdir(parents=True, exist_ok=True)
                     try:
-                        os.remove(pdf_path)
-                        print(f"[LIMP] Archivo local eliminado: {pdf_path}")
+                        shutil.move(pdf_path, str(dir_destino / nombre_archivo))
+                        print(f"[REPALDO] Archivo local movido a: {dir_destino}")
                     except OSError as e:
-                        print(f"[WARN] No se pudo eliminar el archivo local: {e}")
+                        print(f"[WARN] No se pudo mover el archivo local: {e}")
                     return True
                 else:
                     print(f"[ERROR DRIVE-WEBAPP] Error retornado por la Web App: {res_data.get('message')}")
@@ -161,11 +164,14 @@ def archivar_reporte_en_drive(pdf_path, sigla_local):
         print(f"[ERROR DRIVE] Falla al subir el archivo {nombre_archivo} a Drive: {e}")
         return False
     
-    # 4. Limpieza local
+    # 4. Guardar archivo local en lugar de eliminarlo
+    import shutil
+    dir_destino = Path("/home/cristian/PROYECTOS/Supervisor-Project/brain/locales/PDFs_Originales")
+    dir_destino.mkdir(parents=True, exist_ok=True)
     try:
-        os.remove(pdf_path)
-        print(f"[LIMP] Archivo local eliminado: {pdf_path}")
+        shutil.move(pdf_path, str(dir_destino / nombre_archivo))
+        print(f"[RESPALDO] Archivo local movido a: {dir_destino}")
     except OSError as e:
-        print(f"[WARN] No se pudo eliminar el archivo local: {e}")
+        print(f"[WARN] No se pudo mover el archivo local: {e}")
         
     return True

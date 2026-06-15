@@ -1,5 +1,8 @@
 import urllib.request
 import urllib.parse
+import time
+import uuid
+import requests
 
 def enviar_alerta(mensaje, agente="Antigravity"):
     """Envía un mensaje de alerta a Telegram a través del Userbot local."""
@@ -39,3 +42,46 @@ def enviar_alerta(mensaje, agente="Antigravity"):
     except Exception as e:
         print(f"[TELEGRAM] No se pudo enviar alerta a Telegram: {e}")
     return False
+
+def solicitar_aprobacion(mensaje, timeout=3600):
+    """
+    Solicita aprobación interactiva a través de botones en Telegram.
+    Espera de forma síncrona hasta recibir 'approved', 'rejected' o alcanzar el timeout.
+    """
+    if "[Antigravity]" not in mensaje and "[Hermes]" not in mensaje:
+        mensaje = f"🛠️ [Antigravity] {mensaje}"
+        
+    req_id = str(uuid.uuid4())[:8]
+    url_ask = "http://127.0.0.1:8088/ask_approval"
+    payload = {
+        "message": mensaje,
+        "request_id": req_id
+    }
+    
+    try:
+        res = requests.post(url_ask, json=payload, timeout=10)
+        res.raise_for_status()
+        print(f"[TELEGRAM] Solicitud de aprobación enviada (ID: {req_id})")
+    except Exception as e:
+        print(f"[TELEGRAM] Error al solicitar aprobación: {e}")
+        return "error"
+        
+    url_check = f"http://127.0.0.1:8088/check_approval/{req_id}"
+    inicio = time.time()
+    
+    print("[TELEGRAM] Esperando decisión del usuario...")
+    while time.time() - inicio < timeout:
+        try:
+            check_res = requests.get(url_check, timeout=5)
+            if check_res.status_code == 200:
+                data = check_res.json()
+                status = data.get("status")
+                if status in ["approved", "rejected"]:
+                    print(f"[TELEGRAM] Decisión recibida: {status.upper()}")
+                    return status
+        except Exception:
+            pass
+        time.sleep(3) # Polling cada 3 segundos
+        
+    print("[TELEGRAM] Timeout esperando aprobación.")
+    return "timeout"

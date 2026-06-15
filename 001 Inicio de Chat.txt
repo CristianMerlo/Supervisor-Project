@@ -1,0 +1,1 @@
+Hola, vamos a trabajar en el Supervisor-Project. Por favor lee el archivo /home/cristian/PROYECTOS/Supervisor-Project/brain/proyecto/mapa_de_modulos_y_codigo.md para cargar en tu memoria toda la arquitectura antes de empezar.

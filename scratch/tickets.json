@@ -1,0 +1,900 @@
+[
+  {
+    "id": 1,
+    "name": "Mantenimiento",
+    "tickets": {
+      "incidences": {
+        "1364": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "1": 1,
+                "6": 1
+              }
+            }
+          }
+        },
+        "1368": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "1": 1
+              }
+            }
+          }
+        },
+        "1306": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "1": 1
+              }
+            }
+          }
+        },
+        "1985": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "1": 1
+              }
+            }
+          }
+        },
+        "1343": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "1": 1,
+                "6": 1
+              }
+            }
+          }
+        },
+        "1425": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "1": 1
+              }
+            }
+          }
+        },
+        "1119": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "1": 2
+              }
+            }
+          }
+        },
+        "1422": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "1": 1,
+                "6": 1
+              }
+            }
+          }
+        },
+        "1329": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "1": 1,
+                "6": 1,
+                "7": 4
+              }
+            }
+          }
+        },
+        "1262": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1,
+                "7": 1
+              }
+            }
+          }
+        },
+        "1328": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1186": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 2
+              }
+            }
+          }
+        },
+        "1164": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1382": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1336": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1,
+                "7": 1
+              }
+            }
+          }
+        },
+        "1338": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1421": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 2
+              }
+            }
+          }
+        },
+        "1187": {
+          "priorities": {
+            "25": {
+              "statuses": {
+                "6": 1,
+                "7": 1
+              }
+            }
+          }
+        },
+        "1260": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1324": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1417": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1269": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1115": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1251": {
+          "priorities": {
+            "26": {
+              "statuses": {
+                "6": 1,
+                "8": 2
+              }
+            }
+          }
+        },
+        "1128": {
+          "priorities": {
+            "25": {
+              "statuses": {
+                "6": 2
+              }
+            }
+          }
+        },
+        "1193": {
+          "priorities": {
+            "25": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1244": {
+          "priorities": {
+            "26": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1416": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1363": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 3
+              }
+            }
+          }
+        },
+        "1298": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1189": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1355": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 2
+              }
+            }
+          }
+        },
+        "1105": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1955": {
+          "priorities": {
+            "25": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1109": {
+          "priorities": {
+            "25": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1423": {
+          "priorities": {
+            "25": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1265": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "7": 1
+              }
+            }
+          }
+        },
+        "1307": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "1339": {
+          "priorities": {
+            "25": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "1219": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "1960": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "1962": {
+          "priorities": {
+            "25": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "1958": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "1264": {
+          "priorities": {
+            "24": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "tickets_total": 64,
+    "tickets_by_status": {
+      "1": 10,
+      "6": 37,
+      "7": 8,
+      "8": 9
+    }
+  },
+  {
+    "id": 2,
+    "name": "Mantenimiento Franquicias",
+    "tickets": {
+      "incidences": {
+        "2221": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "1": 4,
+                "6": 36,
+                "7": 7
+              }
+            }
+          }
+        },
+        "2173": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "1": 1
+              }
+            }
+          }
+        },
+        "1543": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "1": 2,
+                "7": 1
+              }
+            }
+          }
+        },
+        "2142": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "1": 4,
+                "6": 1,
+                "7": 1
+              }
+            }
+          }
+        },
+        "2110": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "1": 2
+              }
+            }
+          }
+        },
+        "2141": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "1": 3
+              }
+            }
+          }
+        },
+        "2140": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "1": 2
+              }
+            }
+          }
+        },
+        "1997": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "1": 1
+              }
+            }
+          }
+        },
+        "1968": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "1": 1
+              }
+            }
+          }
+        },
+        "2114": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "1": 1
+              }
+            }
+          }
+        },
+        "1555": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "1": 1,
+                "8": 1
+              }
+            }
+          }
+        },
+        "2032": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "2185": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "2063": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "2095": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 2,
+                "8": 1
+              }
+            }
+          }
+        },
+        "1528": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "6": 2,
+                "7": 2,
+                "8": 1
+              }
+            }
+          }
+        },
+        "1545": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "6": 3
+              }
+            }
+          }
+        },
+        "1977": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "6": 1,
+                "8": 2
+              }
+            }
+          }
+        },
+        "1972": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "2121": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "2123": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 2
+              }
+            }
+          }
+        },
+        "2034": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "6": 6,
+                "7": 2,
+                "8": 3
+              }
+            }
+          }
+        },
+        "2035": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "2006": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1532": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1534": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "2129": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "6": 1,
+                "7": 1
+              }
+            }
+          }
+        },
+        "1533": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1535": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "6": 1,
+                "8": 1
+              }
+            }
+          }
+        },
+        "1529": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 3,
+                "8": 1
+              }
+            }
+          }
+        },
+        "1542": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 1,
+                "8": 2
+              }
+            }
+          }
+        },
+        "1540": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1527": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1996": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 1,
+                "8": 1
+              }
+            }
+          }
+        },
+        "2175": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "1530": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 2,
+                "8": 3
+              }
+            }
+          }
+        },
+        "2106": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "2075": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "6": 1
+              }
+            }
+          }
+        },
+        "2220": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "7": 1
+              }
+            }
+          }
+        },
+        "2124": {
+          "priorities": {
+            "28": {
+              "statuses": {
+                "7": 1
+              }
+            }
+          }
+        },
+        "2074": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "7": 1
+              }
+            }
+          }
+        },
+        "2083": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "7": 1
+              }
+            }
+          }
+        },
+        "1995": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "2084": {
+          "priorities": {
+            "27": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "1539": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "2120": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "1551": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        },
+        "1548": {
+          "priorities": {
+            "29": {
+              "statuses": {
+                "8": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "tickets_total": 139,
+    "tickets_by_status": {
+      "1": 22,
+      "6": 77,
+      "7": 18,
+      "8": 22
+    }
+  },
+  {
+    "id": 13,
+    "name": "Taller",
+    "tickets": [],
+    "tickets_total": 0,
+    "tickets_by_status": {
+      "6": 0,
+      "8": 0,
+      "4": 0,
+      "1": 0,
+      "7": 0
+    }
+  }
+]

@@ -220,9 +220,8 @@ def ejecutar_ingesta_formulario():
             # 1. Descargar el PDF
             descargar_archivo_drive(drive_service, file_id, temp_pdf_path)
 
-            # 2. Extraer texto y parsear
-            texto_pdf = motor_supervisor.extraer_texto_pdf(str(temp_pdf_path))
-            datos_extraidos, resultado_auditoria = motor_supervisor.procesar_reporte(str(temp_pdf_path))
+            # 2. Parsear reporte y obtener texto
+            datos_extraidos, resultado_auditoria, texto_pdf = motor_supervisor.procesar_reporte(str(temp_pdf_path))
             
             # 3. Extraer estado de la cafetera
             estado_cafetera = extraer_estado_cafetera(texto_pdf)

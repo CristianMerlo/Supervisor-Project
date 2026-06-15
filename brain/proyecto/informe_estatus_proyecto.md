@@ -73,6 +73,15 @@ El ecosistema actual del proyecto se compone de los siguientes archivos:
 *   **Conexión Dinámica con Sheets (Gemini Tools)**: Se integró el soporte nativo de Function Calling en la API local (`server.py`). Al consultar sobre el estado de una sucursal, mantenimientos o alertas, la IA ejecuta automáticamente búsquedas y lecturas dinámicas sobre la base de datos de Sheets (`Locales_Maestro`, `Historial_Mantenimiento`, `Alertas_Activas`).
 *   **Ejecución Transparente y Asíncrona**: Habilitado el modo `enable_automatic_function_calling=True` en las sesiones de chat de la API. El bot resuelve la petición por detrás de escena y responde con los datos duros reales formateados.
 
+### I. Motor de Conocimiento RAG y Bóveda de Obsidian (Completado)
+*   **Integración Local-First:** Se implementó `obsidian_bridge.py`, que actúa como buscador semántico sobre la bóveda local de Obsidian (`brain/`).
+*   **Conversión de PDFs y OCR Automático:** Se desarrolló `convertir_pdfs_a_md.py` para transformar manuales técnicos PDF a formato Markdown. Además, el bot transcribe fotos (ej. diagramas de error) enviadas por Telegram a texto utilizando la API local.
+*   **Contexto Extendido:** El motor RAG fue configurado para extraer hasta 15,000 caracteres preservando el formato de tablas y enviarlo a Gemini 2.5 Flash, logrando cero alucinaciones en diagnósticos complejos como los errores de La Cimbali.
+*   **Automatización de Mantenimiento de la Bóveda:** Tarea programada en cron que corre diariamente a las 02:00 AM para ingestar y convertir nuevos PDFs a la base de conocimientos, así como conversión en tiempo real al subir documentos por Telegram.
+
+### J. Optimización de Infraestructura Local (Completado)
+*   **Perfil de Bajo Consumo para Chrome:** Se configuró el daemon de WhatsApp Web (`reiniciar_chrome.sh`) con banderas estrictas (`--disable-gpu`, `--disable-extensions`, `--mute-audio`, `--disable-sync`) para reducir radicalmente el consumo de RAM en Ubuntu.
+
 ---
 
 ## 4. Estatus de Funciones Pendientes (Planificadas en Arquitectura)

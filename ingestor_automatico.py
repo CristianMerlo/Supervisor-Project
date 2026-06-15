@@ -1,24 +1,23 @@
 import os
 import time
+import json
+import shutil
+import logging
 import imaplib
 import email
 from email.header import decode_header
-import shutil
 from pathlib import Path
 import socket
-import json
-import notificador_telegram
+import datetime
+import re
+import subprocess
+
+# Configuración de Logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - [%(levelname)s] - %(message)s')
+logger = logging.getLogger(__name__)
 
 # Establecer timeout por defecto de 15 segundos para evitar cuelgues de red
 socket.setdefaulttimeout(15)
-
-# Importar los módulos que ya construimos
-import motor_supervisor
-import fase3_sheets
-import archivador_drive
-import motor_whatsapp_web
-import motor_outlook_web
-
 
 # Carga de variables de entorno locales desde archivo .env si existe
 def cargar_env():
@@ -34,6 +33,15 @@ def cargar_env():
 
 cargar_env()
 
+# Importar los módulos que ya construimos
+import notificador_telegram
+import motor_supervisor
+import fase3_sheets
+import archivador_drive
+import gestion_locales
+import ingestor_formulario
+import motor_whatsapp_web
+
 # Configuración IMAP (Gmail)
 IMAP_SERVER = "imap.gmail.com"
 EMAIL_USER = os.getenv("GMAIL_USER", "usuario@gmail.com")
@@ -45,6 +53,9 @@ DIR_ENTRANTES = BASE_DIR / "entrantes"
 DIR_PROCESADOS = BASE_DIR / "procesados"
 DIR_ERRORES = BASE_DIR / "errores"
 
+# Archivos de estado
+WHATSAPP_STATE_FILE = BASE_DIR / "whatsapp_last_run.json"
+
 # Asegurar que los directorios existen
 for d in [DIR_ENTRANTES, DIR_PROCESADOS, DIR_ERRORES]:
     d.mkdir(exist_ok=True)
@@ -54,21 +65,18 @@ SHEET_URL = os.getenv("SHEETS_SABANA_URL", "https://docs.google.com/spreadsheets
 
 def descargar_adjuntos_gmail():
     """Se conecta por IMAP y descarga PDFs MTZ_ de correos no leídos."""
-    # Si no se configuraron las variables, omitimos para evitar fallos continuos de login
     if EMAIL_USER == "usuario@gmail.com" or EMAIL_PASS == "password_de_aplicacion":
-        print("[IMAP] Gmail no configurado (GMAIL_USER y GMAIL_APP_PASSWORD no establecidas). Omitiendo descarga.")
+        logger.warning("[IMAP] Gmail no configurado (GMAIL_USER y GMAIL_APP_PASSWORD no establecidas). Omitiendo descarga.")
         return
 
     try:
-        # Conexión al servidor IMAP con timeout de 15 segundos
         mail = imaplib.IMAP4_SSL(IMAP_SERVER, timeout=15)
         mail.login(EMAIL_USER, EMAIL_PASS)
         mail.select("inbox")
         
-        # Buscar correos no leídos
         status, mensajes = mail.search(None, 'UNSEEN')
         if status != "OK" or not mensajes[0]:
-            print("[IMAP] No hay correos nuevos.")
+            logger.info("[IMAP] No hay correos nuevos.")
             return
 
         for num in mensajes[0].split():
@@ -91,49 +99,44 @@ def descargar_adjuntos_gmail():
                     filepath = DIR_ENTRANTES / filename
                     with open(filepath, "wb") as f:
                         f.write(part.get_payload(decode=True))
-                    print(f"[IMAP] PDF Descargado: {filename}")
+                    logger.info(f"[IMAP] PDF Descargado exitosamente: {filename}")
                     pdf_descargado = True
             
-            # Si no descargó un PDF de este correo, lo vuelve a marcar como no leído para evitar perder correos importantes
             if not pdf_descargado:
                 mail.store(num, '-FLAGS', '\\Seen')
                 
         mail.logout()
     except Exception as e:
-        print(f"[ERROR IMAP] Falla al conectar o leer correos: {e}")
+        logger.error(f"[ERROR IMAP] Falla al conectar o leer correos: {e}")
 
 def procesar_carpeta_entrantes():
     """Lee la carpeta local, ejecuta el motor y sube a Sheets."""
     pdfs = list(DIR_ENTRANTES.glob("MTZ_*.pdf"))
     if not pdfs:
-        print("[ORQUESTADOR] No hay archivos PDF pendientes en la carpeta 'entrantes'.")
+        logger.info("[ORQUESTADOR] No hay archivos PDF pendientes en la carpeta 'entrantes'.")
         return
         
     for pdf_path in pdfs:
         try:
-            print(f"\n--- [ORQUESTADOR] Iniciando {pdf_path.name} ---")
-            # 1. Fase 1 y 2 (Parser y Reglas)
-            datos_extraidos, alertas_negocio = motor_supervisor.procesar_reporte(str(pdf_path))
+            logger.info(f"--- [ORQUESTADOR] Iniciando {pdf_path.name} ---")
+            
+            # 1. Fase 1 y 2 (Parser y Reglas) - Retorna ahora también el texto extraído
+            datos_extraidos, alertas_negocio, texto_pdf = motor_supervisor.procesar_reporte(str(pdf_path))
             
             # 2. Fase 3 (Google Sheets)
             fase3_sheets.inyectar_en_sabana(datos_extraidos, alertas_negocio, SHEET_URL)
             
-            # 3. Archivar en Google Drive y autolimpieza (Paso B.1)
+            # 3. Archivar en Google Drive y autolimpieza
             sigla = datos_extraidos.get("sigla", "")
             exito_drive = False
             if sigla:
                 exito_drive = archivador_drive.archivar_reporte_en_drive(str(pdf_path), sigla)
             
             if exito_drive:
-                print(f"[✓] Archivo subido a Google Drive y eliminado localmente.")
+                logger.info(f"[✓] Archivo subido a Google Drive y eliminado localmente.")
                 
-                # Actualizar ficha local en el cerebro de Hermes
+                # Actualizar ficha local re-usando el texto ya extraído (Eficiencia I/O)
                 try:
-                    import re
-                    import gestion_locales
-                    import ingestor_formulario
-                    # Extraer estado de la cafetera y nro de serie del texto del PDF
-                    texto_pdf = motor_supervisor.extraer_texto_pdf(str(pdf_path))
                     estado_caf = ingestor_formulario.extraer_estado_cafetera(texto_pdf)
                     sn_match = re.search(r"SN:\s*(\w+)", texto_pdf)
                     
@@ -152,57 +155,88 @@ def procesar_carpeta_entrantes():
                         fecha_reporte=datos_extraidos.get("fecha", None)
                     )
                     
-                    # Sincronización en Tiempo Real a NotebookLM
-                    print(f"[NOTEBOOKLM] Iniciando actualización en la nube para {sigla}...")
-                    import subprocess
+                    # Sincronización a NotebookLM
+                    logger.info(f"[NOTEBOOKLM] Iniciando actualización en la nube para {sigla}...")
                     script_nlm = str(Path(__file__).parent / "actualizar_notebook_local.py")
                     subprocess.Popen(["python3", script_nlm, sigla])
                     
                 except Exception as e_ficha:
-                    print(f"[ORQUESTADOR] Error al actualizar ficha local de {sigla}: {e_ficha}")
+                    logger.error(f"[ORQUESTADOR] Error al actualizar ficha local de {sigla}: {e_ficha}")
             else:
                 msg_err = f"⚠️ [Ingestor] Alerta: No se pudo subir el archivo {pdf_path.name} a Google Drive (o no se detectó la sigla del local). Se movió a 'errores/' para resguardo manual."
-                print(msg_err)
+                logger.warning(msg_err)
                 notificador_telegram.enviar_alerta(msg_err)
-                # Asegurar que el archivo de origen sigue existiendo antes de moverlo
                 if pdf_path.exists():
                     shutil.move(str(pdf_path), str(DIR_ERRORES / pdf_path.name))
             
         except Exception as e:
             msg_err = f"❌ [Ingestor] ERROR al procesar reporte {pdf_path.name}: {e}"
-            print(msg_err)
+            logger.error(msg_err)
             notificador_telegram.enviar_alerta(msg_err)
             if pdf_path.exists():
                 shutil.move(str(pdf_path), str(DIR_ERRORES / pdf_path.name))
 
-import ingestor_formulario
+def deberia_ejecutar_whatsapp():
+    """Verifica si pasaron 20 minutos usando persistencia de timestamp."""
+    try:
+        if WHATSAPP_STATE_FILE.exists():
+            with open(WHATSAPP_STATE_FILE, "r") as f:
+                data = json.load(f)
+                ultimo_run = data.get("last_run_timestamp", 0)
+        else:
+            ultimo_run = 0
+            
+        ahora = time.time()
+        # 20 minutos = 1200 segundos
+        if (ahora - ultimo_run) >= 1200:
+            return True
+        return False
+    except Exception as e:
+        logger.error(f"Error verificando timestamp de WhatsApp: {e}")
+        return True # Si falla la lectura, ejecutamos por seguridad
+
+def actualizar_timestamp_whatsapp():
+    try:
+        with open(WHATSAPP_STATE_FILE, "w") as f:
+            json.dump({"last_run_timestamp": time.time()}, f)
+    except Exception as e:
+        logger.error(f"Error guardando timestamp de WhatsApp: {e}")
 
 if __name__ == "__main__":
-    print("Iniciando Ingestor Automático...")
+    logger.info("=======================================")
+    logger.info("Iniciando Ingestor Automático...")
     
+    # 1. Ejecutar Ingestor de Formulario Google
     try:
-        print("\n--- Ejecutando Ingestor de Formulario Google ---")
+        logger.info("--- Ejecutando Ingestor de Formulario Google ---")
         ingestor_formulario.ejecutar_ingesta_formulario()
     except Exception as e:
-        print(f"[ERROR] Falla en Ingestor de Formulario Google: {e}")
+        logger.error(f"Falla en Ingestor de Formulario Google: {e}")
         
-    # Ejecutar el motor de WhatsApp Web cada 20 minutos (minutos múltiplos de 20: 0, 20, 40)
-    import datetime
-    minuto_actual = datetime.datetime.now().minute
-    if minuto_actual % 20 == 0:
+    # 2. Ejecutar Motor WhatsApp Web (Reloj basado en Timestamp)
+    if deberia_ejecutar_whatsapp():
         try:
-            print("\n--- Ejecutando Motor WhatsApp Web (Cada 20 min) ---")
-            import motor_whatsapp_web
+            logger.info("--- Ejecutando Motor WhatsApp Web (Revisión programada) ---")
             motor_whatsapp_web.ejecutar_motor()
+            actualizar_timestamp_whatsapp()
         except Exception as e:
-            print(f"[ERROR] Falla en Motor WhatsApp Web: {e}")
+            logger.error(f"Falla en Motor WhatsApp Web: {e}")
     else:
-        print(f"\n--- Omitiendo Motor WhatsApp Web (Minuto {minuto_actual} no es múltiplo de 20) ---")
+        logger.info("--- Omitiendo Motor WhatsApp Web (Aún no pasaron 20 minutos) ---")
 
+    # 3. Descargar correos de Gmail
     try:
-        print("\n--- Procesando Carpeta Entrantes (Fallback Local) ---")
+        logger.info("--- Revisando Bandeja de Entrada de Gmail ---")
+        descargar_adjuntos_gmail()
+    except Exception as e:
+        logger.error(f"Falla al revisar correos de Gmail: {e}")
+
+    # 4. Procesar todos los archivos acumulados en /entrantes
+    try:
+        logger.info("--- Procesando Carpeta Entrantes ---")
         procesar_carpeta_entrantes()
     except Exception as e:
-        print(f"[ERROR] Falla al procesar carpeta de entrantes: {e}")
+        logger.error(f"Falla al procesar carpeta de entrantes: {e}")
         
-    print("\nCiclo finalizado.")
+    logger.info("Ciclo finalizado.")
+    logger.info("=======================================\n")

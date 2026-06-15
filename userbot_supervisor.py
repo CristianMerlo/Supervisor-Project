@@ -138,6 +138,28 @@ def guardar_mensaje_aprendizaje(remitente_id, remitente_nombre, mensaje, es_grup
 
 from aiohttp import web
 
+pending_approvals = {}
+
+async def ask_approval_handler(request):
+    try:
+        data = await request.json()
+        mensaje = data.get("message", "Solicitud de aprobación sin mensaje")
+        req_id = data.get("request_id")
+        if req_id:
+            pending_approvals[req_id] = "pending"
+            # Formato de Telegram para copiar con un toque (si la app lo soporta)
+            mensaje_con_botones = f"{mensaje}\n\n👉 Responde con uno de estos comandos copiando el ID:\n`/aprobar {req_id}`\n`/rechazar {req_id}`"
+            await client.send_message(MI_TELEGRAM_ID, mensaje_con_botones)
+            return web.json_response({"status": "ok"})
+        return web.json_response({"error": "No request_id"}, status=400)
+    except Exception as e:
+        return web.json_response({"error": str(e)}, status=500)
+
+async def check_approval_handler(request):
+    req_id = request.match_info.get('req_id')
+    status = pending_approvals.get(req_id, "unknown")
+    return web.json_response({"status": status})
+
 async def notify_handler(request):
     try:
         message = ""
@@ -167,6 +189,8 @@ async def notify_handler(request):
 async def start_notification_server():
     app = web.Application()
     app.router.add_post('/notify', notify_handler)
+    app.router.add_post('/ask_approval', ask_approval_handler)
+    app.router.add_get('/check_approval/{req_id}', check_approval_handler)
     runner = web.AppRunner(app)
     await runner.setup()
     site = web.TCPSite(runner, '127.0.0.1', 8088)
@@ -228,10 +252,37 @@ def filtrar_palabras(mensaje):
     return palabras_filtradas
 
 @client.on(events.NewMessage(incoming=True))
-async def on_new_message(event):
-    # En Telethon, event.is_channel es True tanto para canales de difusión como para supergrupos.
-    # Queremos ignorar canales de difusión, pero SÍ procesar supergrupos.
-    if event.is_channel and not event.is_group:
+async def handler(event):
+    if event.is_private and event.sender_id != MI_TELEGRAM_ID:
+        return
+
+    remitente_id = event.sender_id
+    remitente_nombre = "Usuario"
+    
+    if event.sender:
+        remitente_nombre = getattr(event.sender, "first_name", "Usuario") or getattr(event.sender, "username", "Usuario")
+
+    mensaje = event.text
+    if not mensaje and not event.media:
+        return
+        
+    # LOGICA DE APROBACIÓN POR COMANDOS
+    if mensaje and mensaje.startswith("/aprobar "):
+        req_id = mensaje.split(" ")[1].strip()
+        if req_id in pending_approvals:
+            pending_approvals[req_id] = "approved"
+            await event.respond(f"✅ Has aprobado la solicitud {req_id}.")
+        else:
+            await event.respond("❌ ID de solicitud no encontrado o ya expirado.")
+        return
+        
+    if mensaje and mensaje.startswith("/rechazar "):
+        req_id = mensaje.split(" ")[1].strip()
+        if req_id in pending_approvals:
+            pending_approvals[req_id] = "rejected"
+            await event.respond(f"🚫 Has rechazado la solicitud {req_id}.")
+        else:
+            await event.respond("❌ ID de solicitud no encontrado o ya expirado.")
         return
 
     remitente_id = event.sender_id
@@ -299,6 +350,12 @@ async def on_new_message(event):
                             nombre_sin_ext = os.path.splitext(dest_path)[0]
                             md_dest_path = f"{nombre_sin_ext}.md"
                             t = threading.Thread(target=transcribir_y_guardar_imagen, args=(dest_path, md_dest_path))
+                            t.start()
+                            
+                        # Si es un PDF, extraerlo usando PyPDF2 (llamando al script de forma asíncrona)
+                        is_pdf = nuevo_nombre.lower().endswith('.pdf')
+                        if is_pdf:
+                            t = threading.Thread(target=lambda: os.system("python3 /home/cristian/PROYECTOS/Supervisor-Project/convertir_pdfs_a_md.py"))
                             t.start()
                     except Exception as e:
                         logging.info(f"Error moviendo archivo {f_name} en userbot: {e}")
@@ -564,6 +621,24 @@ async def on_new_message(event):
         elif mensaje.startswith("/buscar"):
             await event.respond("🔍 [Antigravity] Iniciando barrido web de novedades...")
             return
+        elif mensaje.startswith("/reporte"):
+            instruccion = mensaje.replace("/reporte_semanal", "").replace("/reporte", "").strip()
+            if not instruccion:
+                instruccion = "Reporte general por local"
+            
+            await event.respond(f"📊 [Hermes Analytics] Iniciando generación del reporte dinámico: '{instruccion}'. Aguarda unos segundos...")
+            import asyncio
+            # Correr en un hilo separado para no bloquear el event loop
+            from motor_reportes_supervisor import ReportSupervisor
+            loop = asyncio.get_running_loop()
+            supervisor_reportes = ReportSupervisor()
+            ruta_excel = await loop.run_in_executor(None, supervisor_reportes.generar_reporte_dinamico, instruccion)
+            
+            if ruta_excel and os.path.exists(ruta_excel):
+                await event.respond(file=ruta_excel, message="✅ Aquí tienes tu reporte consolidado.")
+            else:
+                await event.respond("❌ Ocurrió un error al generar el reporte o faltan credenciales de Google Sheets.")
+            return
             
     # 2. IDENTIDAD DUAL: Técnico / General (Habla Supervisor)
     # Detectar mención o respuesta al bot
@@ -643,15 +718,67 @@ async def on_new_message(event):
         return
 
     # Nivel 3: Consultas Complejas / Errores técnicos (Manuales / RAG)
-    elif "error" in m_lower or "falla" in m_lower or "cimbali" in m_lower or "ablandador" in m_lower:
-        msg_espera = await event.respond("🛠️ [Supervisor] Buscando en los manuales de servicio. Aguarda un instante...")
+    elif "error" in m_lower or "falla" in m_lower or "cimbali" in m_lower or "ablandador" in m_lower or "melitta" in m_lower or "broiler" in m_lower:
+        msg_espera = await event.respond("🛠️ [Supervisor] Buscando en la Bóveda de Conocimiento Local y NotebookLM...")
         
-        # Intentar usar la API local inteligente (Gemini)
-        respuesta_ia = consultar_api_local(mensaje, remitente_id)
+        from obsidian_bridge import ObsidianVault
+        import subprocess
+        
+        vault = ObsidianVault()
+        
+        # 1. Router: Extraer palabras clave
+        prompt_keys = f"Extrae máximo 3 palabras clave vitales para buscar este fallo en un manual: '{mensaje}'. Retorna SOLO las palabras separadas por espacios. Sin explicaciones ni puntos."
+        keywords = consultar_api_local(prompt_keys, remitente_id)
+        if not keywords or len(keywords.split()) > 5:
+            keywords = mensaje
+            
+        # 2. Búsqueda Local (Obsidian)
+        hallazgos = vault.buscar_manual(keywords)
+        contexto_final = ""
+        enlaces_obsidian = []
+        fuente = "Obsidian"
+        
+        if hallazgos:
+            contexto_final = "INFORMACIÓN LOCAL:\n"
+            for h in hallazgos:
+                contexto_final += f"- {h['link']}: {h['contexto']}\n"
+                enlaces_obsidian.append(h['nota'])
+        else:
+            # 3. Fallback a NotebookLM si no hay datos locales
+            fuente = "NotebookLM"
+            try:
+                nlm_path = "/home/cristian/.local/bin/nlm"
+                res_nlm = subprocess.run([nlm_path, "cross", "query", mensaje, "--all"], capture_output=True, text=True)
+                if res_nlm.returncode == 0 and res_nlm.stdout.strip():
+                    contexto_final = f"INFORMACIÓN NOTEBOOKLM:\n{res_nlm.stdout.strip()[:1000]}"
+                else:
+                    contexto_final = "SIN RESULTADOS EN MANUALES."
+            except Exception as e:
+                contexto_final = "SIN RESULTADOS EN MANUALES."
+        
+        # 4. Generación Estricta (Anti-Alucinaciones)
+        prompt_enriquecido = f"""
+Eres Hermes, un asistente técnico infalible. REGLA ESTRICTA: Cero alucinaciones.
+El técnico pregunta: '{mensaje}'.
+Contexto recuperado de manuales ({fuente}):
+{contexto_final}
+
+Instrucciones:
+- Si el contexto dice "SIN RESULTADOS EN MANUALES" o no resuelve la duda de forma directa, DEBES responder exactamente: "No tengo registrada esta falla específica para este equipo en mis manuales. Por favor, ¿deseas que aperture un ticket para que un humano lo investigue y yo aprenda la solución?"
+- NO inventes ni ofrezcas sugerencias genéricas si la falla exacta no aparece en el contexto.
+- Si el contexto resuelve el problema, resume la solución e incluye las referencias al manual.
+"""
+        respuesta_ia = consultar_api_local(prompt_enriquecido, remitente_id)
+        
         if not respuesta_ia:
-            # Fallback estático en caso de fallo
-            respuesta_ia = "El error indica problemas de presión en la caldera o filtro saturado. Por favor, realiza la purga de la válvula de entrada y verifica el manómetro."
+            respuesta_ia = "Error al procesar la respuesta con el LLM."
         
+        # 5. Memoria en Wiki solo si se encontró solución
+        if hallazgos and "No tengo registrada esta falla" not in respuesta_ia:
+            titulo_falla = f"Reporte de falla - {remitente_nombre.split()[0]}"
+            link_wiki = vault.crear_nota_wiki(titulo_falla, f"**Consulta:** {mensaje}\n\n**Solución:** {respuesta_ia}", enlaces_obsidian)
+            respuesta_ia += f"\n\n*(Registrado en Wiki: {link_wiki})*"
+
         await msg_espera.edit(f"🛠️ [Supervisor] {respuesta_ia}")
         return
 

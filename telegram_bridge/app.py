@@ -38,6 +38,24 @@ def limpiar_estado():
         except Exception as e:
             print(f"Error eliminando estado: {e}")
 
+APPROVALS_FILE = "/home/cristian/Documentos/Supervisor/telegram_bridge/approvals_state.json"
+
+def cargar_aprobaciones():
+    if os.path.exists(APPROVALS_FILE):
+        try:
+            with open(APPROVALS_FILE, "r") as f:
+                return json.load(f)
+        except Exception as e:
+            print(f"Error cargando aprobaciones: {e}")
+    return {}
+
+def guardar_aprobaciones(estado):
+    try:
+        with open(APPROVALS_FILE, "w") as f:
+            json.dump(estado, f)
+    except Exception as e:
+        print(f"Error guardando aprobaciones: {e}")
+
 def descargar_audio_telegram(file_id):
     """Descarga el archivo de audio desde Telegram y lo devuelve en Base64."""
     try:
@@ -190,6 +208,42 @@ ALLOWED_CHAT_IDS = os.getenv("ALLOWED_CHAT_IDS", "").split(",")
 def webhook():
     datos = request.get_json()
     
+    # Manejo de clics en botones interactivos (Inline Keyboards)
+    if datos and "callback_query" in datos:
+        cq = datos["callback_query"]
+        chat_id = str(cq.get("message", {}).get("chat", {}).get("id", ""))
+        message_id = cq.get("message", {}).get("message_id")
+        data = cq.get("data", "")
+        
+        req_id = data.split("_")[1] if "_" in data else "unknown"
+        action = data.split("_")[0]
+        
+        estado_aprob = cargar_aprobaciones()
+        if req_id in estado_aprob and estado_aprob[req_id]["status"] == "pending":
+            estado_aprob[req_id]["status"] = "approved" if action == "approve" else "rejected"
+            guardar_aprobaciones(estado_aprob)
+            
+            # Finalizar animación de carga del botón
+            url_answer = f"{BASE_URL}/answerCallbackQuery"
+            requests.post(url_answer, json={"callback_query_id": cq["id"], "text": "Decisión registrada"})
+            
+            # Actualizar el mensaje original borrando los botones y mostrando el veredicto
+            if message_id:
+                url_edit = f"{BASE_URL}/editMessageText"
+                text_result = "✅ *Aprobado*" if action == "approve" else "❌ *Rechazado*"
+                original_text = cq.get('message', {}).get('text', 'Aprobación')
+                requests.post(url_edit, json={
+                    "chat_id": chat_id,
+                    "message_id": message_id,
+                    "text": f"{original_text}\n\n{text_result}",
+                    "parse_mode": "Markdown"
+                })
+        else:
+            url_answer = f"{BASE_URL}/answerCallbackQuery"
+            requests.post(url_answer, json={"callback_query_id": cq["id"], "text": "Esta solicitud ya caducó o fue respondida."})
+            
+        return jsonify({"status": "ok"}), 200
+
     if not datos or "message" not in datos:
         return jsonify({"status": "ignored"}), 200
         
@@ -400,6 +454,43 @@ def webhook():
     hilo.start()
     
     return jsonify({"status": "ok"}), 200
+
+@app.route("/ask_approval", methods=["POST"])
+def ask_approval():
+    datos = request.get_json()
+    chat_id = datos.get("chat_id", ALLOWED_CHAT_IDS[0] if ALLOWED_CHAT_IDS else None)
+    mensaje = datos.get("message", "Aprobación requerida")
+    req_id = datos.get("request_id")
+    
+    if not chat_id or not req_id:
+        return jsonify({"error": "Faltan parametros"}), 400
+        
+    estado = cargar_aprobaciones()
+    estado[req_id] = {"status": "pending"}
+    guardar_aprobaciones(estado)
+    
+    url = f"{BASE_URL}/sendMessage"
+    payload = {
+        "chat_id": chat_id,
+        "text": mensaje,
+        "parse_mode": "Markdown",
+        "reply_markup": {
+            "inline_keyboard": [
+                [
+                    {"text": "✔️ Aprobar", "callback_data": f"approve_{req_id}"},
+                    {"text": "❌ Rechazar", "callback_data": f"reject_{req_id}"}
+                ]
+            ]
+        }
+    }
+    requests.post(url, json=payload)
+    return jsonify({"status": "sent"}), 200
+
+@app.route("/check_approval/<req_id>", methods=["GET"])
+def check_approval(req_id):
+    estado = cargar_aprobaciones()
+    status = estado.get(req_id, {}).get("status", "not_found")
+    return jsonify({"status": status}), 200
 
 def set_webhook():
     WEBHOOK_URL = os.getenv("WEBHOOK_URL")

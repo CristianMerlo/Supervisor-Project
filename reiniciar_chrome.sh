@@ -16,7 +16,7 @@ sleep 3
 
 # 2. Iniciar Chrome en background con el puerto CDP abierto
 echo "[2/2] Lanzando Chrome con remote debugging..."
-google-chrome --remote-debugging-port=9222 --user-data-dir="/home/cristian/.config/chrome-whatsapp" --no-first-run --no-default-browser-check > /dev/null 2>&1 &
+google-chrome --remote-debugging-port=9222 --user-data-dir="/home/cristian/.config/chrome-whatsapp" --no-first-run --no-default-browser-check --disable-extensions --disable-gpu --disable-sync --disable-translate --disable-default-apps --mute-audio > /dev/null 2>&1 &
 
 sleep 2
 echo "✓ Proceso completado exitosamente."

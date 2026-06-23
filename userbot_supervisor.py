@@ -219,21 +219,59 @@ def buscar_pendientes_local(termino):
     conn.close()
     return resultados
 
-def consultar_api_local(mensaje_usuario, chat_id):
+def guardar_mensaje_memoria(chat_id, rol, mensaje):
+    try:
+        conn = sqlite3.connect("supervisor_local.db")
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO memoria_conversacional (chat_id, rol, mensaje) VALUES (?, ?, ?)", (str(chat_id), rol, mensaje))
+        conn.commit()
+        conn.close()
+    except Exception as e:
+        logging.error(f"Error guardando memoria: {e}")
+
+def obtener_historial(chat_id, limite=10):
+    try:
+        conn = sqlite3.connect("supervisor_local.db")
+        cursor = conn.cursor()
+        cursor.execute("SELECT rol, mensaje FROM memoria_conversacional WHERE chat_id = ? ORDER BY id DESC LIMIT ?", (str(chat_id), limite))
+        resultados = cursor.fetchall()
+        conn.close()
+        resultados.reverse()
+        return [{"role": row[0], "content": row[1]} for row in resultados]
+    except Exception as e:
+        logging.error(f"Error obteniendo memoria: {e}")
+        return []
+
+def consultar_api_local(mensaje_usuario, chat_id, system_prompt=None, guardar_historial=True, mensaje_original=None):
     """Consulta la API local de Supervisor para obtener respuestas asistidas por IA de Gemini"""
     try:
         url = "http://127.0.0.1:8000/v1/chat/completions"
+        
+        messages = []
+        if system_prompt:
+            messages.append({"role": "system", "content": system_prompt})
+            
+        if guardar_historial:
+            historial = obtener_historial(chat_id, limite=10)
+            messages.extend(historial)
+            
+            texto_a_guardar = mensaje_original if mensaje_original else mensaje_usuario
+            guardar_mensaje_memoria(chat_id, "user", texto_a_guardar)
+            
+        messages.append({"role": "user", "content": mensaje_usuario})
+
         payload = {
             "model": "gemini-2.0-flash",
-            "messages": [
-                {"role": "user", "content": mensaje_usuario}
-            ],
+            "messages": messages,
             "user": str(chat_id)
         }
         res = requests.post(url, json=payload, timeout=30)
         if res.status_code == 200:
             data = res.json()
-            return data["choices"][0]["message"]["content"]
+            respuesta = data["choices"][0]["message"]["content"]
+            if guardar_historial:
+                guardar_mensaje_memoria(chat_id, "assistant", respuesta)
+            return respuesta
     except Exception as e:
         logging.info(f"⚠️ Error de conexión con API local: {e}")
     return None
@@ -728,7 +766,7 @@ async def handler(event):
         
         # 1. Router: Extraer palabras clave
         prompt_keys = f"Extrae máximo 3 palabras clave vitales para buscar este fallo en un manual: '{mensaje}'. Retorna SOLO las palabras separadas por espacios. Sin explicaciones ni puntos."
-        keywords = consultar_api_local(prompt_keys, remitente_id)
+        keywords = consultar_api_local(prompt_keys, remitente_id, guardar_historial=False)
         if not keywords or len(keywords.split()) > 5:
             keywords = mensaje
             
@@ -758,17 +796,17 @@ async def handler(event):
         
         # 4. Generación Estricta (Anti-Alucinaciones)
         prompt_enriquecido = f"""
-Eres Hermes, un asistente técnico infalible. REGLA ESTRICTA: Cero alucinaciones.
-El técnico pregunta: '{mensaje}'.
-Contexto recuperado de manuales ({fuente}):
+Eres el "Supervisor" actuando en tu rol de experto 🛠️ [Hermes]. REGLA ESTRICTA: Cero alucinaciones.
+El técnico te ha consultado lo siguiente. Contexto recuperado de manuales ({fuente}):
 {contexto_final}
 
 Instrucciones:
-- Si el contexto dice "SIN RESULTADOS EN MANUALES" o no resuelve la duda de forma directa, DEBES responder exactamente: "No tengo registrada esta falla específica para este equipo en mis manuales. Por favor, ¿deseas que aperture un ticket para que un humano lo investigue y yo aprenda la solución?"
+- Si el contexto dice "SIN RESULTADOS EN MANUALES" o no resuelve la duda, DEBES responder exactamente: "No tengo registrada esta falla específica para este equipo en mis manuales. Por favor, ¿deseas que aperture un ticket para que un humano lo investigue y yo aprenda la solución?"
 - NO inventes ni ofrezcas sugerencias genéricas si la falla exacta no aparece en el contexto.
 - Si el contexto resuelve el problema, resume la solución e incluye las referencias al manual.
+- Comienza siempre tu respuesta con: "🛠️ [Hermes] "
 """
-        respuesta_ia = consultar_api_local(prompt_enriquecido, remitente_id)
+        respuesta_ia = consultar_api_local(mensaje, remitente_id, system_prompt=prompt_enriquecido, guardar_historial=True)
         
         if not respuesta_ia:
             respuesta_ia = "Error al procesar la respuesta con el LLM."
@@ -779,14 +817,26 @@ Instrucciones:
             link_wiki = vault.crear_nota_wiki(titulo_falla, f"**Consulta:** {mensaje}\n\n**Solución:** {respuesta_ia}", enlaces_obsidian)
             respuesta_ia += f"\n\n*(Registrado en Wiki: {link_wiki})*"
 
-        await msg_espera.edit(f"🛠️ [Supervisor] {respuesta_ia}")
+        await msg_espera.edit(respuesta_ia)
         return
 
-    # Nivel 4: Asistente General (Solo en privado y solo para el Jefe)
-    if not es_grupo and remitente_id == MI_TELEGRAM_ID:
-        respuesta_ia = consultar_api_local(mensaje, remitente_id)
+    # Nivel 4: Asistente General Supervisor (En privado o si lo nombran en el grupo)
+    if not es_grupo or ("supervisor" in m_lower) or ("hermes" in m_lower) or ("antigravity" in m_lower):
+        system_prompt = """Eres el "Supervisor" principal del sistema y asistente personal de Cristian. Tienes conocimiento de todo el proyecto y acceso a múltiples identidades/expertos internos.
+REGLA ESTRICTA: Siempre debes firmar tus respuestas usando el emoji y el nombre del experto interno que estás utilizando para responder la consulta, según esta guía:
+- 🛠️ [Hermes]: Para fallas de máquinas, cafeteras, hardware, manuales técnicos y mantenimiento.
+- 🧠 [AntiGravity]: Para código, servidores, DevOps, infraestructura, bots y programación.
+- 🪿 [Goose]: Para tareas de automatización, UI web o scraping.
+- 💼 [Supervisor]: Para reportes, resúmenes generales o si ninguna de las anteriores aplica.
+
+Debes responder de manera útil y mantener el contexto de la conversación. Aprende de lo que el usuario te dice."""
+        
+        # Mostrar "Escribiendo..." en Telegram
+        async with client.action(event.chat_id, 'typing'):
+            respuesta_ia = consultar_api_local(mensaje, remitente_id, system_prompt=system_prompt, guardar_historial=True)
+        
         if respuesta_ia:
-            await event.respond(f"🧠 [Supervisor] {respuesta_ia}")
+            await event.respond(respuesta_ia)
         return
 
 async def watchdog_loop():

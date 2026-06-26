@@ -109,3 +109,11 @@ Analizando los códigos de producción frente al diseño de `hermes_architecture
 1.  **Prioridad 1: Validación de Emisores:** Implementar la validación de Chat ID y correo electrónico contra la lista oficial de técnicos habilitados.
 2.  **Prioridad 2: Auditoría y Viáticos:** Desarrollar los bloques de visión computacional y conciliación de viáticos.
 3.  **Prioridad 3: Orquestación Predictiva:** Programar la proyección por shots y la integración de agendamiento en calendario.
+
+---
+
+## 6. Últimas Actualizaciones de Arquitectura (Integradas)
+*   **Módulo Asistente de Correos**: Desarrollado `asistente_correos.py` con integración IMAP y procesamiento de IA (Gemini Flash) para leer, resumir y almacenar correos informativos en `supervisor_local.db` y Google Drive. Se sumaron las capacidades `tool_consultar_correos` y `tool_redactar_correo_borrador` a Hermes.
+*   **Enrutamiento Inteligente en Telegram**: Se modificó la infraestructura de notificaciones y el userbot para rutear alertas directamente al chat privado del supervisor (evitando fugas de privacidad en el grupo general).
+*   **Motor de Extracción (Self-Healing)**: El `motor_extraccion_errores.py` se actualizó para utilizar el agente local Qwen 2.5 (0.5b), reduciendo drásticamente el consumo de recursos de Ubuntu. Se agregó lógica de recuperación automática (auto-reinicio de Ollama si crashea) y control de estado para evitar reprocesar manuales.
+*   **Estabilización del Cerebro Agentic Loop**: Se implementó un "limitador de contexto" en `agentic_loop.py` para prevenir excesos de cuota en Groq (Error 413 por historiales inmensos). Además, se programó un recuperador de alucinaciones (Error 400) que intercepta errores de sintaxis XML al buscar locales y fuerza la ejecución de las herramientas.

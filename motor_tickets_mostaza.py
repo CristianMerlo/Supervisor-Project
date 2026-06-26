@@ -20,7 +20,7 @@ API_CLIENT_ID = "4"
 API_CLIENT_SECRET = "lXsUsNd9NXldzNENiUTNC2uLSQMhc3kI4CjhimJn"
 
 USERNAME = os.getenv("MOSTAZA_USER", "cmerlo@mostazaweb.com.ar")
-PASSWORD = os.getenv("MOSTAZA_PASS", "cmer654321")
+PASSWORD = os.getenv("MOSTAZA_PASS", "Mante2026")
 
 STATE_FILE = BASE_DIR / "brain" / "tickets_vistos.json"
 DB_PATH = BASE_DIR / "supervisor_local.db"
@@ -153,7 +153,9 @@ def procesar_tickets():
             )
             
             print(f"[+] Alertando sobre ticket {t_id} del local {t_store}")
-            exito = notificador_telegram.enviar_alerta(mensaje, agente="Hermes")
+            # ID del Grupo Mantenimiento Franquicias
+            grupo_id = -5223900821
+            exito = notificador_telegram.enviar_alerta(mensaje, agente="Hermes", destinatario_id=grupo_id)
             
             if exito:
                 nuevos_vistos.append(t_id)

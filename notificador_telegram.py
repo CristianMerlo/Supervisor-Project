@@ -4,7 +4,7 @@ import time
 import uuid
 import requests
 
-def enviar_alerta(mensaje, agente="Antigravity"):
+def enviar_alerta(mensaje, agente="Antigravity", destinatario_id=None):
     """Envía un mensaje de alerta a Telegram a través del Userbot local."""
     if any(tag in mensaje for tag in ["[Hermes]", "[Goose]", "[Antigravity]"]):
         pass
@@ -25,11 +25,15 @@ def enviar_alerta(mensaje, agente="Antigravity"):
                 mensaje = f"🛠️ [Antigravity] {mensaje}"
     url = "http://127.0.0.1:8088/notify"
     try:
-        data = mensaje.encode("utf-8")
+        import json
+        payload = {"message": mensaje}
+        if destinatario_id:
+            payload["chat_id"] = destinatario_id
+        data = json.dumps(payload).encode("utf-8")
         req = urllib.request.Request(
             url, 
             data=data, 
-            headers={"Content-Type": "text/plain; charset=utf-8"},
+            headers={"Content-Type": "application/json; charset=utf-8"},
             method="POST"
         )
         # Timeout de 5 segundos para evitar bloquear la ejecución si el listener estuviera inactivo

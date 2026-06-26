@@ -1,0 +1,316 @@
+{
+    "Melitta_Cafina": [
+        {
+            "codigo": "E01",
+            "falla": "Error de Group Erogador, la pantalla muestra 'Limpiar Grupo' o 'Grupo atascado'. No permite sacar café.",
+            "solucion": "Extraer el grupo erogador por el panel frontal, lavarlo con agua tibia para quitar restos de café compactado, engrasar las guías de movimiento (con grasa de grado alimenticio) y volver a insertar."
+        }
+    ],
+    "phu__Cambio_de_configuracion_PHU": [
+        {
+            "codigo": "E01",
+            "falla": "La configuración de PHU no se puede cambiar debido a errores de sintaxis.",
+            "solucion": "No se proporcionó información sobre cómo hacer este cambio. Asegúrate de que los archivos de configuración son correctos y en formato válido."
+        }
+    ],
+    "taylor__Mantenimiento_de_Taylor_C713": [
+        {
+            "codigo": "FALLA_PRODUCT_DOOR_OFF",
+            "falla": "Sensor del freezer dor Dañado: Cambiar el Sensor"
+        },
+        {
+            "codigo": "CORTE_ALT_PRES_COMP",
+            "falla": "Condensador (Obstruido por un Objeto o pared – Sucio el condensador – Sucio el filtro) – No funciona la turbina."
+        },
+        {
+            "codigo": "CONGELADOR_BLOQUEADO",
+            "falla": "Las causantes de esta falla pueden ser: 1_ El priming está mal echo – 2_ Los carburitos esta puestos al revés – 3_ El nivel de mezcla de la tolva no es el adecuado."
+        },
+        {
+            "codigo": "FALLA_TOLVA",
+            "falla": "La maquina se tilda y no se puede utilizar – Se debe cambiar el sensor y hacer el Priming para dejarla operativa."
+        },
+        {
+            "codigo": "E01",
+            "falla": "Se debe verificar la cámara de enfriamiento para asegurarse de que esté correctamente instalada y configurada.",
+            "solucion": "Verificar el estado de la cámara de enfriamiento y asegurarse de que esté correctamente conectada al sistema de refrigeración."
+        },
+        {
+            "codigo": "E02",
+            "falla": "El filtro dryer no está en su lugar correcto.",
+            "solucion": "Asegurar que el filtro dryer esté en su posición correcta e instalado en el circuito de moisterización."
+        }
+    ],
+    "tostadora__VCT_2000Español_FINAL_2": [
+        {
+            "codigo": "E01",
+            "falla": "El cinturón Wrap no es adecuado para las ruedas dentadas del abrigo.",
+            "solucion": "Realice los pasos 3 y 4, pero asegúrate de que la cadena Transportadora se ajuste con el espacio entre el rodillo y la parte inferior de la rueda."
+        }
+    ],
+    "Cimbali__cimbali_s30": [
+        {
+            "codigo": "E01",
+            "falla": "La pantalla tátil aparece un mensaje de error.",
+            "solucion": "Para solucionar este problema, debes verificar si la unidad USB está conectada correctamente y asegurarte de que el dispositivo USB esté activado en la máquina."
+        },
+        {
+            "codigo": "E02",
+            "falla": "El archivo de software no se puede encontrar en el disco duro.",
+            "solucion": "Verifica que el disco duro esté cargado correctamente y que el archivo de software sea visible en el explorador de archivos."
+        },
+        {
+            "codigo": "E03",
+            "falla": "La configuración del dispositivo USB no está correctamente establecida.",
+            "solucion": "Reinstala la configuración del dispositivo USB y asegúrate de que esté activada correctamente."
+        },
+        {
+            "codigo": "E01",
+            "falla": "El icono seleccionado no se puede visualizar debido a la configuración del dispositivo.",
+            "solucion": "{\"error_code\": \"E01\", \"description\": \"El icono seleccionado no se puede visualizar\"}"
+        },
+        {
+            "codigo": "E02",
+            "falla": "La memoria de las modificaciones no se ha conservado correctamente.",
+            "solucion": "{\"error_code\": \"E02\", \"description\": \"Las modificaciones no se han conservado correctamente\"}"
+        },
+        {
+            "codigo": "E01",
+            "falla": "Se puede cargar messages en un idioma personalizado mediante llave USB.",
+            "solucion": "{\"error\": \"Error de carga de mensajes de texto\"}"
+        },
+        {
+            "codigo": "C2",
+            "falla": "No hay archivos personales cargados en la memoria externa cuando el soporte USB no contiene ningún archivo admitido.",
+            "solucion": "{\"error\": \"Problema de cargabilidad de archivos de memoria personalizada\"}"
+        },
+        {
+            "codigo": "U20",
+            "falla": "Cargar iconos de bebidas personalizadas mediante llave USB puede tener problemas si hay un fondo personalizado activado.",
+            "solucion": "{\"error\": \"Problema de carga de fondos personalizados\"}"
+        },
+        {
+            "codigo": "E01",
+            "falla": "La máquina no permite copiar imágenes de alta resolución a través de la llave USB cuando el soporte USB contiene archivos con dimensión mayor que 50 Mb.",
+            "solucion": "{\"error\": \"Rango de archivo permitido en la función de carga de imágenes\"}"
+        },
+        {
+            "codigo": "U20",
+            "falla": "No se puede cargar vídeos personalizados mediante llave USB si no hay fondos personalizados activados.",
+            "solucion": "{\"error\": \"Problema de carga de fondos personalizados\"}"
+        },
+        {
+            "codigo": "E01",
+            "falla": "La máquina no tiene configuración para el molinillo MM1.",
+            "solucion": "Debes configurar la selección de referencia para el cálculo de la media para el molinillo MM1."
+        },
+        {
+            "codigo": "E02",
+            "falla": "El dato estándar de 0,5% es adecuado para bebidas expresas.",
+            "solucion": "La variación de molido no afectará la configuración de esta opción."
+        },
+        {
+            "codigo": "A05",
+            "falla": "Sistema de control de nivel de leche",
+            "solucion": "Reactivar el sensor de presión caldera"
+        },
+        {
+            "codigo": "051",
+            "falla": "Sensor de presión caldera de servicios",
+            "solucion": "Ajustar la resistencia y rearmar el termostato de seguridad"
+        },
+        {
+            "codigo": "052",
+            "falla": "Pausa calentamiento caldera",
+            "solucion": "Reactivar el termostato de seguridad y verificar las conexiones eléctricas"
+        }
+    ],
+    "Hielera__Clase_Manitowoc": [
+        {
+            "codigo": "E01",
+            "falla": "La máquina para hacer hielo no se enciende correctamente y permanece apagada durante 10 minutos.",
+            "solucion": "Revisa el panel de control para asegurarse de que las conexiones de agua y regulador de hielo estén funcionando correctamente."
+        },
+        {
+            "codigo": "E01",
+            "falla": "Aplicación de la configuración de hora no se realizó correctamente. Se recomienda utilizar el menú Configuración para ajustar esta aplicación.",
+            "solucion": "Revisar el menú Configuración y asegurarse de que todas las opciones estén activas."
+        },
+        {
+            "codigo": "E02",
+            "falla": "La función de la claridad del hielo no se activó correctamente. Verificar la configuración de la máquina para hacer hielo.",
+            "solucion": "Revisar la configuración de la máquina para hacer hielo y asegurarse de que la opción de Claridad del Hielo esté activada."
+        },
+        {
+            "codigo": "E03",
+            "falla": "El sistema de recordatorio de limpieza no se activó correctamente. Verificar la configuración de la máquina para hacer hielo.",
+            "solucion": "Revisar la configuración de la máquina para hacer hielo y asegurarse de que el interruptor de recordatorio esté activado."
+        }
+    ],
+    "taylor__Manual_C713op_Spanish": [
+        {
+            "codigo": "E01",
+            "falla": "La máquina no tiene agujeros en las juntas tóricas localizadas en el extremo del tubo de alimentación.",
+            "solucion": "Reemplazar los agujeros con un tubo correcto."
+        },
+        {
+            "codigo": "E02",
+            "falla": "El sistema no detecta datos corruptos durante la inicialización.",
+            "solucion": "Reiniciar el sistema o cambiar los parámetros de control."
+        },
+        {
+            "codigo": "VNRAM",
+            "falla": "La memoria NVRAM no está configurada correctamente.",
+            "solucion": "Configurar la memoria NVRAM para obtener información adicional sobre la falla."
+        },
+        {
+            "codigo": "E01",
+            "falla": "La máquina no se enciende correctamente",
+            "solucion": "Revisa la fuente de alimentación y asegúrate de que esté conectada a la red eléctrica. Verifica también si el interruptor de energía está configurado correctamente."
+        }
+    ],
+    "melitta__CT8_SP_V4_1_EN": [
+        {
+            "codigo": "E01",
+            "falla": "Descripción de la falla: Servicio de reparación necesaria debido a la mala instalación del sistema.",
+            "solucion": "Reparar el sistema de fluidos y ajustar las bombas según el manual."
+        },
+        {
+            "codigo": "E07",
+            "falla": "El sistema de fluidos no se puede utilizar para ciertos productos, por lo que se recomienda contactar al servicio de reparación.",
+            "solucion": "Contactar al servicio de reparación para obtener instrucciones específicas."
+        },
+        {
+            "codigo": "E11",
+            "falla": "El sistema de hidráulicos no se puede utilizar en los modelos no adaptados a este sistema.",
+            "solucion": "Adaptar el modelo del sistema de hidráulicos según el manual de instrucciones."
+        },
+        {
+            "codigo": "E13",
+            "falla": "El sistema de temperatura no está funcionando correctamente, se recomienda contactar al servicio de reparación.",
+            "solucion": "Contactar al servicio de reparación para obtener instrucciones específicas."
+        },
+        {
+            "codigo": "E01",
+            "falla": "Descripción de la falla: Código de defecto o problema en el sistema",
+            "solucion": "Solución propuesta"
+        },
+        {
+            "codigo": "E02",
+            "falla": "Descripción de la falla: Código de defecto o problema en la parte de controlar",
+            "solucion": "Solución propuesta"
+        },
+        {
+            "codigo": "E03",
+            "falla": "Descripción de la falla: Código de defecto o problema en el sistema",
+            "solucion": "Solución propuesta"
+        },
+        {
+            "codigo": "E01",
+            "falla": "Descripción de la falla",
+            "solucion": "Propuesta de solución"
+        },
+        {
+            "codigo": "E02",
+            "falla": "Teoría detrás de la falla",
+            "solucion": "Reemplazo del componente defectuoso"
+        }
+    ],
+    "Melitta__Milk_Test_E": [
+        {
+            "codigo": "E01",
+            "falla": "Máquina no está funcionando correctamente para realizar el test de millo.",
+            "solucion": "Verificar la alimentación y el sistema de calibración, así como ajustar las configuraciones de máquina según lo indicado en el manual."
+        },
+        {
+            "codigo": "Y71",
+            "falla": "La máquina no tiene el modelo correcto del sistema CF- System.",
+            "solucion": "Revisar la información de modelaje y asegurarse de que se utilice el correcto."
+        },
+        {
+            "codigo": "DSD",
+            "falla": "El sistema Top Foam está funcionando correctamente.",
+            "solucion": "Verificar si el sistema Top Foam está configurado correctamente y si no hay problemas con la conexión a la fuente de agua."
+        }
+    ],
+    "freidora_empero__EMP.PLS.ODFE.020": [
+        {
+            "codigo": "E01",
+            "falla": "The appliance is not connected to another heat-sensitive appliance or furniture.",
+            "solucion": "Place the appliance at least 150 mm away from other heat sources, such as heaters or furniture. If placing near a heat source, use duct tape or insulation materials around the appliance to avoid temperature build-up."
+        }
+    ],
+    "broiler__Nieco_JF94_final": [
+        {
+            "codigo": "E01",
+            "falla": "Error al desengrasar el desengrasador correctamente.",
+            "solucion": "Desentregar la artesa de grasa del asador y recargar con estropajo o cepillo de nylon."
+        },
+        {
+            "codigo": "E01",
+            "falla": "",
+            "solucion": ""
+        },
+        {
+            "codigo": "E01",
+            "falla": "El ventilador debe estar de bien funcionando.",
+            "solucion": "Verifique la campana, que la conecte con el motor y verifica si se está cocinado o no. Verifique que los bloques de terminales sean confiados en el motor y la caja de control."
+        }
+    ],
+    "La_Cimbali_M23": [
+        {
+            "codigo": "E01",
+            "falla": "El presostato no calienta correctamente o levanta demasiada presión al abrir el grifo.",
+            "solucion": "{\"Revisar contacto eléctrico del presostato, si está sulfatado limpiar y si el tubo de cobre está obstruido con sarro desarmar y purgar, reemplazar la pieza si la membrana interna está perforada.\""
+        }
+    ],
+    "ups__MOSTAZA__UPS_10_KVA__001_002095": [],
+    "Melitta__CT8_SM_V5.0_ES": [
+        {
+            "codigo": "E01",
+            "falla": "Descripción de la falla: Las personas que intervienen en el área de trabajo no deben tocar piezas calientes, conductoras de vapor o materiales auxiliares."
+        },
+        {
+            "codigo": "1-4",
+            "falla": "La máquina no está protegida frente a salpicaduras y chorros de agua.",
+            "solucion": "Protege el aparato desde fuera del rango de flujo de agua"
+        },
+        {
+            "codigo": "E01",
+            "falla": "La válvula Y51 queda suprimida.",
+            "solucion": "Debilitar la válvula Y51."
+        },
+        {
+            "codigo": "E02",
+            "falla": "El motor reductor permanece en la máquina.",
+            "solucion": "Desmontar y reemplazar el motor reductor."
+        },
+        {
+            "codigo": "E01",
+            "falla": "Error de comunicación con el MST",
+            "solucion": "Verificar la conexión entre el MST y la tarjeta de control, asegurarse de que estén correctamente conectados."
+        },
+        {
+            "codigo": "V5.0CONTENIDO",
+            "falla": "",
+            "solucion": ""
+        }
+    ],
+    "broiler__Nieco_JF93_GAS_ES_03.31.2015_Manual": [
+        {
+            "codigo": "E01",
+            "falla": "El dispositivo restrictivo debe pedirse con todos los conectores para aparatos móviles. No es necesario que se conecte a la placa de cizallamiento del asador.",
+            "solucion": "Para un acople correcto al asador, use la ferretería suministrada para conectar el dispositivo a los orificios en la placa de cizallamiento del pedestal del asador. Si es necesaria la desconexión de la restricción, reconéctela después que el aparato se haya regresado a su posición de instalación original."
+        },
+        {
+            "codigo": "E01",
+            "falla": "El asador no fue inicializado correctamente.",
+            "solucion": "Llene la pantalla con los números de los productos que quieras cambiar y presiona el botón cuadrado para guardar las modificaciones. Luego, use las flechas ascendentes y descendentes para configurar los tiempos prefijados en la pantalla."
+        },
+        {
+            "codigo": "E01",
+            "falla": "El cambio de configuración de los transistores debe ser previamente realizado por un profesional en el área de seguridad energética y electrónica.",
+            "solucion": "Realizar cambios de configuraciones de transistores aprobadas por ingenieros autorizados y certificados. En este caso, se recomienda la colaboración con un ingeniero técnico en el sector de la automatización y la seguridad electricidad para que los cambios se hagan correctamente."
+        }
+    ]
+}

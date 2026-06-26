@@ -139,6 +139,7 @@ def guardar_mensaje_aprendizaje(remitente_id, remitente_nombre, mensaje, es_grup
 from aiohttp import web
 
 pending_approvals = {}
+modo_chat = {}
 
 async def ask_approval_handler(request):
     try:
@@ -163,22 +164,29 @@ async def check_approval_handler(request):
 async def notify_handler(request):
     try:
         message = ""
+        chat_id = MI_TELEGRAM_ID
         if request.has_body:
             try:
-                data = await request.post()
+                data = await request.json()
                 message = data.get("message", "").strip()
+                if "chat_id" in data:
+                    chat_id = int(data["chat_id"])
             except Exception:
-                pass
+                try:
+                    data = await request.post()
+                    message = data.get("message", "").strip()
+                except Exception:
+                    pass
             if not message:
                 message = (await request.text()).strip()
         
         if message:
-            logging.info(f"[UPS ALERTA LOCAL] Enviando: {message}")
+            logging.info(f"[UPS ALERTA LOCAL] Enviando a {chat_id}: {message}")
             # Si ya contiene un tag de agente con formato unificado, lo enviamos directo
             if any(tag in message for tag in ["[Hermes]", "[Goose]", "[Antigravity]"]):
-                await client.send_message(MI_TELEGRAM_ID, message)
+                await client.send_message(chat_id, message)
             else:
-                await client.send_message(MI_TELEGRAM_ID, f"🔌 [Supervisor UPS] {message}")
+                await client.send_message(chat_id, f"🔌 [Supervisor UPS] {message}")
             return web.Response(text="Enviado con éxito\n")
         else:
             return web.Response(text="Mensaje vacío\n", status=400)
@@ -300,27 +308,139 @@ async def handler(event):
     if event.sender:
         remitente_nombre = getattr(event.sender, "first_name", "Usuario") or getattr(event.sender, "username", "Usuario")
 
-    mensaje = event.text
+    mensaje = event.text or ""
+    
+    # NUEVO: Procesar audio ANTES de revisar comandos
+    if event.message.media and hasattr(event.message.media, 'document') and getattr(event.message, 'voice', False):
+        logging.info("Descargando nota de voz al inicio del handler...")
+        try:
+            archivo = await event.message.download_media(file=DIR_AUDIOS)
+            texto = transcribir_audio_groq(archivo)
+            if texto:
+                mensaje = texto.strip()
+                logging.info(f"Transcripción inicial: {mensaje}")
+            import os
+            os.remove(archivo)
+        except Exception as e:
+            logging.info(f"Error procesando audio: {e}")
+
+    # NUEVO: Análisis de Visión Computacional (Skill 16)
+    if event.media:
+        if getattr(event.media, "photo", None):
+            try:
+                ruta_descarga = await event.download_media(file="/tmp/")
+                if ruta_descarga:
+                    import analizador_imagenes
+                    descripcion_ia = analizador_imagenes.analizar_foto(ruta_descarga)
+                    mensaje = f"{mensaje}\n\n[IMAGEN ADJUNTA] {descripcion_ia}".strip()
+                    import os
+                    os.remove(ruta_descarga)
+            except Exception as e:
+                logging.info(f"Error analizando imagen: {e}")
+
     if not mensaje and not event.media:
         return
         
-    # LOGICA DE APROBACIÓN POR COMANDOS
+    # COMANDOS DIRECTOS (Bypass de Groq)
+    if mensaje and mensaje.lower().strip() == "/excel":
+        await event.respond("⏳ Construyendo el reporte analítico en Excel (bypassing Groq)...")
+        try:
+            import agentic_loop
+            resultado = agentic_loop.tool_generar_excel_kpi()
+            if "[ARCHIVO_ADJUNTO]" in resultado:
+                partes = resultado.split("[ARCHIVO_ADJUNTO]")
+                texto = partes[0].strip()
+                ruta = partes[1].strip()
+                await client.send_file(event.chat_id, ruta, caption=texto)
+            else:
+                await event.respond(f"Error interno: {resultado}")
+        except Exception as e:
+            await event.respond(f"❌ Fallo crítico armando el Excel: {e}")
+        return
+        
+    # LÓGICA DE ANTIGRAVITY Y ESTADO DE CHAT
+    if mensaje.lower().strip() in ["/hermes", "@hermes", "hermes"]:
+        modo_chat[remitente_id] = "hermes"
+        await event.respond("🧠 [Hermes] He vuelto al control. ¿En qué te ayudo?")
+        return
+
+    es_comando_ag = (
+        mensaje.lower().startswith("/antigravity") or 
+        mensaje.lower().startswith("@antigravity") or 
+        mensaje.lower().startswith("arroba antigravity") or
+        mensaje.lower().startswith("antigravity")
+    )
+    
+    if es_comando_ag:
+        if modo_chat.get(remitente_id) != "antigravity":
+            modo_chat[remitente_id] = "antigravity"
+            await event.respond("✨ [AntiGravity] Control asumido. Seguiré respondiendo hasta que digas `/hermes`.")
+            
+    if modo_chat.get(remitente_id) == "antigravity":
+        try:
+            import google.generativeai as genai
+            import os
+            from dotenv import load_dotenv
+            load_dotenv("/home/cristian/PROYECTOS/Supervisor-Project/.env")
+            api_key = os.getenv("GEMINI_API_KEY")
+            if api_key:
+                genai.configure(api_key=api_key)
+                model = genai.GenerativeModel('gemini-2.5-flash')
+                consulta = mensaje.lower().replace("/antigravity", "").replace("@antigravity", "").replace("arroba antigravity", "").replace("antigravity", "").strip()
+                if not consulta:
+                    return
+                prompt = f"Eres AntiGravity, la IA base que programó a Hermes. El usuario dice: {consulta}. Responde de forma clara y directa."
+                respuesta = model.generate_content(prompt).text.strip()
+                await event.respond(f"✨ [AntiGravity]\n{respuesta}")
+            else:
+                await event.respond("❌ Falta GEMINI_API_KEY en .env")
+        except Exception as e:
+            await event.respond(f"❌ Error de AntiGravity: {e}")
+        return
+
+    # LOGICA DE APROBACIÓN POR COMANDOS (SOLUCIONES WIKI)
     if mensaje and mensaje.startswith("/aprobar "):
         req_id = mensaje.split(" ")[1].strip()
-        if req_id in pending_approvals:
-            pending_approvals[req_id] = "approved"
-            await event.respond(f"✅ Has aprobado la solicitud {req_id}.")
-        else:
-            await event.respond("❌ ID de solicitud no encontrado o ya expirado.")
+        try:
+            conn = sqlite3.connect("supervisor_local.db")
+            c = conn.cursor()
+            c.execute("SELECT maquina, falla, solucion FROM soluciones_pendientes WHERE id = ? AND estado = 'PENDIENTE'", (req_id,))
+            row = c.fetchone()
+            if row:
+                c.execute("UPDATE soluciones_pendientes SET estado = 'APROBADO' WHERE id = ?", (req_id,))
+                conn.commit()
+                # Registrar en la Wiki
+                import agentic_loop
+                # Llamar a la herramienta original para registrar
+                from obsidian_bridge import ObsidianVault
+                vault = ObsidianVault()
+                maquina, falla, solucion = row
+                titulo = f"Solución - {maquina} - {falla[:30]}"
+                contenido = f"**Falla reportada:** {falla}\n\n**Solución confirmada por técnicos:**\n{solucion}"
+                enlaces = [maquina.replace(" ", "_")]
+                link = vault.crear_nota_wiki(titulo, contenido, enlaces)
+                await event.respond(f"✅ Has aprobado la solución {req_id}.\nSe ha registrado permanentemente en la Wiki: {link}")
+            else:
+                await event.respond("❌ ID de solución no encontrado, o ya fue procesada.")
+            conn.close()
+        except Exception as e:
+            await event.respond(f"Error procesando aprobación: {e}")
         return
         
     if mensaje and mensaje.startswith("/rechazar "):
         req_id = mensaje.split(" ")[1].strip()
-        if req_id in pending_approvals:
-            pending_approvals[req_id] = "rejected"
-            await event.respond(f"🚫 Has rechazado la solicitud {req_id}.")
-        else:
-            await event.respond("❌ ID de solicitud no encontrado o ya expirado.")
+        try:
+            conn = sqlite3.connect("supervisor_local.db")
+            c = conn.cursor()
+            c.execute("UPDATE soluciones_pendientes SET estado = 'RECHAZADO' WHERE id = ? AND estado = 'PENDIENTE'", (req_id,))
+            if c.rowcount > 0:
+                await event.respond(f"🚫 Has rechazado la solución {req_id}. No se agregará a la Wiki.")
+            else:
+                await event.respond("❌ ID de solución no encontrado, o ya fue procesada.")
+            conn.commit()
+            conn.close()
+        except Exception as e:
+            pass
         return
 
     remitente_id = event.sender_id
@@ -612,20 +732,7 @@ async def handler(event):
             await event.respond(f"⚠️ Error al descargar el archivo `{file_name}`. Por favor, reintenta.")
         return
 
-    # Soporte de Audio / Voice Notes
-    if event.message.media and hasattr(event.message.media, 'document') and event.message.voice:
-        logging.info("Descargando nota de voz...")
-        archivo = await event.message.download_media(file=DIR_AUDIOS)
-        texto = transcribir_audio_groq(archivo)
-        logging.info(f"Transcripción: {texto}")
-        mensaje = texto.strip()
-        try:
-            os.remove(archivo)
-        except:
-            pass
-    else:
-        mensaje = event.text.strip() if event.text else ""
-        
+    pass
     if not mensaje:
         return
         
@@ -731,114 +838,47 @@ async def handler(event):
             return  # Silencio en el grupo
             
     # Filtrar palabras significativas para buscar local (ya definido arriba)
-    
-    # Nivel 1: Consulta Estática (Dirección de locales)
-    if "direccion" in m_lower or "dirección" in m_lower or "donde queda" in m_lower or "dónde queda" in m_lower:
-        for palabra in palabras_clave:
-            res = buscar_direccion_local(palabra)
-            if res:
-                await event.respond(f"📍 [Supervisor] La dirección de {res[0]} es: {res[1]}")
-                return
-        await event.respond("📍 [Supervisor] No encontré el local solicitado. ¿Me indicas la sigla o nombre?")
-        return
+    # 3. Agentic Loop para Consultas Inteligentes (Reemplaza Niveles 1-4)
+    # Solo procesa si debe responder en grupo, o si es privado
+    if not es_grupo or debe_responder:
+        from agentic_loop import consultar_agentic_loop
         
-    # Nivel 2: Consulta Dinámica (Pendientes)
-    elif "pendiente" in m_lower or "pendientes" in m_lower or "tarea" in m_lower or "tareas" in m_lower:
-        for palabra in palabras_clave:
-            pendientes = buscar_pendientes_local(palabra)
-            if pendientes:
-                respuesta = f"📋 [Supervisor] Pendientes registrados para {palabra.upper()}:\n"
-                for p in pendientes:
-                    respuesta += f"- {p[0]} (Registrado: {p[1]})\n"
-                await event.respond(respuesta)
-                return
-        await event.respond("📋 [Supervisor] No hay pendientes críticos registrados para ese local en este momento.")
-        return
-
-    # Nivel 3: Consultas Complejas / Errores técnicos (Manuales / RAG)
-    elif "error" in m_lower or "falla" in m_lower or "cimbali" in m_lower or "ablandador" in m_lower or "melitta" in m_lower or "broiler" in m_lower:
-        msg_espera = await event.respond("🛠️ [Supervisor] Buscando en la Bóveda de Conocimiento Local y NotebookLM...")
-        
-        from obsidian_bridge import ObsidianVault
-        import subprocess
-        
-        vault = ObsidianVault()
-        
-        # 1. Router: Extraer palabras clave
-        prompt_keys = f"Extrae máximo 3 palabras clave vitales para buscar este fallo en un manual: '{mensaje}'. Retorna SOLO las palabras separadas por espacios. Sin explicaciones ni puntos."
-        keywords = consultar_api_local(prompt_keys, remitente_id, guardar_historial=False)
-        if not keywords or len(keywords.split()) > 5:
-            keywords = mensaje
-            
-        # 2. Búsqueda Local (Obsidian)
-        hallazgos = vault.buscar_manual(keywords)
-        contexto_final = ""
-        enlaces_obsidian = []
-        fuente = "Obsidian"
-        
-        if hallazgos:
-            contexto_final = "INFORMACIÓN LOCAL:\n"
-            for h in hallazgos:
-                contexto_final += f"- {h['link']}: {h['contexto']}\n"
-                enlaces_obsidian.append(h['nota'])
-        else:
-            # 3. Fallback a NotebookLM si no hay datos locales
-            fuente = "NotebookLM"
-            try:
-                nlm_path = "/home/cristian/.local/bin/nlm"
-                res_nlm = subprocess.run([nlm_path, "cross", "query", mensaje, "--all"], capture_output=True, text=True)
-                if res_nlm.returncode == 0 and res_nlm.stdout.strip():
-                    contexto_final = f"INFORMACIÓN NOTEBOOKLM:\n{res_nlm.stdout.strip()[:1000]}"
-                else:
-                    contexto_final = "SIN RESULTADOS EN MANUALES."
-            except Exception as e:
-                contexto_final = "SIN RESULTADOS EN MANUALES."
-        
-        # 4. Generación Estricta (Anti-Alucinaciones)
-        prompt_enriquecido = f"""
-Eres el "Supervisor" actuando en tu rol de experto 🛠️ [Hermes]. REGLA ESTRICTA: Cero alucinaciones.
-El técnico te ha consultado lo siguiente. Contexto recuperado de manuales ({fuente}):
-{contexto_final}
-
-Instrucciones:
-- Si el contexto dice "SIN RESULTADOS EN MANUALES" o no resuelve la duda, DEBES responder exactamente: "No tengo registrada esta falla específica para este equipo en mis manuales. Por favor, ¿deseas que aperture un ticket para que un humano lo investigue y yo aprenda la solución?"
-- NO inventes ni ofrezcas sugerencias genéricas si la falla exacta no aparece en el contexto.
-- Si el contexto resuelve el problema, resume la solución e incluye las referencias al manual.
-- Comienza siempre tu respuesta con: "🛠️ [Hermes] "
+        system_prompt = """Eres Hermes, el "Supervisor" principal del sistema y asistente experto en mantenimiento operativo.
+Tienes acceso a múltiples herramientas para consultar datos de locales, pendientes, manuales técnicos y reportes analizados.
+REGLAS ESTRICTAS:
+1. Siempre sé profesional, resolutivo y analítico.
+2. NUNCA respondas que "no tienes la capacidad" o "no encuentras" algo ANTES de usar las herramientas. Úsalas para buscar siglas, información o reportes.
+3. Si la herramienta de buscar local te dice que no encontró el local, pide amablemente aclaración. Si te devuelve una sigla (ej. FSJU), usa ESA SIGLA para buscar reportes o pendientes.
+4. Si hay fallas técnicas, usa la herramienta de buscar manuales. Si es algo de código o infraestructura que falla, usa la herramienta de contactar a AntiGravity.
+5. Inicia tu respuesta final con el emoji 🤖 [Hermes] (a menos que el usuario esté pidiendo ayuda de otro agente, pero Hermes siempre coordina).
 """
-        respuesta_ia = consultar_api_local(mensaje, remitente_id, system_prompt=prompt_enriquecido, guardar_historial=True)
-        
-        if not respuesta_ia:
-            respuesta_ia = "Error al procesar la respuesta con el LLM."
-        
-        # 5. Memoria en Wiki solo si se encontró solución
-        if hallazgos and "No tengo registrada esta falla" not in respuesta_ia:
-            titulo_falla = f"Reporte de falla - {remitente_nombre.split()[0]}"
-            link_wiki = vault.crear_nota_wiki(titulo_falla, f"**Consulta:** {mensaje}\n\n**Solución:** {respuesta_ia}", enlaces_obsidian)
-            respuesta_ia += f"\n\n*(Registrado en Wiki: {link_wiki})*"
-
-        await msg_espera.edit(respuesta_ia)
-        return
-
-    # Nivel 4: Asistente General Supervisor (En privado o si lo nombran en el grupo)
-    if not es_grupo or ("supervisor" in m_lower) or ("hermes" in m_lower) or ("antigravity" in m_lower):
-        system_prompt = """Eres el "Supervisor" principal del sistema y asistente personal de Cristian. Tienes conocimiento de todo el proyecto y acceso a múltiples identidades/expertos internos.
-REGLA ESTRICTA: Siempre debes firmar tus respuestas usando el emoji y el nombre del experto interno que estás utilizando para responder la consulta, según esta guía:
-- 🛠️ [Hermes]: Para fallas de máquinas, cafeteras, hardware, manuales técnicos y mantenimiento.
-- 🧠 [AntiGravity]: Para código, servidores, DevOps, infraestructura, bots y programación.
-- 🪿 [Goose]: Para tareas de automatización, UI web o scraping.
-- 💼 [Supervisor]: Para reportes, resúmenes generales o si ninguna de las anteriores aplica.
-
-Debes responder de manera útil y mantener el contexto de la conversación. Aprende de lo que el usuario te dice."""
         
         # Mostrar "Escribiendo..." en Telegram
         async with client.action(event.chat_id, 'typing'):
-            respuesta_ia = consultar_api_local(mensaje, remitente_id, system_prompt=system_prompt, guardar_historial=True)
-        
+            # Cargar historial
+            historial = obtener_historial(remitente_id, limite=10)
+            
+            # Consultar Agentic Loop
+            respuesta_ia = consultar_agentic_loop(mensaje, historial, system_prompt)
+            
+            # Guardar en memoria local del userbot
+            guardar_mensaje_memoria(remitente_id, "user", mensaje)
+            guardar_mensaje_memoria(remitente_id, "assistant", respuesta_ia)
         if respuesta_ia:
-            await event.respond(respuesta_ia)
+            if "[ARCHIVO_ADJUNTO]" in respuesta_ia:
+                partes = respuesta_ia.split("[ARCHIVO_ADJUNTO]")
+                mensaje_texto = partes[0].strip()
+                ruta_archivo = partes[1].strip()
+                
+                if mensaje_texto:
+                    await event.respond(mensaje_texto)
+                if os.path.exists(ruta_archivo):
+                    await client.send_file(event.chat_id, ruta_archivo)
+                else:
+                    await event.respond(f"❌ Error: El archivo generado no se encontró en {ruta_archivo}")
+            else:
+                await event.respond(respuesta_ia)
         return
-
 async def watchdog_loop():
     logging.info("--- [WATCHDOG] Iniciando perro guardián de conexión Telegram ---")
     while True:

@@ -43,8 +43,8 @@ class ObsidianVault:
                 for p in palabras:
                     if p in contenido_lower:
                         idx = contenido_lower.find(p)
-                        inicio = max(0, idx - 3000)
-                        fin = min(len(contenido), idx + 12000)
+                        inicio = max(0, idx - 300)
+                        fin = min(len(contenido), idx + 1500)
                         contexto = "..." + contenido[inicio:fin] + "..."
                         break
                         

@@ -3,7 +3,6 @@ import sqlite3
 import sys
 import requests
 import asyncio
-import threading
 from telethon import TelegramClient, events
 from dotenv import load_dotenv
 
@@ -58,8 +57,10 @@ client = TelegramClient('supervisor', API_ID, API_HASH)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 from pathlib import Path
 DIR_AUDIOS = Path("temp_audios")
+import threading
 import json
 STATE_FILE = "/home/cristian/Documentos/Supervisor/telegram_bridge/bridge_state.json"
+DB_PATH_MASTER = "/home/cristian/Documentos/Supervisor/supervisor_local.db"
 
 def cargar_estado():
     if os.path.exists(STATE_FILE):
@@ -107,23 +108,209 @@ import datetime
 
 BOT_USER_ID = None
 
+def cargar_mapa_locales():
+    """Carga un mapeo completo de siglas de sistema, siglas de tickets y nombres hacia la sigla oficial y nombre real."""
+    mapa = {}
+    csv_path = "/home/cristian/Documentos/Supervisor/locales.csv"
+    if not os.path.exists(csv_path):
+        csv_path = "/home/cristian/PROYECTOS/Supervisor-Project/locales.csv"
+        
+    if os.path.exists(csv_path):
+        try:
+            import csv
+            with open(csv_path, newline='', encoding='utf-8') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    sigla_sistema = row.get("SIGLA SISTEMA", "").strip().upper()
+                    sigla_tickets = row.get("SIGLA TICKETS", "").strip().upper()
+                    nombre_local = row.get("LOCAL", "").strip()
+                    
+                    # Sigla oficial será sigla_sistema, o sigla_tickets si la de sistema es '-'
+                    sigla_oficial = sigla_sistema
+                    if not sigla_oficial or sigla_oficial == "-":
+                        sigla_oficial = sigla_tickets
+                    
+                    if not sigla_oficial:
+                        continue
+                        
+                    datos = {
+                        "sigla": sigla_oficial,
+                        "nombre": nombre_local,
+                        "direccion": row.get("DIRECCION", "").strip(),
+                        "supervisor": row.get("SUPERVISOR (GTE ZONA)", "").strip()
+                    }
+                    
+                    # Registrar bajo sigla de sistema
+                    if sigla_sistema and sigla_sistema != "-":
+                        mapa[sigla_sistema] = datos
+                    # Registrar bajo sigla de tickets
+                    if sigla_tickets and sigla_tickets != "-":
+                        mapa[sigla_tickets] = datos
+                    # Registrar bajo nombre del local (normalizado)
+                    if nombre_local:
+                        mapa[nombre_local.lower()] = datos
+        except Exception as e:
+            logging.info(f"[ERROR cargar_mapa_locales] {e}")
+            
+    # Fallback con base de datos si el CSV falla
+    try:
+        conn = sqlite3.connect(DB_PATH_MASTER)
+        cursor = conn.cursor()
+        cursor.execute("SELECT sigla, nombre, direccion, supervisor FROM locales")
+        for row in cursor.fetchall():
+            sigla = row[0].strip().upper()
+            nombre = row[1].strip()
+            datos = {
+                "sigla": sigla,
+                "nombre": nombre,
+                "direccion": row[2],
+                "supervisor": row[3]
+            }
+            if sigla not in mapa:
+                mapa[sigla] = datos
+            if nombre.lower() not in mapa:
+                mapa[nombre.lower()] = datos
+        conn.close()
+    except Exception as e:
+        logging.info(f"[ERROR DB fallback locales] {e}")
+        
+    return mapa
+
+def buscar_local_criterio_amplio(mensaje, mapa_locales):
+    """Busca un local en el mensaje usando coincidencia de siglas o nombre completo, con tolerancia a errores simples."""
+    m_clean = mensaje.upper().strip()
+    
+    # 1. Buscar coincidencia exacta de siglas (palabras sueltas en el mensaje)
+    palabras = [p.strip().upper().rstrip(',.?!;:') for p in mensaje.split()]
+    for p in palabras:
+        if p in mapa_locales:
+            return mapa_locales[p]
+            
+    # 2. Buscar coincidencia en el nombre del local completo (ej: "Villa del Parque" en el mensaje)
+    m_lower = mensaje.lower()
+    candidato = None
+    max_len = 0
+    for key, datos in mapa_locales.items():
+        # Evitar buscar por siglas cortas de menos de 3 letras en el texto completo para evitar falsos positivos
+        if len(key) < 3:
+            continue
+        if key in m_lower:
+            # Elegir la coincidencia más larga para evitar que "Laferrere 2" coincida solo con "Laferrere"
+            if len(key) > max_len:
+                candidato = datos
+                max_len = len(key)
+                
+    if candidato:
+        return candidato
+        
+    # 3. Tolerancia simple (coincidencia parcial de palabras largas)
+    for key, datos in mapa_locales.items():
+        if len(key) > 5 and key in m_lower:
+            return datos
+            
+    return None
+
+async def esperar_respuesta_timeout(chat_id_str, expected_status, timeout_seconds=600):
+    await asyncio.sleep(timeout_seconds)
+    estado_actual = cargar_estado()
+    if estado_actual.get("chat_id") == chat_id_str and estado_actual.get("status") == expected_status:
+        files = estado_actual.get("files", [])
+        desc_files = ""
+        if files:
+            desc_files = ", ".join([f"`{f.get('file_name')}`" for f in files])
+        else:
+            ruta_descarga = estado_actual.get("ruta_descarga")
+            if ruta_descarga:
+                desc_files = f"`{os.path.basename(ruta_descarga)}`"
+                
+        limpiar_estado()
+        
+        sender_name = estado_actual.get("sender_name", "Un técnico")
+        chat_title = estado_actual.get("chat_title", "un grupo")
+        aviso = (
+            f"⚠️ *[Aviso de Confirmación Pendiente]*\n"
+            f"El técnico {sender_name} en '{chat_title}' subió archivos ({desc_files or 'Multimedia'}) "
+            f"pero no respondió a la pregunta de confirmación en los últimos 10 minutos.\n"
+            f"El estado fue liberado. Puedes retomar el tema con él más tarde."
+        )
+        try:
+            await client.send_message(MI_TELEGRAM_ID, aviso)
+        except Exception as e_aviso:
+            logging.info(f"Error enviando aviso de timeout a Cristian: {e_aviso}")
+
 def obtener_lista_locales():
     try:
-        conn = sqlite3.connect("supervisor_local.db")
-        cursor = conn.cursor()
-        cursor.execute("SELECT sigla, nombre FROM locales")
-        filas = cursor.fetchall()
-        conn.close()
+        mapa = cargar_mapa_locales()
+        vistos = set()
         locales = []
-        for sigla, nombre in filas:
-            if sigla:
-                locales.append(sigla.lower())
-            if nombre:
-                locales.append(nombre.lower())
+        for key, datos in mapa.items():
+            sigla = datos["sigla"]
+            nombre = datos["nombre"]
+            identificador = f"{sigla}: {nombre}"
+            if identificador not in vistos:
+                vistos.add(identificador)
+                locales.append(identificador)
         return locales
     except Exception as e:
         logging.info(f"[ERROR DB locales] No se pudo cargar: {e}")
         return []
+
+def obtener_contexto_cronograma(sender):
+    try:
+        import json
+        import os
+        
+        nombre_completo = ""
+        if sender:
+            fn = getattr(sender, "first_name", "") or ""
+            ln = getattr(sender, "last_name", "") or ""
+            nombre_completo = f"{fn} {ln}".strip().lower()
+            
+        tecnicos_map = {
+            "fernando": "Fernando Soria",
+            "soria": "Fernando Soria",
+            "anabella": "Anabella Guerrero",
+            "ana": "Anabella Guerrero",
+            "guerrero": "Anabella Guerrero",
+            "tomas": "Tomas Vera",
+            "tomy": "Tomas Vera",
+            "vera": "Tomas Vera",
+            "francisco": "Francisco Rametta",
+            "rametta": "Francisco Rametta"
+        }
+        
+        tecnico_detectado = None
+        for key, val in tecnicos_map.items():
+            if key in nombre_completo:
+                tecnico_detectado = val
+                break
+                
+        if not tecnico_detectado:
+            return ""
+            
+        cronograma_path = "/home/cristian/PROYECTOS/Supervisor-Project/cronograma_tecnicos.json"
+        if not os.path.exists(cronograma_path):
+            return ""
+            
+        with open(cronograma_path, "r", encoding="utf-8") as f:
+            cronograma = json.load(f)
+            
+        import datetime
+        dias_semana = {
+            0: "lunes", 1: "martes", 2: "miercoles", 3: "jueves", 
+            4: "viernes", 5: "sabado", 6: "domingo"
+        }
+        dia_hoy = dias_semana[datetime.datetime.now().weekday()]
+        
+        locales_hoy = cronograma.get(tecnico_detectado, {}).get(dia_hoy, [])
+        if locales_hoy:
+            if "OFF" in locales_hoy or not locales_hoy:
+                return f"El técnico {tecnico_detectado} hoy ({dia_hoy}) tiene franco (OFF) o no tiene asignación."
+            return f"El técnico {tecnico_detectado} hoy ({dia_hoy}) tiene asignados los siguientes locales en su ruta: {', '.join(locales_hoy)}."
+    except Exception as e:
+        logging.info(f"Error cargando cronograma: {e}")
+    return ""
+
 
 def guardar_mensaje_aprendizaje(remitente_id, remitente_nombre, mensaje, es_grupo):
     log_path = "grupo_aprendizaje.log"
@@ -194,9 +381,41 @@ async def notify_handler(request):
         logging.info(f"[ERROR NOTIFICACIÓN LOCAL] {e}")
         return web.Response(text=f"Error: {e}\n", status=500)
 
+async def notify_file_handler(request):
+    try:
+        reader = await request.multipart()
+        field = await reader.next()
+        if not field:
+            return web.Response(status=400, text="No file uploaded")
+            
+        filename = field.filename
+        content = await field.read()
+        
+        chat_id = MI_TELEGRAM_ID
+        if 'chat_id' in request.query:
+            chat_id = int(request.query['chat_id'])
+            
+        import tempfile
+        import os
+        fd, temp_path = tempfile.mkstemp(suffix=filename)
+        with open(fd, 'wb') as f:
+            f.write(content)
+            
+        caption = "📄 Reporte Adjunto"
+        if 'caption' in request.query:
+            caption = request.query['caption']
+        
+        await client.send_file(chat_id, temp_path, caption=caption)
+        os.remove(temp_path)
+        return web.Response(text="Archivo enviado con éxito")
+    except Exception as e:
+        logging.info(f"[ERROR SEND_FILE] {e}")
+        return web.Response(text=f"Error: {e}\n", status=500)
+
 async def start_notification_server():
     app = web.Application()
     app.router.add_post('/notify', notify_handler)
+    app.router.add_post('/notify_file', notify_file_handler)
     app.router.add_post('/ask_approval', ask_approval_handler)
     app.router.add_get('/check_approval/{req_id}', check_approval_handler)
     runner = web.AppRunner(app)
@@ -206,7 +425,7 @@ async def start_notification_server():
     logging.info("--- [SERVER LOCAL] Notificador local escuchando en 127.0.0.1:8088/notify ---")
 
 def buscar_direccion_local(termino):
-    conn = sqlite3.connect("supervisor_local.db")
+    conn = sqlite3.connect(DB_PATH_MASTER)
     cursor = conn.cursor()
     cursor.execute("SELECT nombre, direccion FROM locales WHERE sigla = ? OR nombre LIKE ?", (termino.upper(), f"%{termino}%"))
     resultado = cursor.fetchone()
@@ -214,7 +433,7 @@ def buscar_direccion_local(termino):
     return resultado
 
 def buscar_pendientes_local(termino):
-    conn = sqlite3.connect("supervisor_local.db")
+    conn = sqlite3.connect(DB_PATH_MASTER)
     cursor = conn.cursor()
     # Buscar pendientes por sigla o nombre del local
     cursor.execute("""
@@ -229,7 +448,7 @@ def buscar_pendientes_local(termino):
 
 def guardar_mensaje_memoria(chat_id, rol, mensaje):
     try:
-        conn = sqlite3.connect("supervisor_local.db")
+        conn = sqlite3.connect(DB_PATH_MASTER)
         cursor = conn.cursor()
         cursor.execute("INSERT INTO memoria_conversacional (chat_id, rol, mensaje) VALUES (?, ?, ?)", (str(chat_id), rol, mensaje))
         conn.commit()
@@ -239,7 +458,7 @@ def guardar_mensaje_memoria(chat_id, rol, mensaje):
 
 def obtener_historial(chat_id, limite=10):
     try:
-        conn = sqlite3.connect("supervisor_local.db")
+        conn = sqlite3.connect(DB_PATH_MASTER)
         cursor = conn.cursor()
         cursor.execute("SELECT rol, mensaje FROM memoria_conversacional WHERE chat_id = ? ORDER BY id DESC LIMIT ?", (str(chat_id), limite))
         resultados = cursor.fetchall()
@@ -299,6 +518,9 @@ def filtrar_palabras(mensaje):
 
 @client.on(events.NewMessage(incoming=True))
 async def handler(event):
+    import os
+    import shutil
+    import asyncio
     if event.is_private and event.sender_id != MI_TELEGRAM_ID:
         return
 
@@ -331,10 +553,77 @@ async def handler(event):
                 ruta_descarga = await event.download_media(file="/tmp/")
                 if ruta_descarga:
                     import analizador_imagenes
-                    descripcion_ia = analizador_imagenes.analizar_foto(ruta_descarga)
+                    import subidor_evidencias
+                    import seguimiento_ppm
+                    
+                    # Recuperar contexto si la foto no tiene caption
+                    contexto_mensaje = mensaje
+                    if not contexto_mensaje:
+                        try:
+                            # Buscar en los últimos 5 mensajes del mismo chat/usuario para recuperar contexto
+                            mensajes_recientes = await client.get_messages(event.chat_id, limit=5)
+                            textos_contexto = []
+                            for msg in mensajes_recientes:
+                                if msg.sender_id == remitente_id and msg.text:
+                                    textos_contexto.append(msg.text)
+                            if textos_contexto:
+                                contexto_mensaje = " | ".join(textos_contexto)
+                                logging.info(f"[VISION CONTEXTO] Recuperado del chat: {contexto_mensaje}")
+                        except Exception as e_context:
+                            logging.info(f"Error recuperando contexto de mensajes: {e_context}")
+                    
+                    locales_db = obtener_lista_locales()
+                    contexto_cronograma = obtener_contexto_cronograma(event.sender)
+                    if contexto_cronograma:
+                        logging.info(f"[VISION CRONOGRAMA] Contexto: {contexto_cronograma}")
+                    resultado_ia = analizador_imagenes.analizar_foto(ruta_descarga, contexto_mensaje, locales_db, contexto_cronograma)
+                    
+                    es_evidencia = resultado_ia.get("es_evidencia_tecnica", False)
+                    descripcion_ia = resultado_ia.get("descripcion_tecnica", "")
+                    sigla_encontrada = resultado_ia.get("local_detectado", None)
+                    
+                    if not es_evidencia:
+                        logging.info("La foto no califica como evidencia técnica relevante (remito, selfie, etc.). Ignorando de forma silenciosa.")
+                        import os
+                        if os.path.exists(ruta_descarga):
+                            os.remove(ruta_descarga)
+                    else:
+                        if sigla_encontrada:
+                            url_foto = subidor_evidencias.subir_evidencia(ruta_descarga)
+                            if url_foto:
+                                exito, msj_excel = seguimiento_ppm.adjuntar_evidencia_visual(sigla_encontrada, descripcion_ia, url_foto)
+                                if exito:
+                                    await event.respond(f"✅ [Hermes] Foto analizada y adjuntada como evidencia al local {sigla_encontrada}.\nDiagnóstico:\n{descripcion_ia}")
+                                else:
+                                    await event.respond(f"⚠️ [Hermes] Foto analizada pero hubo un error en Excel: {msj_excel}")
+                            else:
+                                await event.respond(f"⚠️ [Hermes] Foto analizada pero falló la subida a Drive.")
+                            
+                            import os
+                            if os.path.exists(ruta_descarga):
+                                os.remove(ruta_descarga)
+                        else:
+                            chat_id_str = str(event.sender_id)
+                            estado_tmp = cargar_estado()
+                            estado_tmp["chat_id"] = chat_id_str
+                            estado_tmp["status"] = "waiting_evidence_local"
+                            estado_tmp["ruta_descarga"] = ruta_descarga
+                            estado_tmp["descripcion_ia"] = descripcion_ia
+                            
+                            # Info para watchdog
+                            estado_tmp["sender_name"] = remitente_nombre
+                            chat = await event.get_chat()
+                            chat_title = "Grupo"
+                            if chat and hasattr(chat, 'title') and chat.title:
+                                chat_title = chat.title
+                            estado_tmp["chat_title"] = chat_title
+                            
+                            guardar_estado(estado_tmp)
+                            await event.respond(f"📸 Recibí la evidencia visual, pero no detecto el local.\n¿De qué local estás hablando? (Ej: 9 de julio o FM9JU)")
+                            asyncio.create_task(esperar_respuesta_timeout(chat_id_str, "waiting_evidence_local", 600))
+                            return
+                    
                     mensaje = f"{mensaje}\n\n[IMAGEN ADJUNTA] {descripcion_ia}".strip()
-                    import os
-                    os.remove(ruta_descarga)
             except Exception as e:
                 logging.info(f"Error analizando imagen: {e}")
 
@@ -402,7 +691,7 @@ async def handler(event):
     if mensaje and mensaje.startswith("/aprobar "):
         req_id = mensaje.split(" ")[1].strip()
         try:
-            conn = sqlite3.connect("supervisor_local.db")
+            conn = sqlite3.connect(DB_PATH_MASTER)
             c = conn.cursor()
             c.execute("SELECT maquina, falla, solucion FROM soluciones_pendientes WHERE id = ? AND estado = 'PENDIENTE'", (req_id,))
             row = c.fetchone()
@@ -430,7 +719,7 @@ async def handler(event):
     if mensaje and mensaje.startswith("/rechazar "):
         req_id = mensaje.split(" ")[1].strip()
         try:
-            conn = sqlite3.connect("supervisor_local.db")
+            conn = sqlite3.connect(DB_PATH_MASTER)
             c = conn.cursor()
             c.execute("UPDATE soluciones_pendientes SET estado = 'RECHAZADO' WHERE id = ? AND estado = 'PENDIENTE'", (req_id,))
             if c.rowcount > 0:
@@ -466,10 +755,18 @@ async def handler(event):
                 return
             elif respuesta_clean.startswith("n") or respuesta_clean in ["no", "cancelar", "cancela"]:
                 # En lugar de cancelar, preguntamos si es un reporte de local
+                chat = await event.get_chat()
+                chat_title = "Grupo"
+                if chat and hasattr(chat, 'title') and chat.title:
+                    chat_title = chat.title
+
                 estado["status"] = "waiting_report_confirm"
+                estado["sender_name"] = remitente_nombre
+                estado["chat_title"] = chat_title
                 guardar_estado(estado)
                 nombres = ", ".join([f"`{f['file_name']}`" for f in files])
                 await event.respond(f"📋 Los archivos ({nombres}) no son manuales.\n¿Se trata de un *Informe o Remito técnico* de un local? Responde con *Sí* o *No*.")
+                asyncio.create_task(esperar_respuesta_timeout(chat_id_str, "waiting_report_confirm", 600))
                 return
             else:
                 nombres = ", ".join([f"`{f['file_name']}`" for f in files])
@@ -536,9 +833,17 @@ async def handler(event):
         elif status == "waiting_report_confirm":
             respuesta_clean = mensaje.lower().strip()
             if respuesta_clean.startswith("s") or respuesta_clean in ["yes", "ok", "bueno", "dale"]:
+                chat = await event.get_chat()
+                chat_title = "Grupo"
+                if chat and hasattr(chat, 'title') and chat.title:
+                    chat_title = chat.title
+
                 estado["status"] = "waiting_local_name"
+                estado["sender_name"] = remitente_nombre
+                estado["chat_title"] = chat_title
                 guardar_estado(estado)
                 await event.respond(f"📍 *¿A qué local corresponde este informe?*\n(Ingresa la sigla exacta o el nombre, ej: FVDP o Villa del Parque)")
+                asyncio.create_task(esperar_respuesta_timeout(chat_id_str, "waiting_local_name", 600))
                 return
             elif respuesta_clean.startswith("n") or respuesta_clean in ["no", "cancelar", "cancela"]:
                 for f in files:
@@ -557,29 +862,28 @@ async def handler(event):
 
         elif status == "waiting_local_name":
             local = mensaje.strip()
-            # Validar local
-            res = buscar_direccion_local(local)
-            if not res:
-                await event.respond(f"⚠️ No encontré el local '{local}'. Por favor, intenta de nuevo escribiendo la sigla exacta o cancela enviando 'no'.")
+            # Validar local con criterio amplio
+            mapa_locales = cargar_mapa_locales()
+            res_mapa = buscar_local_criterio_amplio(local, mapa_locales)
+            
+            if not res_mapa:
+                # Intentar buscar locales con nombres parecidos para sugerir
+                sugerencias = []
+                for key, datos in mapa_locales.items():
+                    if len(key) > 3 and (key in local.lower() or local.lower() in key):
+                        sugerencia = f"{datos['nombre']} ({datos['sigla']})"
+                        if sugerencia not in sugerencias:
+                            sugerencias.append(sugerencia)
+                
+                msg_sug = ""
+                if sugerencias:
+                    msg_sug = f"\n¿Tal vez quisiste decir alguno de estos?: " + ", ".join(sugerencias)
+                    
+                await event.respond(f"⚠️ No encontré el local '{local}'.{msg_sug}\nPor favor, intenta de nuevo escribiendo la sigla exacta o cancela enviando 'no'.")
                 return
                 
-            sigla = local.upper()
-            # Si buscar_direccion_local pudiera retornar la sigla, sería mejor. 
-            # Como retorna (nombre, direccion), asumimos que el usuario puso la sigla, 
-            # o intentaremos extraerla buscando en la DB (búsqueda inversa).
-            # Para simplificar, buscamos la sigla exacta.
-            conn = sqlite3.connect("supervisor_local.db")
-            cursor = conn.cursor()
-            cursor.execute("SELECT sigla, nombre FROM locales WHERE sigla = ? OR nombre LIKE ?", (local.upper(), f"%{local}%"))
-            resultado_db = cursor.fetchone()
-            conn.close()
-            
-            if resultado_db:
-                sigla_real = resultado_db[0]
-                nombre_real = resultado_db[1]
-            else:
-                sigla_real = local.upper()
-                nombre_real = local
+            sigla_real = res_mapa["sigla"]
+            nombre_real = res_mapa["nombre"]
             
             dest_dir = "/home/cristian/Documentos/Supervisor/entrantes"
             os.makedirs(dest_dir, exist_ok=True)
@@ -611,6 +915,74 @@ async def handler(event):
                 await event.respond("⚠️ Ocurrió un error al enviar los archivos a la cola de ingesta.")
             return
 
+        elif status == "waiting_evidence_local":
+            local = mensaje.strip()
+            
+            # Validar local con criterio amplio
+            mapa_locales = cargar_mapa_locales()
+            res_mapa = buscar_local_criterio_amplio(local, mapa_locales)
+            
+            import os
+            
+            if not res_mapa:
+                respuesta_clean = local.lower()
+                if respuesta_clean.startswith("n") or respuesta_clean in ["no", "cancelar", "cancela"]:
+                    ruta_descarga = estado.get("ruta_descarga")
+                    if ruta_descarga and os.path.exists(ruta_descarga):
+                        try:
+                            os.remove(ruta_descarga)
+                        except Exception:
+                            pass
+                    limpiar_estado()
+                    await event.respond("❌ Operación cancelada. Evidencia visual descartada.")
+                    return
+                    
+                # Intentar buscar locales con nombres parecidos para sugerir
+                sugerencias = []
+                for key, datos in mapa_locales.items():
+                    if len(key) > 3 and (key in local.lower() or local.lower() in key):
+                        sugerencia = f"{datos['nombre']} ({datos['sigla']})"
+                        if sugerencia not in sugerencias:
+                            sugerencias.append(sugerencia)
+                
+                msg_sug = ""
+                if sugerencias:
+                    msg_sug = f"\n¿Tal vez quisiste decir alguno de estos?: " + ", ".join(sugerencias)
+                    
+                await event.respond(f"⚠️ No encontré el local '{local}'.{msg_sug}\nPor favor, intenta de nuevo escribiendo la sigla exacta o cancela enviando 'cancelar'.")
+                return
+                
+            sigla_real = res_mapa["sigla"]
+            
+            ruta_descarga = estado.get("ruta_descarga")
+            descripcion_ia = estado.get("descripcion_ia", "Sin descripción")
+            
+            if not ruta_descarga or not os.path.exists(ruta_descarga):
+                limpiar_estado()
+                await event.respond("⚠️ Error: No se encontró la foto temporal. Por favor, vuelve a enviarla.")
+                return
+                
+            import subidor_evidencias
+            import seguimiento_ppm
+            
+            url_foto = subidor_evidencias.subir_evidencia(ruta_descarga)
+            if url_foto:
+                exito, msj_excel = seguimiento_ppm.adjuntar_evidencia_visual(sigla_real, descripcion_ia, url_foto)
+                if exito:
+                    await event.respond(f"✅ [Hermes] Foto analizada y adjuntada como evidencia al local {sigla_real}.\nDiagnóstico:\n{descripcion_ia}")
+                else:
+                    await event.respond(f"⚠️ [Hermes] Foto analizada pero hubo un error en Excel: {msj_excel}")
+            else:
+                await event.respond(f"⚠️ [Hermes] Foto analizada pero falló la subida a Drive.")
+                
+            try:
+                os.remove(ruta_descarga)
+            except Exception:
+                pass
+                
+            limpiar_estado()
+            return
+
     # Soporte de Videos (Análisis de fallas en video)
     is_video = (event.message.video is not None) or (event.message.media and hasattr(event.message.media, 'document') and (event.message.media.document.mime_type or "").startswith("video/"))
     if is_video:
@@ -626,15 +998,39 @@ async def handler(event):
         os.makedirs(temp_dir, exist_ok=True)
         dest_path = os.path.join(temp_dir, file_name)
         
-        msg_espera = await event.respond("🛠️ [Supervisor] He recibido tu video. Estoy descargándolo y analizándolo, por favor aguarda...")
+        is_private = event.is_private
+        
+        # Si es chat privado (Cristian haciendo pruebas), le respondemos con progreso en el chat
+        msg_espera = None
+        if is_private:
+            msg_espera = await event.respond("🛠️ [Supervisor] He recibido tu video. Estoy descargándolo y analizándolo, por favor aguarda...")
         
         async def procesar_video_async():
             print("🎬 Iniciando procesar_video_async...", flush=True)
             try:
+                # Obtener info de remitente y grupo antes de procesar
+                sender = await event.get_sender()
+                sender_name = "Técnico Desconocido"
+                if sender:
+                    if hasattr(sender, 'username') and sender.username:
+                        sender_name = f"@{sender.username}"
+                    elif hasattr(sender, 'first_name') and sender.first_name:
+                        sender_name = sender.first_name
+                        if hasattr(sender, 'last_name') and sender.last_name:
+                            sender_name += f" {sender.last_name}"
+                
+                chat = await event.get_chat()
+                chat_title = "Grupo"
+                if chat and hasattr(chat, 'title') and chat.title:
+                    chat_title = chat.title
+                
                 archivo = await event.message.download_media(file=dest_path)
                 if not archivo:
                     print("❌ download_media no devolvió archivo", flush=True)
-                    await msg_espera.edit("⚠️ No se pudo descargar el video para su análisis.")
+                    if is_private and msg_espera:
+                        await msg_espera.edit("⚠️ No se pudo descargar el video para su análisis.")
+                    else:
+                        await client.send_message(MI_TELEGRAM_ID, f"⚠️ *[Falla de Video]* No se pudo descargar el video subido por {sender_name} en '{chat_title}' para su análisis.")
                     return
                 
                 print(f"🎬 Video descargado en: {dest_path}, enviando a API...", flush=True)
@@ -646,16 +1042,32 @@ async def handler(event):
                 print(f"🎬 API respondió con código: {res.status_code}", flush=True)
                 if res.status_code == 200:
                     diagnosis = res.json().get("diagnosis", "No se obtuvo diagnóstico.")
-                    await msg_espera.delete()
-                    await event.respond(diagnosis)
+                    if is_private:
+                        if msg_espera:
+                            await msg_espera.delete()
+                        await event.respond(diagnosis)
+                    else:
+                        # Enviar el diagnóstico únicamente a Cristian por privado
+                        msg_privado = (
+                            f"📹 *[Video en Grupo]* El técnico {sender_name} subió un video en el grupo '{chat_title}'.\n"
+                            f"Aquí tienes el análisis automático de Hermes:\n\n"
+                            f"{diagnosis}"
+                        )
+                        await client.send_message(MI_TELEGRAM_ID, msg_privado)
                 else:
-                    await msg_espera.edit(f"⚠️ Ocurrió un error en los servidores al procesar tu video (código {res.status_code}).")
+                    if is_private and msg_espera:
+                        await msg_espera.edit(f"⚠️ Ocurrió un error en los servidores al procesar tu video (código {res.status_code}).")
+                    else:
+                        await client.send_message(MI_TELEGRAM_ID, f"⚠️ *[Falla de Video]* El video subido por {sender_name} en '{chat_title}' falló en el servidor con código {res.status_code}.")
             except Exception as e:
                 import traceback
                 print(f"❌ Excepción en procesar_video_async: {e}", flush=True)
                 traceback.print_exc()
                 logging.info(f"Error procesando video en userbot: {e}")
-                await msg_espera.edit("⚠️ Ocurrió un error inesperado al analizar el video.")
+                if is_private and msg_espera:
+                    await msg_espera.edit("⚠️ Ocurrió un error inesperado al analizar el video.")
+                else:
+                    await client.send_message(MI_TELEGRAM_ID, f"⚠️ *[Falla de Video]* Ocurrió una excepción procesando el video de {sender_name} en '{chat_title}': {e}")
             finally:
                 if os.path.exists(dest_path):
                     try:
@@ -706,6 +1118,11 @@ async def handler(event):
             is_image = is_photo or file_name.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.bmp'))
             tipo_desc = "la imagen" if is_image else "el documento"
             
+            chat = await event.get_chat()
+            chat_title = "Grupo"
+            if chat and hasattr(chat, 'title') and chat.title:
+                chat_title = chat.title
+
             # Si ya hay un lote en curso esperando confirmación
             if estado.get("chat_id") == chat_id_str and estado.get("status") == "waiting_manual_confirm":
                 if "files" not in estado:
@@ -714,6 +1131,8 @@ async def handler(event):
                     "temp_path": dest_path,
                     "file_name": file_name
                 })
+                estado["sender_name"] = remitente_nombre
+                estado["chat_title"] = chat_title
                 guardar_estado(estado)
                 await event.respond(f"📥 Agregado `{file_name}` al lote actual (Total: {len(estado['files'])} archivos).\n¿Se trata de manuales técnicos para el sistema? Responde con *Sí* o *No*.")
             else:
@@ -724,10 +1143,13 @@ async def handler(event):
                     "files": [{
                         "temp_path": dest_path,
                         "file_name": file_name
-                    }]
+                    }],
+                    "sender_name": remitente_nombre,
+                    "chat_title": chat_title
                 }
                 guardar_estado(nuevo_estado)
                 await event.respond(f"📥 He recibido {tipo_desc} `{file_name}`.\n¿Se trata de un manual técnico para el sistema? Responde con *Sí* o *No*.")
+                asyncio.create_task(esperar_respuesta_timeout(chat_id_str, "waiting_manual_confirm", 600))
         else:
             await event.respond(f"⚠️ Error al descargar el archivo `{file_name}`. Por favor, reintenta.")
         return
@@ -802,10 +1224,10 @@ async def handler(event):
     if "supervisor" in m_lower or "hermes" in m_lower:
         me_menciono = True
 
-    # Cargar lista de locales dinámicos
-    locales_conocidos = obtener_lista_locales()
-    palabras_clave = filtrar_palabras(mensaje)
-    menciona_local = any(p in locales_conocidos for p in palabras_clave)
+    # Cargar lista de locales dinámicos con criterio amplio
+    mapa_locales = cargar_mapa_locales()
+    local_detectado = buscar_local_criterio_amplio(mensaje, mapa_locales)
+    menciona_local = local_detectado is not None
 
     # Filtro flexible para intervenir en el grupo
     if es_grupo:
@@ -827,10 +1249,13 @@ async def handler(event):
             palabras_tecnicas = {"error", "falla", "roto", "no anda", "no funciona", "alarma", "problema", "cimbali", "ablandador", "filtrando", "pérdida", "manómetro", "presión", "presion", "caldera", "temperatura"}
             palabras_pregunta_tecnica = {"alguien", "sabe", "saben", "cómo", "como", "quién", "quien", "ayuda", "conoce", "solución", "solucion", "limpiar", "purga", "reparar", "arreglar", "que le pasa", "qué le pasa"}
             
+            import re
+            tiene_error_numero = re.search(r'\berror\s+\d+\b', m_lower) is not None
+            
             tiene_kw_tecnica = any(w in m_lower for w in palabras_tecnicas)
             tiene_kw_pregunta_tecnica = any(w in m_lower for w in palabras_pregunta_tecnica)
             
-            pregunta_falla = tiene_kw_tecnica and tiene_kw_pregunta_tecnica
+            pregunta_falla = (tiene_kw_tecnica and tiene_kw_pregunta_tecnica) or tiene_error_numero
             
             debe_responder = pregunta_direccion or pregunta_direccion_generica or pregunta_falla
 

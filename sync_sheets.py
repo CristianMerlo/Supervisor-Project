@@ -4,7 +4,7 @@ import sqlite3
 import os
 
 URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTs9ktsmxlfoL6C0aD-bJvjkM_WTKRh0EHaYoGPxwmzRhwHtGfaLT75GJinUA9lougJOh07bGffz_go/pub?gid=923285048&single=true&output=csv"
-DB_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "supervisor_local.db")
+DB_PATH = "/home/cristian/Documentos/Supervisor/supervisor_local.db"
 
 def sync_locales():
     print("[Sync] Descargando CSV desde Google Sheets...")

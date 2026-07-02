@@ -24,27 +24,67 @@ def enviar_alerta(mensaje, agente="Antigravity", destinatario_id=None):
             else:
                 mensaje = f"🛠️ [Antigravity] {mensaje}"
     url = "http://127.0.0.1:8088/notify"
+    
+    import json
+    max_len = 4000
+    chunks = [mensaje[i:i+max_len] for i in range(0, len(mensaje), max_len)]
+    
+    exito_total = True
+    for idx, chunk in enumerate(chunks):
+        if len(chunks) > 1:
+            # Añadir indicador de página si hay múltiples partes
+            chunk_prefix = f"[{idx+1}/{len(chunks)}]\n"
+            # Ajustar si el prefijo hace que se pase (muy improbable, pero buena práctica)
+            chunk = chunk_prefix + chunk
+            
+        try:
+            payload = {"message": chunk}
+            if destinatario_id:
+                payload["chat_id"] = destinatario_id
+            data = json.dumps(payload).encode("utf-8")
+            req = urllib.request.Request(
+                url, 
+                data=data, 
+                headers={"Content-Type": "application/json; charset=utf-8"},
+                method="POST"
+            )
+            # Timeout de 5 segundos para evitar bloquear la ejecución si el listener estuviera inactivo
+            with urllib.request.urlopen(req, timeout=5) as response:
+                if response.status == 200:
+                    print(f"[TELEGRAM] Alerta enviada con éxito ({idx+1}/{len(chunks)}): {chunk[:60]}...")
+                else:
+                    print(f"[TELEGRAM] Error al enviar alerta. Status: {response.status}")
+                    exito_total = False
+        except Exception as e:
+            print(f"[TELEGRAM] No se pudo enviar alerta a Telegram: {e}")
+            exito_total = False
+            
+    return exito_total
+
+def enviar_archivo(ruta_archivo, destinatario_id=None, caption=None):
+    """Envía un archivo a Telegram a través del Userbot local."""
+    url = "http://127.0.0.1:8088/notify_file"
     try:
-        import json
-        payload = {"message": mensaje}
-        if destinatario_id:
-            payload["chat_id"] = destinatario_id
-        data = json.dumps(payload).encode("utf-8")
-        req = urllib.request.Request(
-            url, 
-            data=data, 
-            headers={"Content-Type": "application/json; charset=utf-8"},
-            method="POST"
-        )
-        # Timeout de 5 segundos para evitar bloquear la ejecución si el listener estuviera inactivo
-        with urllib.request.urlopen(req, timeout=5) as response:
-            if response.status == 200:
-                print(f"[TELEGRAM] Alerta enviada con éxito: {mensaje[:60]}...")
-                return True
-            else:
-                print(f"[TELEGRAM] Error al enviar alerta. Status: {response.status}")
+        import os
+        if not os.path.exists(ruta_archivo):
+            return False
+            
+        with open(ruta_archivo, 'rb') as f:
+            files = {'file': (os.path.basename(ruta_archivo), f)}
+            params = {}
+            if destinatario_id:
+                params['chat_id'] = destinatario_id
+            if caption:
+                params['caption'] = caption
+            response = requests.post(url, files=files, params=params, timeout=30)
+            
+        if response.status_code == 200:
+            print(f"[TELEGRAM] Archivo {ruta_archivo} enviado con éxito.")
+            return True
+        else:
+            print(f"[TELEGRAM] Error al enviar archivo. Status: {response.status_code}")
     except Exception as e:
-        print(f"[TELEGRAM] No se pudo enviar alerta a Telegram: {e}")
+        print(f"[TELEGRAM] No se pudo enviar archivo a Telegram: {e}")
     return False
 
 def solicitar_aprobacion(mensaje, timeout=3600):

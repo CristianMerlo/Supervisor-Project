@@ -31,7 +31,9 @@ if GEMINI_API_KEY and genai:
         logger.error(f"Error inicializando Gemini: {e}")
 
 # --- CONSTANTES DE NEGOCIO (Umbrales del sistema) ---
-UMBRAL_PPM_CRITICO = 200
+UMBRAL_PPM_BLANDO = 50
+UMBRAL_PPM_ADVERTENCIA = 120
+UMBRAL_PPM_CRITICO = 300
 UMBRAL_SHOTS_PREVENTIVO = 150000
 
 # --- PRE-COMPILACIÓN DE EXPRESIONES REGULARES ---
@@ -68,8 +70,11 @@ def fallback_ia_gemini(texto: str, datos_parciales: dict) -> dict:
     prompt = f"""
 Extrae los siguientes datos de mantenimiento a partir del texto del PDF.
 Responde ÚNICAMENTE con un JSON válido con estas claves exactas:
-"local" (string), "sigla" (string), "tecnico" (string), "ticket" (string), "viatico" (float), "ppm" (int), "shots" (int).
-Si un dato no existe, pon 0 para números o "" para strings.
+"local" (string), "sigla" (string), "tecnico" (string), "ticket" (string), "viatico" (float), "ppm" (int), "shots" (int),
+"filtro_presente" (bool), "ablandador_presente" (bool), "osmosis_presente" (bool), "observaciones_hidricas" (string).
+Para los booleanos, pon true si el texto menciona que ese elemento está instalado o presente en el local.
+En "observaciones_hidricas" pon un breve resumen del estado del sistema de agua (ej: "Se cambió cartucho", "Resina saturada").
+Si un dato no existe, pon 0 para números, false para booleanos, o "" para strings.
 
 Texto del reporte:
 {texto}
@@ -104,7 +109,9 @@ def parser_hibrido(pdf_path):
     
     datos = {
         "fecha": "", "local": "", "sigla": "", "tecnico": "", "ticket": "",
-        "viatico": 0.0, "ppm": 0, "maquina": "", "shots": 0, "repuestos": ""
+        "viatico": 0.0, "ppm": 0, "maquina": "", "shots": 0, "repuestos": "",
+        "filtro_presente": False, "ablandador_presente": False, "osmosis_presente": False,
+        "observaciones_hidricas": ""
     }
     
     m_local = REGEX_LOCAL.search(texto)
@@ -115,7 +122,7 @@ def parser_hibrido(pdf_path):
     # Fallback DB para la sigla si falta
     if not datos["sigla"] and datos["local"]:
         try:
-            db_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "supervisor_local.db")
+            db_path = "/home/cristian/Documentos/Supervisor/supervisor_local.db"
             if os.path.exists(db_path):
                 with sqlite3.connect(db_path) as conn:
                     cursor = conn.cursor()
@@ -149,9 +156,10 @@ def parser_hibrido(pdf_path):
     # ---------------------------------------------------------
     # FALLBACK IA: Si faltan datos críticos, consultar a Gemini
     # ---------------------------------------------------------
-    datos_criticos_faltantes = not datos["local"] or not datos["tecnico"] or datos["ppm"] == 0 or datos["shots"] == 0
-    if datos_criticos_faltantes and texto.strip():
-        logger.warning("   [IA] Datos incompletos tras Regex. Activando Parser IA Gemini de respaldo...")
+    # EXTRACCIÓN IA: Extraer campos booleanos hídricos y fallback
+    # ---------------------------------------------------------
+    if texto.strip():
+        logger.info("   [IA] Activando Parser IA Gemini para datos hídricos...")
         datos = fallback_ia_gemini(texto, datos)
     return datos, texto
 
@@ -161,25 +169,35 @@ def evaluar_reglas_negocio(datos):
     estado_general = "VERDE_NORMAL"
     
     ppm = datos.get("ppm", 0)
-    if ppm > UMBRAL_PPM_CRITICO:
-        estado_general = "ROJO_CRITICO"
-        mensaje = f"Peligro: Agua Dura detectada ({ppm} PPM). Supera {UMBRAL_PPM_CRITICO} PPM."
-        
-        # Enriquecimiento MCP (Obsidian)
-        resultados = hermes_obsidian_client.buscar_notas("calcificación caldera")
-        if resultados and "matches" in resultados and len(resultados["matches"]) > 0:
-            mensaje += f"\n📚 Info en Obsidian: Se encontraron {len(resultados['matches'])} antecedentes/manuales sobre esto."
+    if ppm > 0:
+        if ppm < UMBRAL_PPM_BLANDO:
+            estado_general = "ROJO_BLANDO"
+            alertas.append({
+                "tipo": "JERARQUIA_HIDRICA", "nivel": "CRITICO",
+                "mensaje": f"Peligro: Agua Demasiado Blanda ({ppm} PPM). Riesgo Corrosivo. Requiere Filtro Remineralizador."
+            })
+        elif ppm > UMBRAL_PPM_CRITICO:
+            estado_general = "ROJO_CRITICO"
+            mensaje = f"Peligro: Agua Extremadamente Dura ({ppm} PPM). Supera {UMBRAL_PPM_CRITICO} PPM. Requiere Filtro Zen y Ablandador."
             
-        alertas.append({
-            "tipo": "JERARQUIA_HIDRICA", "nivel": "CRITICO",
-            "mensaje": mensaje
-        })
-    elif ppm >= 150: 
-        if estado_general == "VERDE_NORMAL": estado_general = "AMARILLO_ADVERTENCIA"
-        alertas.append({
-            "tipo": "JERARQUIA_HIDRICA", "nivel": "ADVERTENCIA",
-            "mensaje": f"Precaución: PPM elevado ({ppm}). Agendar posible cambio de resina."
-        })
+            # Enriquecimiento MCP (Obsidian)
+            resultados = hermes_obsidian_client.buscar_notas("calcificación caldera")
+            if resultados and "matches" in resultados and len(resultados["matches"]) > 0:
+                mensaje += f"\n📚 Info en Obsidian: Se encontraron {len(resultados['matches'])} antecedentes/manuales sobre esto."
+                
+            alertas.append({
+                "tipo": "JERARQUIA_HIDRICA", "nivel": "CRITICO",
+                "mensaje": mensaje
+            })
+        elif ppm >= UMBRAL_PPM_ADVERTENCIA: 
+            if estado_general == "VERDE_NORMAL": estado_general = "AMARILLO_ADVERTENCIA"
+            alertas.append({
+                "tipo": "JERARQUIA_HIDRICA", "nivel": "ADVERTENCIA",
+                "mensaje": f"Precaución: Riesgo de Sarro ({ppm} PPM). Requiere Ablandador operativo."
+            })
+        else:
+            # Entre 50 y 120
+            pass # VERDE_NORMAL
 
     shots = datos.get("shots", 0)
     if shots > UMBRAL_SHOTS_PREVENTIVO:

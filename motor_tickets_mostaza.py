@@ -2,7 +2,6 @@ import os
 import sys
 import time
 import json
-import sqlite3
 import requests
 import datetime
 from pathlib import Path
@@ -23,7 +22,7 @@ USERNAME = os.getenv("MOSTAZA_USER", "cmerlo@mostazaweb.com.ar")
 PASSWORD = os.getenv("MOSTAZA_PASS", "Mante2026")
 
 STATE_FILE = BASE_DIR / "brain" / "tickets_vistos.json"
-DB_PATH = BASE_DIR / "supervisor_local.db"
+DB_PATH = Path("/home/cristian/Documentos/Supervisor/supervisor_local.db")
 
 def cargar_vistos():
     if STATE_FILE.exists():

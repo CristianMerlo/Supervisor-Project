@@ -39,7 +39,7 @@ def obtener_servicio_drive():
     return build('drive', 'v3', credentials=creds)
 
 def obtener_locales_db():
-    db_path = BASE_DIR / "supervisor_local.db"
+    db_path = Path("/home/cristian/Documentos/Supervisor/supervisor_local.db")
     locales_map = {}
     if db_path.exists():
         try:
@@ -97,7 +97,7 @@ def generar_excel(datos, output_path):
     ws.title = "Resumen Informes"
     
     # Grid lines visibles
-    ws.views.sheetView[0].showGridLines = True
+
     
     # Encabezados
     headers = ["Sigla", "Nombre Local", "Informes en Drive", "Estado de Información"]

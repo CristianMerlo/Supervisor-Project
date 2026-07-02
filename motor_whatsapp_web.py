@@ -162,6 +162,21 @@ def mover_al_ingestor(rutas_archivos):
     movidos = 0
     for ruta in rutas_archivos:
         nombre = os.path.basename(ruta)
+        
+        if nombre.lower().endswith(('.jpg', '.jpeg', '.png', '.webp')):
+            print(f"   [+] Evidencia visual detectada en WhatsApp: {nombre}")
+            try:
+                import notificador_telegram
+                notificador_telegram.enviar_archivo(
+                    ruta_archivo=ruta,
+                    caption=f"📲 *[WhatsApp]* Nueva foto recibida en los grupos.\nSi quieres asignarla a un local como evidencia (Skill 5), reenvíame esta misma foto escribiendo la sigla en el mensaje."
+                )
+                os.remove(ruta)
+                movidos += 1
+                continue
+            except Exception as e:
+                print(f"   [!] Error mandando foto a TG: {e}")
+                
         destino = os.path.join(ENTRANTES_DIR, nombre)
         try:
             shutil.move(ruta, destino)
@@ -374,27 +389,41 @@ def procesar_mensajes_grupo(page, grupo, estado_actual):
             
             if btn_descarga.count() > 0:
                 print(f"   [Descarga] Archivo detectado en mensaje: '{texto[:20]}...'")
-                btn_descarga.first.click()
-                page.wait_for_timeout(3000) # Esperar a que descargue
+                try:
+                    btn_descarga.first.click(timeout=10000)
+                    page.wait_for_timeout(3000) # Esperar a que descargue
+                except Exception as e_dl:
+                    print(f"   [!] Error clicando btn_descarga: {e_dl}")
             elif btn_doc.count() > 0:
                 print(f"   [Descarga] Documento PDF detectado. Abriendo visor de medios...")
-                btn_doc.first.click()
-                page.wait_for_timeout(3000) # Esperar a que abra el visor
-                
-                # Descargar desde el visor
-                btn_down_viewer = page.locator("span[data-testid='ic-download']")
-                if btn_down_viewer.count() > 0:
-                    print("   [Descarga] Clic en botón de descarga del visor...")
-                    btn_down_viewer.first.click()
-                    page.wait_for_timeout(5000) # Esperar descarga
-                else:
-                    print("   [!] Botón de descarga no encontrado en el visor.")
-                
-                # Cerrar visor
-                btn_close_viewer = page.locator("span[data-testid='ic-close']")
-                if btn_close_viewer.count() > 0:
-                    btn_close_viewer.first.click()
-                    page.wait_for_timeout(1000)
+                try:
+                    btn_doc.first.click(timeout=10000)
+                    page.wait_for_timeout(3000) # Esperar a que abra el visor
+                    
+                    # Descargar desde el visor
+                    btn_down_viewer = page.locator("span[data-testid='ic-download']")
+                    if btn_down_viewer.count() > 0:
+                        print("   [Descarga] Clic en botón de descarga del visor...")
+                        btn_down_viewer.first.click(timeout=5000)
+                        page.wait_for_timeout(5000) # Esperar descarga
+                    else:
+                        print("   [!] Botón de descarga no encontrado en el visor.")
+                except Exception as e_pdf:
+                    print(f"   [!] Error interactuando con PDF: {e_pdf}")
+                    
+                # Siempre intentar cerrar el visor
+                try:
+                    btn_close_viewer = page.locator("span[data-testid='ic-close']")
+                    if btn_close_viewer.count() > 0:
+                        btn_close_viewer.first.click(timeout=5000)
+                        page.wait_for_timeout(1000)
+                    else:
+                        # Fallback: presionar escape
+                        page.keyboard.press("Escape")
+                        page.wait_for_timeout(500)
+                except Exception as e_close:
+                    print(f"   [!] Error cerrando visor: {e_close}")
+                    page.keyboard.press("Escape")
                 
             nuevo_ultimo_procesado = ident
             
@@ -449,12 +478,20 @@ def ejecutar_motor():
             except Exception as e_cdp:
                 print(f"   [!] Advertencia al configurar descargas vía CDP: {e_cdp}")
             
-            # Resiliencia: si el visor de medios quedó abierto por error, cerrarlo
-            close_btn = whatsapp_page.locator("span[data-testid='ic-close']")
-            if close_btn.count() > 0:
-                print("   [+] Visor de medios previo detectado abierto. Cerrando...")
-                close_btn.first.click()
-                whatsapp_page.wait_for_timeout(1000)
+            # Resiliencia: limpiar overlays y modales trabados
+            try:
+                whatsapp_page.keyboard.press("Escape")
+                whatsapp_page.wait_for_timeout(500)
+                whatsapp_page.keyboard.press("Escape")
+                whatsapp_page.wait_for_timeout(500)
+                
+                close_btn = whatsapp_page.locator("span[data-testid='ic-close']")
+                if close_btn.count() > 0:
+                    print("   [+] Visor de medios previo detectado abierto. Cerrando...")
+                    close_btn.first.click(timeout=3000)
+                    whatsapp_page.wait_for_timeout(1000)
+            except Exception as e_clean:
+                print(f"   [!] Error en limpieza inicial: {e_clean}")
                 
             # Verificar si cargó correctamente o hay error
             whatsapp_page.wait_for_timeout(5000)
@@ -474,6 +511,12 @@ def ejecutar_motor():
 
             print("✅ WhatsApp Web detectado y activo.")
             
+            # Borrar archivo de bloqueo de alertas porque conectamos bien
+            lock_file = "/tmp/whatsapp_alert.lock"
+            if os.path.exists(lock_file):
+                try: os.remove(lock_file)
+                except: pass
+            
             estado_actual = cargar_estado()
             
             for grupo in GRUPOS:
@@ -485,13 +528,28 @@ def ejecutar_motor():
         except Exception as e:
             msg_err = f"❌ ERROR [WhatsApp Bot]: Error al conectar con Chrome (¿Está abierto en puerto 9222?): {e}"
             print(msg_err)
-            notificador_telegram.enviar_alerta(msg_err)
-            try:
-                import notificador_mail
-                asunto = "⚠️ [Hermes] Alerta: Falla de Conexión en WhatsApp Web"
-                notificador_mail.enviar_correo(asunto, msg_err)
-            except Exception as e_mail:
-                print(f"   [!] Error enviando email de contingencia: {e_mail}")
+            
+            lock_file = "/tmp/whatsapp_alert.lock"
+            should_alert = True
+            
+            if os.path.exists(lock_file):
+                mtime = os.path.getmtime(lock_file)
+                if time.time() - mtime < 14400:  # 4 hours
+                    should_alert = False
+            
+            if should_alert:
+                notificador_telegram.enviar_alerta(msg_err)
+                try:
+                    with open(lock_file, "w") as f: f.write(str(time.time()))
+                except: pass
+                
+                try:
+                    import notificador_mail
+                    asunto = "⚠️ [Hermes] Alerta: Falla de Conexión en WhatsApp Web"
+                    cuerpo = f"El motor de WhatsApp falló con el siguiente error:\n\n{e}\n\nRevisar Chrome en puerto 9222."
+                    notificador_mail.enviar_correo(asunto, cuerpo)
+                except Exception as e_mail:
+                    print(f"   [!] Error enviando email de contingencia: {e_mail}")
 
 if __name__ == "__main__":
     ejecutar_motor()

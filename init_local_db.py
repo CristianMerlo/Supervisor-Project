@@ -1,7 +1,7 @@
 import sqlite3
 
 def init_db():
-    conn = sqlite3.connect("supervisor_local.db")
+    conn = sqlite3.connect("/home/cristian/Documentos/Supervisor/supervisor_local.db")
     cursor = conn.cursor()
     
     # Tabla de locales (Nivel 1 - Estático)

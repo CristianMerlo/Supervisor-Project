@@ -32,7 +32,7 @@ EMAIL_USER = os.getenv("GMAIL_USER")
 EMAIL_PASS = os.getenv("GMAIL_APP_PASSWORD")
 GEMINI_KEY = os.getenv("GEMINI_API_KEY")
 
-DB_PATH = BASE_DIR / "supervisor_local.db"
+DB_PATH = Path("/home/cristian/Documentos/Supervisor/supervisor_local.db")
 
 def obtener_locales():
     locales = []

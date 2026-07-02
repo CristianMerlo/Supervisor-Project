@@ -126,8 +126,16 @@ def procesar_carpeta_entrantes():
             # 2. Fase 3 (Google Sheets)
             fase3_sheets.inyectar_en_sabana(datos_extraidos, alertas_negocio, SHEET_URL)
             
-            # 3. Archivar en Google Drive y autolimpieza
             sigla = datos_extraidos.get("sigla", "")
+            if sigla:
+                try:
+                    import seguimiento_ppm
+                    logger.info(f"   [SHEETS] Actualizando Sistema Hídrico en Agua Seguimiento para {sigla}...")
+                    seguimiento_ppm.actualizar_datos_hidricos(sigla, datos_extraidos)
+                except Exception as e_hidrico:
+                    logger.error(f"   [!] Error actualizando Agua Seguimiento: {e_hidrico}")
+            
+            # 3. Archivar en Google Drive y autolimpieza
             exito_drive = False
             if sigla:
                 exito_drive = archivador_drive.archivar_reporte_en_drive(str(pdf_path), sigla)
@@ -213,16 +221,9 @@ if __name__ == "__main__":
     except Exception as e:
         logger.error(f"Falla en Ingestor de Formulario Google: {e}")
         
-    # 2. Ejecutar Motor WhatsApp Web (Reloj basado en Timestamp)
-    if deberia_ejecutar_whatsapp():
-        try:
-            logger.info("--- Ejecutando Motor WhatsApp Web (Revisión programada) ---")
-            motor_whatsapp_web.ejecutar_motor()
-            actualizar_timestamp_whatsapp()
-        except Exception as e:
-            logger.error(f"Falla en Motor WhatsApp Web: {e}")
-    else:
-        logger.info("--- Omitiendo Motor WhatsApp Web (Aún no pasaron 20 minutos) ---")
+    # 2. Ejecutar Motor WhatsApp Web (Desactivado en cron para evitar conflictos con whatsapp-bridge.service)
+    # El escaneo de WhatsApp se delega completamente al servicio del sistema.
+    logger.info("--- Omitiendo Motor WhatsApp Web (Delegado a whatsapp-bridge.service) ---")
 
     # 3. Descargar correos de Gmail
     try:

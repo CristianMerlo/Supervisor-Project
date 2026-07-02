@@ -2,7 +2,7 @@ import os
 import json
 import sqlite3
 import requests
-import subprocess
+
 import glob
 from dotenv import load_dotenv
 
@@ -75,7 +75,7 @@ def tool_proponer_solucion(maquina, falla, solucion):
     """Propone una solución al Supervisor para que la apruebe antes de registrarla en la Wiki. Úsala cuando deduzcas una solución final en el grupo."""
     try:
         import datetime
-        conn = sqlite3.connect("/home/cristian/PROYECTOS/Supervisor-Project/supervisor_local.db")
+        conn = sqlite3.connect("/home/cristian/Documentos/Supervisor/supervisor_local.db")
         c = conn.cursor()
         c.execute("INSERT INTO soluciones_pendientes (maquina, falla, solucion, estado, fecha) VALUES (?, ?, ?, 'PENDIENTE', ?)",
                   (maquina, falla, solucion, datetime.datetime.now().isoformat()))
@@ -133,7 +133,7 @@ def tool_generar_excel_kpi():
 def tool_consultar_correos(asunto_o_contenido):
     """Busca en la base de datos de correos recibidos por asunto, contenido o remitente."""
     try:
-        conn = sqlite3.connect("/home/cristian/PROYECTOS/Supervisor-Project/supervisor_local.db")
+        conn = sqlite3.connect("/home/cristian/Documentos/Supervisor/supervisor_local.db")
         c = conn.cursor()
         
         palabras = asunto_o_contenido.split()
@@ -214,15 +214,48 @@ def tool_buscar_manuales(sintoma_falla):
     except Exception as e:
         pass
     
-    # Fallback to NotebookLM
+    # Fallback to NotebookLM local (via Gemini File API)
+    return tool_consultar_manuales_profundo(sintoma_falla)
+
+def tool_consultar_manuales_profundo(consulta):
+    """Fallback tipo NotebookLM: Busca profundamente en todos los manuales técnicos subidos a Gemini."""
     try:
-        nlm_path = "/home/cristian/.local/bin/nlm"
-        res_nlm = subprocess.run([nlm_path, "cross", "query", sintoma_falla, "--all"], capture_output=True, text=True)
-        if res_nlm.returncode == 0 and res_nlm.stdout.strip():
-            return f"Información encontrada en NotebookLM:\n{res_nlm.stdout.strip()[:1000]}"
-    except:
-        pass
-    return f"No se encontró información en los manuales sobre: {sintoma_falla}"
+        import google.generativeai as genai
+        GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
+        if not GEMINI_KEY:
+            return "No se pudo consultar NotebookLM/Gemini (Falta GEMINI_API_KEY)."
+            
+        genai.configure(api_key=GEMINI_KEY)
+        
+        DB_FILES = "/home/cristian/PROYECTOS/Supervisor-Project/brain/gemini_files.json"
+        if not os.path.exists(DB_FILES):
+            return "No hay manuales sincronizados en la nube todavía. Espera a que termine la sincronización."
+            
+        with open(DB_FILES, "r") as f:
+            archivos_gemini = json.load(f)
+            
+        if not archivos_gemini:
+            return "No hay manuales subidos al cerebro en la nube."
+            
+        # Pasar los nombres de los archivos a la API
+        uploaded_files = []
+        for nombre, datos in archivos_gemini.items():
+            try:
+                uploaded_files.append(genai.get_file(datos["name"]))
+            except Exception:
+                pass
+                
+        if not uploaded_files:
+            return "Error recuperando los archivos del cerebro."
+            
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        prompt = f"Eres un experto técnico analizando manuales de máquinas (comportándote como NotebookLM). El técnico pregunta: '{consulta}'. Revisa los documentos adjuntos y encuentra la respuesta más precisa. Cita la fuente o máquina."
+        
+        response = model.generate_content([prompt] + uploaded_files, request_options={"timeout": 60})
+        return f"💡 [Respuesta Profunda de Manuales (NotebookLM)]: {response.text}"
+        
+    except Exception as e:
+        return f"Error consultando los manuales profundos: {e}"
 
 def tool_contar_reportes(sigla):
     """Escanea la carpeta de reportes analizados y la carpeta local de la sucursal para contar los informes."""
@@ -427,6 +460,8 @@ def execute_tool(tool_name, arguments_str):
             return tool_consultar_correos(args.get("asunto_o_contenido", ""))
         elif tool_name == "tool_redactar_correo_borrador":
             return tool_redactar_correo_borrador(args.get("instrucciones_respuesta", ""))
+        elif tool_name == "tool_consultar_manuales_profundo":
+            return tool_consultar_manuales_profundo(args.get("consulta", ""))
         else:
             return f"Herramienta desconocida: {tool_name}"
     except Exception as e:

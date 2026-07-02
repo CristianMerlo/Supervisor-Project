@@ -34,7 +34,7 @@ def obtener_servicio_drive():
     return build('drive', 'v3', credentials=creds)
 
 def obtener_locales_db():
-    db_path = BASE_DIR / "supervisor_local.db"
+    db_path = Path("/home/cristian/Documentos/Supervisor/supervisor_local.db")
     locales = []
     if db_path.exists():
         try:

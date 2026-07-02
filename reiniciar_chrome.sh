@@ -4,6 +4,8 @@
 
 # Exportar variables gráficas para asegurar ejecución bajo cron
 export DISPLAY=:0
+export WAYLAND_DISPLAY=wayland-0
+export XDG_RUNTIME_DIR=/run/user/1000
 export DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/1000/bus"
 
 echo "=== REINICIANDO GOOGLE CHROME (CDP 9222) ==="
@@ -11,12 +13,15 @@ date
 
 # 1. Matar procesos existentes de Chrome
 echo "[1/2] Cerrando instancias previas de Chrome..."
-pkill -f "google-chrome" || true
+killall -9 chrome || true
 sleep 3
+
+# Eliminar archivos de bloqueo antiguos si existen
+rm -f /home/cristian/.config/chrome-whatsapp/Singleton*
 
 # 2. Iniciar Chrome en background con el puerto CDP abierto
 echo "[2/2] Lanzando Chrome con remote debugging..."
-google-chrome --remote-debugging-port=9222 --user-data-dir="/home/cristian/.config/chrome-whatsapp" --no-first-run --no-default-browser-check --disable-extensions --disable-gpu --disable-sync --disable-translate --disable-default-apps --mute-audio > /dev/null 2>&1 &
+setsid google-chrome --remote-debugging-port=9222 --user-data-dir="/home/cristian/.config/chrome-whatsapp" --no-first-run --no-default-browser-check < /dev/null > /dev/null 2>&1 &
 
 sleep 2
 echo "✓ Proceso completado exitosamente."

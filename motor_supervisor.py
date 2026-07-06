@@ -25,8 +25,8 @@ model = None
 if GEMINI_API_KEY and genai:
     try:
         genai.configure(api_key=GEMINI_API_KEY)
-        model = genai.GenerativeModel('gemini-1.5-flash')
-        logger.info("Modelo Gemini 1.5 Flash inicializado correctamente.")
+        model = genai.GenerativeModel('gemini-2.5-flash')
+        logger.info("Modelo Gemini 2.5 Flash inicializado correctamente.")
     except Exception as e:
         logger.error(f"Error inicializando Gemini: {e}")
 
@@ -62,11 +62,9 @@ def extraer_texto_pdf(pdf_path):
     return texto_completo
 
 def fallback_ia_gemini(texto: str, datos_parciales: dict) -> dict:
-    """Utiliza Gemini para completar datos que las Regex no pudieron encontrar."""
-    if not model:
-        logger.warning("Gemini model no está disponible. Saltando fallback de IA.")
-        return datos_parciales
-        
+    """Utiliza Gemini (u otro LLM de resguardo) para completar datos que las Regex no pudieron encontrar."""
+    import llm_fallback
+    
     prompt = f"""
 Extrae los siguientes datos de mantenimiento a partir del texto del PDF.
 Responde ÚNICAMENTE con un JSON válido con estas claves exactas:
@@ -80,20 +78,19 @@ Texto del reporte:
 {texto}
 """
     try:
-        # En Gemini 1.5 usamos response_mime_type para forzar JSON válido
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.GenerationConfig(
-                response_mime_type="application/json",
-                temperature=0.0
-            )
-        )
-        nuevos_datos = json.loads(response.text)
+        response_text = llm_fallback.generar_texto(prompt)
+        
+        # Limpieza por si retorna markdown json blocks
+        if "```" in response_text:
+            match = re.search(r"```(?:json)?\s*(\{.*?\})\s*```", response_text, re.DOTALL)
+            if match:
+                response_text = match.group(1)
+                
+        nuevos_datos = json.loads(response_text)
         
         # Mergeando datos: dar prioridad a lo encontrado por IA si estaba vacío en regex
         for k, v in nuevos_datos.items():
             if k in datos_parciales:
-                # Si el dato original estaba vacío (o era 0) y la IA encontró algo
                 if not datos_parciales[k] and v:
                     datos_parciales[k] = v
                     logger.info(f"   [IA Fallback] Rescatado dato faltante '{k}': {v}")
@@ -102,6 +99,33 @@ Texto del reporte:
         logger.error(f"[!] Error durante el fallback de IA: {e}")
         
     return datos_parciales
+
+def resolver_sigla_desde_db(datos):
+    db_path = "/home/cristian/Documentos/Supervisor/supervisor_local.db"
+    if not os.path.exists(db_path):
+        return datos
+        
+    try:
+        with sqlite3.connect(db_path) as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT sigla, nombre FROM locales")
+            locales_db = cursor.fetchall()
+            valid_siglas = {r[0] for r in locales_db}
+            
+            # Si no hay sigla o la sigla no es válida en la BD
+            if not datos.get("sigla") or datos.get("sigla") not in valid_siglas:
+                if datos.get("local"):
+                    local_name_clean = clean_string(datos["local"])
+                    for db_sigla, db_nombre in locales_db:
+                        db_nombre_clean = clean_string(db_nombre)
+                        if local_name_clean in db_nombre_clean or db_nombre_clean in local_name_clean:
+                            datos["sigla"] = db_sigla
+                            datos["local"] = db_nombre
+                            logger.info(f"   [Fallback DB] Resuelta sigla '{db_sigla}' para '{datos['local']}'")
+                            break
+    except Exception as e_db:
+        logger.error(f"   [!] Error DB lookup: {e_db}")
+    return datos
 
 def parser_hibrido(pdf_path):
     """Fase 1: Extrae los datos usando Regex. Fase 1B: Fallback IA si faltan datos críticos."""
@@ -120,23 +144,7 @@ def parser_hibrido(pdf_path):
         datos["sigla"] = m_local.group(2).strip()
         
     # Fallback DB para la sigla si falta
-    if not datos["sigla"] and datos["local"]:
-        try:
-            db_path = "/home/cristian/Documentos/Supervisor/supervisor_local.db"
-            if os.path.exists(db_path):
-                with sqlite3.connect(db_path) as conn:
-                    cursor = conn.cursor()
-                    local_name_clean = clean_string(datos["local"])
-                    cursor.execute("SELECT sigla, nombre FROM locales")
-                    for db_sigla, db_nombre in cursor.fetchall():
-                        db_nombre_clean = clean_string(db_nombre)
-                        if local_name_clean in db_nombre_clean or db_nombre_clean in local_name_clean:
-                            datos["sigla"] = db_sigla
-                            datos["local"] = db_nombre
-                            logger.info(f"   [Fallback DB] Resuelta sigla '{db_sigla}' para '{datos['local']}'")
-                            break
-        except Exception as e_db:
-            logger.error(f"   [!] Error DB lookup: {e_db}")
+    datos = resolver_sigla_desde_db(datos)
         
     m_tecnico = REGEX_TECNICO.search(texto)
     if m_tecnico: datos["tecnico"] = m_tecnico.group(1).strip()
@@ -161,6 +169,8 @@ def parser_hibrido(pdf_path):
     if texto.strip():
         logger.info("   [IA] Activando Parser IA Gemini para datos hídricos...")
         datos = fallback_ia_gemini(texto, datos)
+        # Re-intentar lookup de DB si la IA rescató el nombre del local pero no la sigla
+        datos = resolver_sigla_desde_db(datos)
     return datos, texto
 
 def evaluar_reglas_negocio(datos):

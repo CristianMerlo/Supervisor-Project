@@ -3,9 +3,10 @@ import os
 import json
 import subprocess
 from pathlib import Path
+from archivador_drive import obtener_sigla_sistema
 
 NLM_CMD = "/home/cristian/.local/bin/nlm"
-LOCALES_DIR = "/home/cristian/PROYECTOS/Supervisor-Project/brain/locales"
+LOCALES_DIR = Path(__file__).parent / "brain" / "locales"
 
 def get_notebooks():
     res = subprocess.run([NLM_CMD, "list", "notebooks", "--json"], capture_output=True, text=True)
@@ -27,31 +28,32 @@ def main():
         print("Uso: python3 actualizar_notebook_local.py <SIGLA>")
         sys.exit(1)
         
-    sigla = sys.argv[1].upper()
-    file_path = os.path.join(LOCALES_DIR, f"{sigla}.md")
+    sigla_ticket = sys.argv[1].upper()
+    file_path = LOCALES_DIR / f"{sigla_ticket}.md"
     
-    if not os.path.exists(file_path):
+    if not file_path.exists():
         print(f"Error: No existe el archivo local {file_path}")
         sys.exit(1)
         
+    sigla_sistema = obtener_sigla_sistema(sigla_ticket)
     notebooks = get_notebooks()
     nb_id = None
     
     for nb in notebooks:
         title = nb.get("title", "")
-        if f"[{sigla}]" in title:
+        if f"[{sigla_sistema}]" in title:
             nb_id = nb["id"]
             break
             
     if not nb_id:
-        print(f"No se encontró un cuaderno en NotebookLM para la sigla {sigla}")
+        print(f"No se encontró un cuaderno en NotebookLM para la sigla {sigla_sistema} (mapeada de {sigla_ticket})")
         sys.exit(1)
         
-    print(f"Actualizando cuaderno de {sigla} (ID: {nb_id})")
+    print(f"Actualizando cuaderno de {sigla_ticket} (sistema: {sigla_sistema}) (ID: {nb_id})")
     
     # Listar fuentes actuales
     sources = get_sources(nb_id)
-    filename = f"{sigla}.md"
+    filename = f"{sigla_ticket}.md"
     
     # (Borrado deshabilitado por instrucción del usuario para mantener historial de visitas)
     # for src in sources:
@@ -67,7 +69,7 @@ def main():
         
     import datetime
     fecha_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    titulo_historial = f"{sigla}_{fecha_str}.md"
+    titulo_historial = f"{sigla_ticket}_{fecha_str}.md"
     
     res_add = subprocess.run(
         [NLM_CMD, "add", "text", nb_id, content, "--title", titulo_historial],
@@ -75,7 +77,7 @@ def main():
     )
     
     if res_add.returncode == 0:
-        print(f"✅ Cuaderno de {sigla} actualizado en NotebookLM exitosamente.")
+        print(f"✅ Cuaderno de {sigla_ticket} (sistema: {sigla_sistema}) actualizado en NotebookLM exitosamente.")
     else:
         print(f"❌ Error actualizando NotebookLM: {res_add.stderr}")
 

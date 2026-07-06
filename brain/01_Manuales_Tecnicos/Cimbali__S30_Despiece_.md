@@ -1,0 +1,1116 @@
+# Manual: Cimbali - S30 Despiece_
+
+Spare parts catalog
+Actualizado 26/01/2020
+Máquinas para café superautomáticas
+ 
+S30
+índice
+S30 - CUADRO GENERAL .................................................................................................................................................................................................................................................................................................... 3
+RECAMBIOS PRIMERA NECESIDAD .................................................................................................................................................................................................................................................................................. 9
+KIT PPM S30 ........................................................................................................................................................................................................................................................................................................................... 10
+INSTALACION HIDRÁULICA ............................................................................................................................................................................................................................................................................................. 12
+S30 - CARROZZERIA ............................................................................................................................................................................................................................................................................................................ 13
+CARROCERIA .......................................................................................................................................................................................................................................................................................................................... 15
+PANEL DE COMANDOS .................................................................................................................................................................................................................................................................................................... 17
+CALDERA DE LOS SERVICIOS .......................................................................................................................................................................................................................................................................................... 19
+BOILER CAFÉ ......................................................................................................................................................................................................................................................................................................................... 21
+TUBO EROGACIÓN VAPOR ............................................................................................................................................................................................................................................................................................. 23
+TUBO EROGACIÓN AGUA CALIENTE .......................................................................................................................................................................................................................................................................... 25
+TURBOSTEAM ........................................................................................................................................................................................................................................................................................................................ 27
+BLOQUEO DE VÁLVULAS ................................................................................................................................................................................................................................................................................................ 29
+COMPONENTES HIDRÁULICOS ...................................................................................................................................................................................................................................................................................... 31
+CIRCUITO CAFÉ .................................................................................................................................................................................................................................................................................................................... 33
+CIRCUITO VAPOR ................................................................................................................................................................................................................................................................................................................. 35
+CIRCUITO LECHE .................................................................................................................................................................................................................................................................................................................. 37CIRCUITO CHOCOLATE ..................................................................................................................................................................................................................................................................................................... 39
+INSTALACION HIDRÁULICA THERMODRIVE ............................................................................................................................................................................................................................................................. 41
+EROGADOR ............................................................................................................................................................................................................................................................................................................................ 43
+EROGADOR A MOTOR ...................................................................................................................................................................................................................................................................................................... 45
+PISTÓN SUPERIOR ................................................................................................................................................................................................................................................................................................................ 47
+PISTÓN INFERIOR ................................................................................................................................................................................................................................................................................................................. 49
+GRUPO CAFÉ ......................................................................................................................................................................................................................................................................................................................... 51
+GRUPO CAFÉ ......................................................................................................................................................................................................................................................................................................................... 53
+ELECTROBOMBA VOLUMETRICA ................................................................................................................................................................................................................................................................................... 55
+CAJA ELÉCTRICA/COMPONENTES ELÉCTRICOS ...................................................................................................................................................................................................................................................... 57
+CAJA ELÉCTRICA/COMPONENTES ELÉCTRICOS ...................................................................................................................................................................................................................................................... 59
+MOLEDOR DOSIFICADOR/CAM.DE MOLTURACIÓN ............................................................................................................................................................................................................................................. 61
+BASE TOLVAS ........................................................................................................................................................................................................................................................................................................................ 63
+TOLVAS CAFÈ ........................................................................................................................................................................................................................................................................................................................ 65
+TOLVAS CHOCOLATE ........................................................................................................................................................................................................................................................................................................ 67
+BASE TOLVAS 3MD ............................................................................................................................................................................................................................................................................................................. 69
+MOLEDOR DOSIFICADOR/CAM.MOLTURACIÓN 3MD .......................................................................................................................................................................................................................................... 71Máquinas para café superautomáticas S30
+Page 3 of 73 S30 - CUADRO GENERAL 26/01/2020 ed. 0 tab. DEPos Recambio Descripción Validez Notas
+-220000014 TUBO￿SILICONA  
+-400301000 JUNTA￿TORICA￿8,73X1,78  
+-944881000F CUERPO￿VÁLVULAS￿CON￿VÁLVULA￿CALIBRADA  
+￿484595000 CUERPO￿VALVULAS￿M3￿CONEXION  
+-532024800 MICRO￿(6)A￿250V  
+￿532024400 MICRO￿16(6)A￿250V  
+-532662300F RACOR￿CODO￿G3/8￿M￿ORIENTABLE￿D8  
+￿532656200 RACOR￿GOM.G3/8￿M￿ORIENT￿D6  
+-533180700F BOMBA￿LECHE  
+￿533180700 BOMBA￿LECHE  
+-533902710 ELECTROV.￿3VÍAS  
+￿533902700 EV￿3￿VÍAS￿ACOP.￿ROSC.  
+-534194100 CRIC￿A￿ESFERA  
+-535536018 FOTOCÉLULA￿TX  
+￿535536008 TARJETA￿EMISORES￿TOLVA  
+-535917040 CIRCUITO￿ELÉCTRICO  
+￿535917030 S30￿Drawer￿Wiring￿Diagram  
+-535959000 CABLE￿CONEX.￿SIST.￿PAGO  
+-537043920 COMPUERTA￿CAFÉ  
+￿537043910 PLACA￿DE￿FONDO￿CAFÉ  
+-542910040 TUERCA￿M10￿INOX  
+-568218000 ANILLO￿DE￿PARO￿DE￿18￿INOX  
+-932013010 SOPORTE￿SOLAPA  
+￿932013000 SOPORTE￿ABATIBLE￿MOLIENDA  
+-932014040 PLACA￿SOLAPA  
+￿932014030 PLACA￿SOLAPA￿(SUST.￿932014020)  
+-932027030 MUELLE￿SOLAPA￿(SUST.￿932027020)  
+￿932027020 MUELLE￿SOLAPA  
+-932028010 CLAVIJA￿SOLAPA  
+￿932028000 CLAVIJA￿SOLAPA  
+-934164000 EMPAQUE￿EROGADOR￿LECHE  
+-936050000 PEGABLE￿MOLIENDA  
+-936159045F FONDO￿CÁMARA￿Diám.￿44  
+￿936159025 FONDO￿CÁMARA￿Diám.￿44  
+-936175035F FONDO￿CÁMARA￿DIÁM.￿50  
+￿936175025 FONDO￿CÁMARA￿D.￿50  
+-936214000 ESPESOR￿COJINETE￿35x25x0,5  
+-940218000 JUNTA￿TUBOS￿DE￿CAFÉ￿BOQUILLA  
+-944704030 CONJ.￿PISTÓN￿C/FOND.￿44￿STEPSEAL￿REC.  
+￿944704020 CONJ.￿PISTÓN￿C/FOND.￿44  
+-944705030 CONJ.￿PISTÓN￿C/FOND.￿50￿STEPSEAL￿REC.  
+￿944705020 CONJ.￿PISTÓN￿C/FOND.￿50  
+-944706020 CONJ.￿PISTÓN￿44￿STEPSEAL￿REC.  
+￿944706010 CONJ.￿PISTÓN￿44￿STEPSEAL￿REP.  
+-944707020 CONJ.￿PISTÓN￿50￿STEPSEAL￿REC.  Máquinas para café superautomáticas S30
+Page 4 of 73 S30 - CUADRO GENERAL 26/01/2020 ed. 0 tab. DEPos Recambio Descripción Validez Notas
+￿944707010 CONJ.￿PISTÓN￿50￿STEPSEAL￿REP.  
+-946047020 PALETAS￿INOXIDABLES  
+￿946047000 PALETTE￿INOX￿CONT.SOLUBILI￿CILINDRICO  
+-946207010 ESTRIBO￿ANGULAR￿GRUPO  
+￿946207000 ESTRIBO￿ANGULAR￿GRUPO  
+-946263000 FIJACIÓN￿GRUPO￿CAFÉ￿INFERIOR  
+￿946208000 ANCLAJE￿GRUPO￿INFERIOR  
+-946211010 SOPORTE￿BOQUILLA￿SUPERIOR  
+￿946211000 SOPORTE￿BOQUILLA￿SUPERIOR  
+-946212010 PLACA￿INFERIOR￿GRUPO  
+￿946212000 PLACA￿INFERIOR￿GRUPO  
+-946268000 PAÑO￿S30￿(25X25)  
+-966899000 TAPA￿TOLVA￿C/CERRADURA  
+￿946386000 TAPA￿TOLVA  
+-966900000 TAPA￿TOLVA￿CAFÉ￿C/CERRADURA￿Rec.  
+￿946391000 TAPA￿TOLVA￿CAFÉ￿CON￿CERRADURA  
+-946520000 TOLVA￿CAFÉ  
+-946805010 CONJ.￿CUBETA￿DE￿LAVADO￿S30  
+￿946805000 CONJ.￿CUBETA￿DE￿LAVADO  
+-946981000 CONJ.￿PANEL￿DCH.￿C/ORIFICIO  
+￿946806000 CONJ.￿PANEL￿LATERAL  
+-946812000 CONJ.￿BOQUILLA￿MANUAL￿DE￿CAFÉ  
+-946820010 KIT￿"A"￿PPM￿X30￿S30  
+￿946820000 KIT￿"A"￿S30￿44MM  
+-946820010 KIT￿"A"￿PPM￿X30￿S30  
+￿946821000 KIT￿"A"￿S30￿50MM  
+-981901020 KIT￿"B"￿PPM￿S20/30  
+￿946822000 KIT￿"B"￿S30  
+-946823010 KIT￿"C"￿PPM￿X30￿S30  
+￿946823000 KIT￿"C"￿S30  
+-946824020 KIT￿"D"￿PPM￿X30￿S30  
+￿946824000 KIT￿"D"￿S30  
+-946824020 KIT￿"D"￿PPM￿X30￿S30  
+￿946824010 KIT￿"D"￿MANTENIMIENTO￿S30￿/X30  
+-946825020 KIT￿"E"￿PPM￿X30￿S30￿44mm  
+￿946825000 KIT￿"E"￿S30￿44mm  
+-946825020 KIT￿"E"￿PPM￿X30￿S30￿44mm  
+￿946825010 KIT￿"E"￿PPM￿S30￿44mm  
+-946826010 KIT￿"F"￿PPM￿X30￿S30  
+￿946826000 KIT￿"F"￿S30  
+-946826010 KIT￿"F"￿PPM￿X30￿S30  
+￿946827000 KIT￿"G"￿S30  
+-946826010 KIT￿"F"￿PPM￿X30￿S30  
+￿946828000 KIT￿"H"￿S30  
+-946826010 KIT￿"F"￿PPM￿X30￿S30  Máquinas para café superautomáticas S30
+Page 5 of 73 S30 - CUADRO GENERAL 26/01/2020 ed. 0 tab. DEPos Recambio Descripción Validez Notas
+￿946828010 KIT￿"H"￿MANTENIMIENTO￿S30￿/X30  
+-946829020 KIT￿"I"￿PPM￿X30￿S30  
+￿946829000 KIT￿"I"￿S30  
+-946830020 KIT￿"E"￿PPM￿X30￿S30￿50mm  
+￿946830000 KIT￿"E"￿S30￿50mm  
+-946830020 KIT￿"E"￿PPM￿X30￿S30￿50mm  
+￿946830010 KIT￿"E"￿PPM￿S30￿50mm  
+-946834010 KIT￿"E"￿PPM￿X30￿S30￿44mm￿MF  
+￿946834000 KIT￿"E"￿S30￿44mm￿MICROFILTRO  
+-946835010 KIT￿"E"￿PPM￿X30￿S30￿50mm￿MF  
+￿946835000 KIT￿"E"￿S30￿50mm￿MICROFILTRO  
+-946840000KIT￿ACTUALIZACIÓN￿DEL￿CIRCUITO
+HIDRÁULIC 
+-946887000 CONJ.￿CALENTADOR￿&￿CALDERA  
+-946824020 KIT￿"D"￿PPM￿X30￿S30  
+￿946940000 KIT￿"D"￿MANTENIMIENTO￿X30/S30￿UL/NSF  
+-966012020 AISLANTE￿CALDERA  
+￿966012010 AISLANTE￿CALDERA  
+-966013020 AISLANTE￿CALDERA  
+￿966013010 AISLANTE￿CALDERA  
+-966014020 AISLANTE￿CALENTADOR  
+￿966014010 AISLANTE￿CALENTADOR  
+-966015020 AISLANTE￿CALENTADOR  
+￿966015010 AISLANTE￿CALENTADOR  
+-966039031 CÁRTER￿GRUPO￿CAFÉ  
+￿966039011 CÁRTER￿GRUPO￿CAFÉ  
+-966039031 CÁRTER￿GRUPO￿CAFÉ  
+￿966039021 CÁRTER￿GRUPO￿CAFÉ  
+-966039031 CÁRTER￿GRUPO￿CAFÉ  
+-966085001 SOPORTE￿LATERAL  
+-966121020 MARCO￿PLÁSTICO￿SUPERIOR￿IZQ.  
+￿966121000 MARCO￿PLÁSTICO￿SUPERIOR￿IZQ.  
+-966123020 MARCO￿PLÁSTICO￿SUPERIOR￿TRAS.  
+￿966123000 MARCO￿PLÁSTICO￿SUPERIOR￿TRASERO  
+-966149000 TUBO￿ASPIRAZIONE￿MIXER  
+-946842000 KIT￿SERVICE  
+￿966158000 LLAVE￿ACTIVACIÓN￿MIXER￿-CON￿TABLAS￿S30-  
+-537056100 KIT￿CONDUCTO  
+￿966159000 DESLIZADERO￿CAFÉ￿INTERMEDIO  
+-966170000 BASE  
+-966182020 PERNO￿DESLIZAMIENTO￿ENGANCHE  
+￿966182000 PERNO￿DESLIZAMIENTO￿ENGANCHE  
+-966203010 LOGOTIPO￿CIMBALI￿CUBETA  
+￿966203000 LOGOTIPO￿CIMBALI￿CUBETA  
+-966204010 LOGOTIPO￿FAEMA￿CUBETA  Máquinas para café superautomáticas S30
+Page 6 of 73 S30 - CUADRO GENERAL 26/01/2020 ed. 0 tab. DEPos Recambio Descripción Validez Notas
+-966295010 TORNILLO￿DE￿FIJACIÓN￿DE￿PANELES  
+￿966295000 VITE￿FISSAGGIO￿PANNELLI  
+-966357000 TUBO￿SILIC.7,9X4_.8X1500￿REC  
+-966402010 TURBINA￿MIXER  
+￿966402000 TURBINA￿MIXER  
+-966405010 PIPA￿SALIDA￿MIXER  
+￿966405000 PIPA￿SALIDA￿MEZCLADOR￿CV  
+-966346000F INYECTOR￿MIXER￿D.￿0,5  
+￿966406000 ACOPLAMIENTO￿AGUA￿MEZCLADOR￿D.5￿CV  
+-966425000 RACOR￿MACHO￿CUBA￿LAVADO  
+-966426000 RACOR￿HEMBRA￿CUBA￿LAVADO  
+-966433000 Boquilla￿Diám.￿0,8￿mm  
+-537043920 COMPUERTA￿CAFÉ  
+￿966487000 PARATOIA￿GRUPPO￿PRODOTTO￿"S30"  
+-966578000F PUERTA￿TOLVA￿DCH.  
+￿966540000 MANIGLIA￿TRAMOGGIA￿DX￿COSTAMPATA  
+-966579000F PUERTA￿TOLVA￿IZQ.  
+￿966541000 MANIGLIA￿TRAMOGGIA￿SX￿COSTAMPATA  
+-966843010 GRUPO￿S30￿44  
+￿966843000 GRUPO￿S30￿44￿REP.  
+-966843010 GRUPO￿S30￿44  
+-966844010 GRUPO￿S30￿50  
+￿966844000 GRUPO￿S30￿50￿REP.  
+-966844010 GRUPO￿S30￿50  
+-537060800 TARJETA￿TRIAC￿S30  
+￿966845000 TARJETA￿TRIAC.￿S30￿REP.  
+-966846030 ASS.SCHEDA￿CPU￿S30￿RIC  
+￿966846000 CONJ.￿TARJETA￿CPU￿S30￿REP.  
+-966846030 ASS.SCHEDA￿CPU￿S30￿RIC  
+￿966846010 CONJ.￿TARJETA￿CPU  
+-966867000 KIT￿EXTRACCIÓN￿ELÉCTROV.￿DESV.￿SOLUBLE￿S  
+-981098000 GOMA￿PASACABLE￿PARA￿ORIFICIOS￿D￿25,1  
+-985506010F CONJ.￿TUBO￿COAXIAL￿TSCT￿10￿MEDIO  
+￿985506000 CONJ.￿TUBO￿COAXIAL￿TSCT  
+-985510020F CONJUNTO￿TUBOS￿TSCT￿MEDIO  
+￿985510000 CONJUNTO￿TUBOS￿TSCT  
+-996724000 KIT￿SONDA￿LECHE  
+-220000031F TUBO￿SILIC.￿RX50￿SILASTIC￿6,35x9,53  
+-402327000F JUNTA￿COBRE￿5,3X8,5X1  
+-533896910F ELECTROV.￿3V￿NC￿D3￿VITON￿1/4G  
+￿533896900R ELETTR.3R￿24V￿DC  
+-533904600F MEMBRANA￿ELECTROV.  
+-946449010F JUNTA￿Diám.￿10,2x6￿Esp.￿3mm  
+￿946449000F GUARNIZIONE￿Diam.￿10,2x6￿Sp.3mm  
+-966346000F INYECTOR￿MIXER￿D.￿0,5  Máquinas para café superautomáticas S30
+Page 7 of 73 S30 - CUADRO GENERAL 26/01/2020 ed. 0 tab. DEPos Recambio Descripción Validez Notas
+-946407000 BANDEJA￿DE￿GOTEO￿MIXER  
+-946260010 ENGRANAJE￿Z35  
+-946989000 COMPONENTES￿MIXER￿PARA￿ALFOMBRILLA.  
+-946450000 TORNILLO￿TSP￿M3X6￿C/FIJADOR￿DE￿ROSCAS  
+-966250000 MANILLA￿S30  
+-966253000 SOPORTE￿FRENO￿ACOPLAMIENTO  
+-966442020 FOTOCÉLULA￿FINAL￿DE￿CARRERA  
+-532662600F VÁLVULA￿DE￿RETENCIÓN  
+-537058400 ALIMENTADOR￿S30  
+-946524000 TRANSPORTADOR￿FONDOS  
+-946736000 TERCER￿MOLINILLO￿COMPLETO  
+-432508000 POMO￿REG.MOLINILLO  
+-966451010F TAPA￿RAMPA￿DESCAFEINADO  
+￿966451000F TAPA￿DE￿RAMPA￿DE￿DESCAFEINADO  
+-537060800 TARJETA￿TRIAC￿S30  
+-946990000 CONJ.￿KIT￿THERMODRIVE  
+-946970010 CONJUNTO￿CUERPO￿Y￿VIROLA￿3￿MOLINILLOS  
+-537057500 PAREJA￿MUELAS￿A￿DERECHAS￿54X8  
+-946829020 KIT￿"I"￿PPM￿X30￿S30  
+-512603050 TORNILLO￿M3X5￿INOX  
+-535955000 Protección￿PTC￿Bomba￿de￿engranajes  
+-535921040 ELECTROVÁLVULA￿+Panel+Molinillos  
+-966906000 MOLINILLO￿"DER"￿KOREA  
+-966907000 MOLINILLO￿"IZQ"￿KOREA  
+-985506020F CONJ.￿TUBO￿COAXIAL￿TSCT  
+-985510020F CONJUNTO￿TUBOS￿TSCT￿MEDIO  
+-966258010 MANILLA￿LATERAL￿DCH.  
+-966259010 MANILLA￿LATERAL￿IZQ.  
+-532663000F RACOR  
+-944794010 CONJ.CALDERA￿LECHE  
+-981901020 KIT￿"B"￿PPM￿S20/30  
+-946814010 CONJ.￿RAMPA￿DESCAFEINADO  
+-966451010F TAPA￿RAMPA￿DESCAFEINADO  
+-936159045F FONDO￿CÁMARA￿Diám.￿44  
+-946047020 PALETAS￿INOXIDABLES  
+-555000030 BUJE￿REFUERZO￿õ￿6  
+-946321000F FILTRO￿LAMINADOR￿LECHE  
+-966220010 REJILLA￿CUBETA  
+-966182020 PERNO￿DESLIZAMIENTO￿ENGANCHE  
+-966500000 ASS.￿CALDAIA  
+-531198010F CONDUCTÍMETRO￿ROMER  
+-966840010 SALPICADERO  
+-936175045F BASE￿CÁMARA￿diám.￿50  
+-973907000F THERMODRIVE  
+-946557000F REJILLA￿TOLVA  Máquinas para café superautomáticas S30
+Page 8 of 73 S30 - CUADRO GENERAL 26/01/2020 ed. 0 tab. DEPos Recambio Descripción Validez Notas
+-946558000F REJILLA￿TOLVA  
+-981164000F CERRADURA￿TOLVA  
+-966846030 ASS.SCHEDA￿CPU￿S30￿RIC  
+-946824030 KIT￿"D"￿PPM￿S30  
+-946826020 KIT￿"F"￿PPM￿S30  
+-981153000 NIPLE￿3/8￿GAS￿C/FILTRO  Máquinas para café superautomáticas S30
+Page 9 of 73 RECAMBIOS PRIMERA NECESIDAD 26/01/2020 ed. 0 tab. WK-DEPos Recambio Descripción Validez Notas
+-966842000 CONJ.￿CALENTADOR￿S30  
+-966841000 CONJ.￿CALDERA￿S30  
+-537058400 ALIMENTADOR￿S30  
+-966846030 ASS.SCHEDA￿CPU￿S30￿RIC  
+-981163000F CONJUNTO￿ADAPTADOR￿QUICK-FIT  
+-966770000 CONJUNTO￿BASE￿+￿MOTOR￿MEZCLADOR￿CV  
+-966840010 SALPICADERO  
+-946781000 CONJUNTO￿MOLEDOR￿DCH.￿COMPLETO￿REP.  
+-946914000 CONJUNTO￿MOLEDOR￿DCH.￿UL￿REC. N:UL
+-946782000 CONJUNTO￿MOLEDOR￿IZQ.￿COMPLETO￿REP.  
+-946915000 CONJUNTO￿MOLEDOR￿IZQ.￿UL￿REC. N:UL
+-966172000 CIERRE￿RAMPA￿PRODUCTO  
+-533898000 ELECTROV.DESVIADORA￿24V￿DC  
+-533902000 EV￿2￿VÍAS￿ETV￿125-A40-6FF-024  
+-533902600 EV￿2￿VÍAS￿ACOP.￿ROSCADOS  
+-533902500 EV￿2￿VÍAS￿ACOP.￿RÁPIDO  
+-533902710 ELECTROV.￿3VÍAS  
+-533900800 EV.￿3￿VÍAS￿ETV-SO2-F30-4FF-024/=￿-￿CON￿T  
+-966423000 FILTRO￿ASPIRACIÓN￿LECHE  
+-535535008 TARJETA￿RECEPTORES￿TOLVA  
+-535536018 FOTOCÉLULA￿TX  
+-402318000 JUNTA￿TÓRICA￿7,65X1,78￿NBR  
+-532024800 MICRO￿(6)A￿250V  
+-532025000 MICRO￿21￿A-250￿V N:UL
+-966519000 MOTORREDUCTOR￿UNIFICADO  
+-530892410 MOTORREDUCTOR￿ACOPLAMIENTO￿ESTRELLA  
+-966405010 PIPA￿SALIDA￿MIXER  
+-533180700F BOMBA￿LECHE  
+-537060800 TARJETA￿TRIAC￿S30  
+-966171000 RAMPA￿SALIDA￿PRODUCTOS  
+-531197200 TERMOSTATO￿CERÁMICO￿140°C N:KTL
+-531196400 TERMOSTATO￿CERÁMICO￿140°C  
+-531196500 TERMOSTATO￿CERÁMICO￿145°C  
+-531197300 TERMOSTATO￿CERÁMICO￿145°C N:KTL
+-966430000 BOQUILLA￿Diám.￿0,35￿mm  
+-966429000 BOQUILLA￿Diám.￿0,6￿mm  
+-966432000 Boquilla￿Diám.￿0,6￿mm  
+-946278000 BOQUILLA￿Diám.￿0,8mm  
+-946279000 BOQUILLA￿Diám.￿1,25mm  
+-966431000 Boquilla￿Diám.￿1￿mm  Máquinas para café superautomáticas S30
+Page 10 of 73 KIT PPM S30 26/01/2020 ed. 1 tab. DE-PPM
+Máquinas para café superautomáticas S30
+Page 11 of 73 KIT PPM S30 26/01/2020 ed. 1 tab. DE-PPMPos Recambio Descripción Validez Notas
+1946820010 KIT￿"A"￿PPM￿X30￿S30  
+2981901020 KIT￿"B"￿PPM￿S20/30  
+￿981901010 KIT￿"B"￿PPM￿S20/30  
+3946823010 KIT￿"C"￿PPM￿X30￿S30  
+4946824020 KIT￿"D"￿PPM￿X30￿S30  
+5946825020 KIT￿"E"￿PPM￿X30￿S30￿44mm G:D44
+5946834010 KIT￿"E"￿PPM￿X30￿S30￿44mm￿MF G:D44￿MF
+5946830020 KIT￿"E"￿PPM￿X30￿S30￿50mm G:D50
+5946835010 KIT￿"E"￿PPM￿X30￿S30￿50mm￿MF G:D50￿MF
+6946826010 KIT￿"F"￿PPM￿X30￿S30  
+7946829020 KIT￿"I"￿PPM￿X30￿S30  
+￿946829010 KIT￿"I"￿PPM￿S30  Máquinas para café superautomáticas S30
+Page 12 of 73 INSTALACION HIDRÁULICA 26/01/2020 ed. 1 tab. DE-A01
+Máquinas para café superautomáticas S30
+Page 13 of 73 S30 - CARROZZERIA 26/01/2020 ed. 1 tab. DE-B01
+Máquinas para café superautomáticas S30
+Page 14 of 73 S30 - CARROZZERIA 26/01/2020 ed. 1 tab. DE-B01Pos Recambio Descripción Validez Notas
+1966123020 MARCO￿PLÁSTICO￿SUPERIOR￿TRAS.  
+2966203010 LOGOTIPO￿CIMBALI￿CUBETA  
+3946808000 CONJ.￿PANEL￿TRASERO  
+4966121020 MARCO￿PLÁSTICO￿SUPERIOR￿IZQ.  
+5946981000 CONJ.￿PANEL￿DCH.￿C/ORIFICIO  
+6966294000 DISTANCIADOR  
+7966295010 TORNILLO￿DE￿FIJACIÓN￿DE￿PANELES  
+8532805500 PIE￿REG.￿NYLON/INOX.￿H105/137 N:NSF
+9532805000 PIE￿REGULABLE  
+10433145000 RASPADOR￿D.￿35  
+11946807000 CONJ.￿PANEL￿LATERAL  
+12966086000 CÁRTER￿INTERNO  Máquinas para café superautomáticas S30
+Page 15 of 73 CARROCERIA 26/01/2020 ed. 0 tab. DE-B02
+Máquinas para café superautomáticas S30
+Page 16 of 73 CARROCERIA 26/01/2020 ed. 0 tab. DE-B02Pos Recambio Descripción Validez Notas
+1463726000 CONTACTO￿MAGNETICO￿CON￿CONECTOR  
+2220000016 TUBO￿DE￿SILICONA￿D￿6X10  
+3532302720 EMPALME￿A￿"Y"  
+4484381000 JUNCTION￿TUBO￿PARA￿LECHE  
+5220000059 TUBO￿Diám.￿7x13  
+6410146000 CONTACTO￿MAGNETICO￿CAJON￿POSOS  
+7946804000 CONJ.￿CAJÓN￿FONDOS  
+8916184010 PORTAGOMA￿1/8￿GAS  
+9613500396 ABRAZADERA￿14-24  
+10946552000 RACOR￿DESCARGA￿CON￿INSERTOS￿IZQ.  
+11946523000 DESVIADOR￿FONDOS￿CON￿REMACHES  
+12966078010 MANILLA￿CAJÓN￿FONDOS￿(Negra)  
+13523140120 TORNILLO￿T.C.￿4X12￿PARA￿PLASTICA  
+14966059010 PANEL￿CAJÓN￿FONDOS  
+15523103120 TORNILLO￿AUTORROSCANTE￿3X12  
+16532302500 TUBO￿ESPIRALADO  
+17916252000 EMPALME￿DESAGUE￿SERIE1  
+18916256000 TORNILLO￿A￿CUELLO￿M5  
+19401347000 EMPAQUE￿OR￿15,54X2,62  
+20220000055 TUBO￿Diám.￿6x10  
+21532304000 RACCORD￿A￿T￿D.18￿MM.  
+22220000024 TUBO￿DE￿SILICONA￿D￿15X21  
+23936299000 PORTAGOMA￿DOBLE￿D8￿D16  
+24966220010 REJILLA￿CUBETA  
+￿966220000 REJILLA￿CUBETA  
+25966153000 SEÑALIZADOR￿POSICIÓN￿TAZAS  
+26946816000 CONJ.￿CUBETA￿REPOSATAZAS  
+27966203010 LOGOTIPO￿CIMBALI￿CUBETA  Máquinas para café superautomáticas S30
+Page 17 of 73 PANEL DE COMANDOS 26/01/2020 ed. 0 tab. DE-B03
+Máquinas para café superautomáticas S30
+Page 18 of 73 PANEL DE COMANDOS 26/01/2020 ed. 0 tab. DE-B03Pos Recambio Descripción Validez Notas
+1532022708 MICROINTERRUPTOR  
+2966106000 GOMA￿CIERRE￿USB  
+3966301000 BISAGRA  
+4966840010 SALPICADERO  
+￿966897000 CONJUNTO￿SALPICADERO￿COMPLETO￿REP.￿JPN  
+4966840010 SALPICADERO  
+￿966840000 CONJUNTO￿SALPICADERO￿COMPLETO￿REP.  Máquinas para café superautomáticas S30
+Page 19 of 73 CALDERA DE LOS SERVICIOS 26/01/2020 ed. 0 tab. DE-C01
+Máquinas para café superautomáticas S30
+Page 20 of 73 CALDERA DE LOS SERVICIOS 26/01/2020 ed. 0 tab. DE-C01Pos Recambio Descripción Validez Notas
+1537046900 KIT￿SENSOR￿DE￿PRESION  
+2401368000 JUNTA￿OR￿2,90X1,78  
+3916549010 SENSOR￿DE￿PRESION  
+4966513000 CONJ.￿TUBO￿SENSOR￿DE￿PRESIÓN  
+4966513008 CONJ.￿TUBO￿SENSOR￿DE￿PRESIÓN N:NSF
+5966492000 PROTECCIÓN￿VÁLVULA￿DE￿SEGURIDAD  
+6532600700 EMPALME￿PORTAGOMA  
+7532746200 ABRAZADERA￿CON￿TORNILLO  
+8532392700 VALVULA￿SEG.￿2,3￿1/4G  
+9402302000 JUNTA￿17X13,2X1,5  
+10966841000 CONJ.￿CALDERA￿S30  
+11966438000 ABRAZADERA￿DE￿BLOQUEO￿FUNDA￿CALDERA  
+12966013020 AISLANTE￿CALDERA  
+13531196500 TERMOSTATO￿CERÁMICO￿145°C  
+13531197300 TERMOSTATO￿CERÁMICO￿145°C N:KTL
+14966436000 TAPA￿AISLANTE￿BLANDA  
+15457347010 TAPÓN￿3/8￿GAS￿HEXAGONAL￿INOX.  
+16401215000 EMPAQUE￿COBRE￿3/8  
+17542114080 TUERCA￿M16X1,5￿BAJA￿UNI￿5589￿INOX  
+18966011008 RACOR￿DIFUSOR￿CALDERA  
+19402270000 JUNTA￿DE￿COBRE￿SO5-5-1/8  
+20532656500 RACOR￿RECTO￿D.61/8￿F  
+21532658700F RACOR￿90￿930X4M-6F-1/8  
+22966026000 DOBLADORA￿DE￿TUBO  
+23220000022 TUBO￿TEFLON￿D￿4X6  
+24946810000 CONJ.￿SONDA￿DE￿NIVEL  
+25531197200 TERMOSTATO￿CERÁMICO￿140°C N:KTL
+25531196400 TERMOSTATO￿CERÁMICO￿140°C  
+26966437000 TAPA￿PLACA￿DE￿DATOS  
+27966012020 AISLANTE￿CALDERA  Máquinas para café superautomáticas S30
+Page 21 of 73 BOILER CAFÉ 26/01/2020 ed. 1 tab. DE-C02
+Máquinas para café superautomáticas S30
+Page 22 of 73 BOILER CAFÉ 26/01/2020 ed. 1 tab. DE-C02Pos Recambio Descripción Validez Notas
+1555000010 CASQUETE￿6￿-￿1/8  
+2592029000R BOCA￿CIEGA￿D8  
+3966842000 CONJ.￿CALENTADOR￿S30  
+4940077000 TAPON￿DE￿1/8  
+5966439000ABRAZADERA￿DE￿BLOQUEO￿FUNDA
+CALENTADOR 
+6966014020 AISLANTE￿CALENTADOR  
+7531197200 TERMOSTATO￿CERÁMICO￿140°C N:KTL
+7531196400 TERMOSTATO￿CERÁMICO￿140°C  
+8542114080 TUERCA￿M16X1,5￿BAJA￿UNI￿5589￿INOX  
+9940072008 TUBO￿INGECTOR￿CARGA￿BOILER￿CAFE'  
+10402270000 JUNTA￿DE￿COBRE￿SO5-5-1/8  
+11531194810 SONDA￿BOILER￿CAFE  
+12401235020 EMPAQUE￿11X6,5X1,5  
+13966435000 TAPA￿AISLANTE￿BLANDA  
+14531196500 TERMOSTATO￿CERÁMICO￿145°C  
+14531197300 TERMOSTATO￿CERÁMICO￿145°C N:KTL
+15966437000 TAPA￿PLACA￿DE￿DATOS  
+16966015020 AISLANTE￿CALENTADOR  
+17532656500 RACOR￿RECTO￿D.61/8￿F  Máquinas para café superautomáticas S30
+Page 23 of 73 TUBO EROGACIÓN VAPOR 26/01/2020 ed. 1 tab. DE-D01
+Máquinas para café superautomáticas S30
+Page 24 of 73 TUBO EROGACIÓN VAPOR 26/01/2020 ed. 1 tab. DE-D01Pos Recambio Descripción Validez Notas
+1532656500 RACOR￿RECTO￿D.61/8￿F  
+2966301000 BISAGRA  
+3535947000SENSOR￿DE￿PRESENCIA￿CUBETA￿DE￿LAVADO
+S30 
+4523135120 TORNILLO￿AUT.T.C.CR.￿3,5X12  
+5966515000 CONTENCIÓN￿CÁRTER￿VAPOR  
+6966053010 PANEL￿VAPOR  
+7532727800 TAPÓN￿BAJO  
+8966290000 TUBO￿LANZA￿VAPOR  
+9484016048 RACOR￿PARA￿DISTRIBUIDOR  
+10401183010 EMPAQUE￿22X17X1,5  
+11485061010 RESORTE￿DE￿EMPUJE  
+12485078010 EMPAQUE￿JUNTA￿GRIFO  
+13401204000 JUNTA￿OR￿10,82X1,78  
+14985758000 CONJ.￿TUBO￿VAPOR￿CON￿BULBO  
+15927132010 MANGUITO  
+16402223000 EMPAQUE￿OR￿7,65X1,78  
+17913438000 BULBO￿VAPOR￿INOXIDABLE  
+18946259000 PANEL￿SIN￿VAPOR  
+19966045010 CÁRTER￿VAPOR  Máquinas para café superautomáticas S30
+Page 25 of 73 TUBO EROGACIÓN AGUA CALIENTE 26/01/2020 ed. 1 tab. DE-D02
+Máquinas para café superautomáticas S30
+Page 26 of 73 TUBO EROGACIÓN AGUA CALIENTE 26/01/2020 ed. 1 tab. DE-D02Pos Recambio Descripción Validez Notas
+1532656000 RAC.GOM.G1/8￿M  
+2966301000 BISAGRA  
+3532738700 TUERCA  
+4523135120 TORNILLO￿AUT.T.C.CR.￿3,5X12  
+5966516000 CONTENCIÓN￿CÁRTER￿AGUA  
+6966050010 PANEL￿AGUA  
+7946811000 CONJ.￿DISPENSADOR￿DE￿AGUA  
+8985716020F ATOMIZADOR￿M22X1  
+9966287000RACOR￿PARA￿DISTRIBUIDOR￿DE￿AGUA
+EXTENSIB 
+10402318000 JUNTA￿TÓRICA￿7,65X1,78￿NBR  
+11966289000 TUBO￿DISTRIBUIDOR￿EXTENSIBLE￿DE￿AGUA  
+12402320000F JUNTA￿21X15X2￿NSF  
+13532305000 FILTRO￿ROMPECHORRO  
+14966046000 CÁRTER￿AGUA  
+15946398000 PANEL￿FRONTAL￿DCH.  Máquinas para café superautomáticas S30
+Page 27 of 73 TURBOSTEAM 26/01/2020 ed. 1 tab. DE-D03
+Máquinas para café superautomáticas S30
+Page 28 of 73 TURBOSTEAM 26/01/2020 ed. 1 tab. DE-D03Pos Recambio Descripción Validez Notas
+1938898000 KIT￿COMPRESOR￿12￿V  
+2220000013 TUBO￿DESILICONA￿D￿3X6  
+3534600300 SILENCIADOR￿CONEXIÓN￿RÁPIDA￿D￿6  
+4966301000 BISAGRA  
+5532656700 RACOR￿EN￿T  
+6934316000 EMPALME￿RAPIDO￿§6￿X￿TUBOS￿3X6  
+7956136010 BOQUILLA￿COMPRESOR￿DIÁM￿0.35  
+8535947000SENSOR￿DE￿PRESENCIA￿CUBETA￿DE￿LAVADO
+S30 
+9523135120 TORNILLO￿AUT.T.C.CR.￿3,5X12  
+10966515000 CONTENCIÓN￿CÁRTER￿VAPOR  
+11966356000 CONJ.￿CABLE￿BLINDADO￿S30  
+12532149500 CONECTOR  
+13485291000 RETÉN￿ABRAZADERA  
+14532727800 TAPÓN￿BAJO  
+15966053010 PANEL￿VAPOR  
+16402223000 EMPAQUE￿OR￿7,65X1,78  
+17495331000 BRIDA￿ESTANQUEIDAD￿INFERIOR  
+18985757000CONJUNTO￿TERMINAL￿BULBO￿TSCT
+REPUESTOS 
+19402218000 EMPAQUE￿OR￿14X1,78￿NF  
+20485289000 CILINDRO￿DE￿ROTACIÓN  
+21402186010 JUNTA￿TÓRICA￿34,52X3,53￿PLATIN.  
+22485296030 ARTICULACIÓN￿TS￿UPGRADE  
+23495334010 BRIDA￿ESTANQUEIDAD￿SUPERIOR￿TUBO￿10  
+24985512000 CONJ.￿TERMOPAR￿MEDIO￿TSCT  
+25402250000 JUNTA￿OR￿3,68X1,78  
+26985510020F CONJUNTO￿TUBOS￿TSCT￿MEDIO  
+￿985510010F CONJUNTO￿TUBOS￿TSCT￿MEDIO  
+27220000029 TUBO￿DE￿SILICONA￿D￿7X11  
+28220000022 TUBO￿TEFLON￿D￿4X6  
+29532654100 EMPALME￿ACOADO￿6G￿1/4  
+30966045010 CÁRTER￿VAPOR  
+31985506010F CONJ.￿TUBO￿COAXIAL￿TSCT￿10￿MEDIO  
+32495337000 PROTECCIÓN￿EXTERNA  Máquinas para café superautomáticas S30
+Page 29 of 73 BLOQUEO DE VÁLVULAS 26/01/2020 ed. 0 tab. DE-E01
+Máquinas para café superautomáticas S30
+Page 30 of 73 BLOQUEO DE VÁLVULAS 26/01/2020 ed. 0 tab. DE-E01Pos Recambio Descripción Validez Notas
+1532656100 RAC.GOM.G1/4￿M  
+2220000022 TUBO￿TEFLON￿D￿4X6  
+3966026000 DOBLADORA￿DE￿TUBO  
+4532657700 RACOR￿RECTO￿D6  
+5532657100 RACOR￿EN￿CODO￿EMP.￿RÁPIDO  
+6402302000 JUNTA￿17X13,2X1,5  
+7944881000F CUERPO￿VÁLVULAS￿CON￿VÁLVULA￿CALIBRADA  
+8402203000 EMPAQUE￿CIEGO￿NF  
+9415020000 PORTAEMPAQUE  
+10415004000 RESORTE  
+11402219000 EMPAQUE￿OR￿10,78X2,62￿NF  
+12415019010 TORN￿DE￿REG.VALV￿DE￿PURGADO  
+13511804120 TORNILLO￿VTCE￿M4￿X￿12￿INOX  
+14946302008 RACOR￿PARA￿CUERPO￿VÁLVULAS￿1/4￿CÓNICO  
+15402195000 EMPAQUE￿OR￿9,25X1,78￿NF  
+16481361000 FILTRO￿BOQUILLA  
+17532501300R TAPON￿DE￿1/8  
+18512904050 TORNILLO￿M4X5￿INOX  
+19400335010 EMPAQUE￿21X24,5X1,5  
+20419083000 NIPLE￿CIERRE￿VASO￿EXPANS.  
+21532656000 RAC.GOM.G1/8￿M  
+22402220000 EMPAQUE￿OR￿9,13X2,62  
+23512605060 TORNILLO￿M5X6￿INOX  
+24532501800R EMPALME￿TERMINAL￿1/8  
+25401196010 EMPAQUE￿8,5X4,5X1,5  
+26534393100CONTADOR￿VOLUMÉTRICO￿GICAR￿CON
+ADAPTADOR 
+27418014000 MUELLE￿PARA￿VALVULA  
+28418012028 VALVULA￿CORTA￿PARA￿RETENCION  
+293951133673 TUBO￿MANÓMETRO  
+303781133399 MANOMETRO￿BOMBA  Máquinas para café superautomáticas S30
+Page 31 of 73 COMPONENTES HIDRÁULICOS 26/01/2020 ed. 1 tab. DE-E02
+Máquinas para café superautomáticas S30
+Page 32 of 73 COMPONENTES HIDRÁULICOS 26/01/2020 ed. 1 tab. DE-E02Pos Recambio Descripción Validez Notas
+1533902600 EV￿2￿VÍAS￿ACOP.￿ROSCADOS  
+2220000022 TUBO￿TEFLON￿D￿4X6  
+3220000016 TUBO￿DE￿SILICONA￿D￿6X10  
+4940224000EMPALME￿PORTAGOMA￿A￿ACOPLAMIENTO
+RAPIDO 
+5946279000 BOQUILLA￿Diám.￿1,25mm  
+6940168000 BICO￿EROGADOR￿1￿VIA  
+7532656700 RACOR￿EN￿T  
+8532657100 RACOR￿EN￿CODO￿EMP.￿RÁPIDO  
+9966026000 DOBLADORA￿DE￿TUBO  
+10966432000 Boquilla￿Diám.￿0,6￿mm  
+11532657700 RACOR￿RECTO￿D6  
+12532658400 CIERRE￿DIÁM.6  
+13532656800 RAC.T￿VERT.D.6-G1/8￿M  
+14532655700 RACOR￿RECTO￿G1/8￿M  
+15533896600R ELECTR.2G￿24V￿DC  Máquinas para café superautomáticas S30
+Page 33 of 73 CIRCUITO CAFÉ 26/01/2020 ed. 1 tab. DE-E03
+Máquinas para café superautomáticas S30
+Page 34 of 73 CIRCUITO CAFÉ 26/01/2020 ed. 1 tab. DE-E03Pos Recambio Descripción Validez Notas
+1530501200 EMPAQUE￿OR￿2025  
+2533896500R ELECTR.￿3R￿24V￿DC  
+3511804120 TORNILLO￿VTCE￿M4￿X￿12￿INOX  
+4402228000 EMPAQUE￿OR￿18,72X2,62  
+5916537010 CONJ￿VASO￿DE￿EXPANSIÓN  
+6220000016 TUBO￿DE￿SILICONA￿D￿6X10  
+7966518000 CONJ.￿BLOQUE￿ELECTROVÁLVULA￿"G"  
+84001042313 CLAVIJA￿HEXAGONO￿INCGR.M5X8  
+9966458000 MUELLE￿DE￿BLOQUEO￿BLOQUE￿ELECTROV.￿"G"  
+10532740610 TAPA  
+11532302720 EMPALME￿A￿"Y"  
+12532655900 RAC.GOM.￿G1/8￿M  
+13220000021 TUBO￿TEFLON￿D￿2,5X4  
+14532501300R TAPON￿DE￿1/8  
+15402209000 JUNTA￿TORICA￿10,82X1,78￿NF  
+16946278000 BOQUILLA￿Diám.￿0,8mm  
+17966430000 BOQUILLA￿Diám.￿0,35￿mm  
+18533897800 ELECTR.2G￿24V￿DC  
+19946377008F RACOR￿EN￿CODO  
+20481361000 FILTRO￿BOQUILLA  
+21946449010F JUNTA￿Diám.￿10,2x6￿Esp.￿3mm  
+22532502918F RACOR  
+23966549028 CONJ.￿TUBO￿ELECTROVÁLVULAS  
+24532657800 RACOR￿RECTO￿D4  
+25946376008F RACOR￿EN￿"T"  
+26590133000 CONTRATUERCA￿1/8  
+27949004008 INTERMEDIO￿A￿T￿-1/8￿CONEXIÓN￿FLARE  
+28952108008CODO￿1/8"G￿x￿1/8"G￿DE￿TARJETA
+TRATAMIENT 
+29966549018 CONJ.￿TUBO￿ELECTROVÁLVULAS  Máquinas para café superautomáticas S30
+Page 35 of 73 CIRCUITO VAPOR 26/01/2020 ed. 1 tab. DE-E04
+Máquinas para café superautomáticas S30
+Page 36 of 73 CIRCUITO VAPOR 26/01/2020 ed. 1 tab. DE-E04Pos Recambio Descripción Validez Notas
+1966026000 DOBLADORA￿DE￿TUBO  
+2220000022 TUBO￿TEFLON￿D￿4X6  
+3532657200 RACOR￿1/4  
+4966431000 Boquilla￿Diám.￿1￿mm  
+5532657900 RACOR￿PASAMAMPARA￿D6  
+6532656000 RAC.GOM.G1/8￿M  
+7441170001 ABRAZADERA￿FIJADO￿TUBO  
+8533896600R ELECTR.2G￿24V￿DC  
+9532655700 RACOR￿RECTO￿G1/8￿M  
+10532567300 EMPALME￿A￿CODO￿G1/4  
+11532656500 RACOR￿RECTO￿D.61/8￿F  
+12532655800 RACOR￿RECTO￿G1/4￿M￿D.6  
+13533896910F ELECTROV.￿3V￿NC￿D3￿VITON￿1/4G  
+14448138018 EMPALME￿A￿PORTAGOMA￿DE￿1/8  
+15220000016 TUBO￿DE￿SILICONA￿D￿6X10  
+16532656100 RAC.GOM.G1/4￿M  
+17220000029 TUBO￿DE￿SILICONA￿D￿7X11  
+18532657100 RACOR￿EN￿CODO￿EMP.￿RÁPIDO  
+19532567400 EMPALME￿A￿CODO￿AD￿4￿D6  
+20220000021 TUBO￿TEFLON￿D￿2,5X4  Máquinas para café superautomáticas S30
+Page 37 of 73 CIRCUITO LECHE 26/01/2020 ed. 1 tab. DE-E05
+Máquinas para café superautomáticas S30
+Page 38 of 73 CIRCUITO LECHE 26/01/2020 ed. 1 tab. DE-E05Pos Recambio Descripción Validez Notas
+1220000021 TUBO￿TEFLON￿D￿2,5X4  
+2220000016 TUBO￿DE￿SILICONA￿D￿6X10  
+3533902000 EV￿2￿VÍAS￿ETV￿125-A40-6FF-024  
+4966026000 DOBLADORA￿DE￿TUBO  
+5947155000 ETIQUETA￿AIRE￿FRÍA  
+6946372000 REGULADOR￿DE￿FLUJO￿1/8￿NIQUELADO N:NSF
+6533590700 VALVULA￿REGULADORA￿AIRE  
+7947156000 ETIQUETA￿AIRE￿CALIENTE  
+8532655900 RAC.GOM.￿G1/8￿M  
+9966409000 RACOR￿P.GOMA￿EMP.￿RÁPIDO￿D.4  
+10936298010PORTAGOMA￿CON￿ACOPLAMIENTO￿RÁPIDO
+D.4 
+11533900800 EV.￿3￿VÍAS￿ETV-SO2-F30-4FF-024/=￿-￿CON￿T  
+12484381000 JUNCTION￿TUBO￿PARA￿LECHE  
+13220000055 TUBO￿Diám.￿6x10  
+14220000022 TUBO￿TEFLON￿D￿4X6  
+15532656800 RAC.T￿VERT.D.6-G1/8￿M  
+16946371000 TUBO￿SILICONA￿NSF￿4,2X7,85X1000MM N:NSF
+16484391000 TUBO￿SILICONA￿4,8X7,9X1000  
+17532161000 PASTECA￿õ￿34  
+18966423000 FILTRO￿ASPIRACIÓN￿LECHE  
+19534600100 FILTRO￿SILENCIADOR  
+20533180700F BOMBA￿LECHE  
+21532655500 RACOR￿Y￿RÁP.￿PVC￿982P3-4FF-S8  
+22533902500 EV￿2￿VÍAS￿ACOP.￿RÁPIDO  
+23532657700 RACOR￿RECTO￿D6  
+24532657100 RACOR￿EN￿CODO￿EMP.￿RÁPIDO  
+25966432000 Boquilla￿Diám.￿0,6￿mm  
+26533902710 ELECTROV.￿3VÍAS  
+27532656700 RACOR￿EN￿T  
+28532656400 RACOR￿PASAMAMPARA  
+29944794010 CONJ.CALDERA￿LECHE  
+￿944794000 CONJ.￿CALENTADOR￿LECHE￿REP.  
+30401360000 EMPAQUES￿OR￿11,11X1,78  
+31935708000 EMPALME￿RAPIDO￿1/8￿Ø4  
+32532567400 EMPALME￿A￿CODO￿AD￿4￿D6  Máquinas para café superautomáticas S30
+Page 39 of 73 CIRCUITO CHOCOLATE 26/01/2020 ed. 1 tab. DE-E06
+Máquinas para café superautomáticas S30
+Page 40 of 73 CIRCUITO CHOCOLATE 26/01/2020 ed. 1 tab. DE-E06Pos Recambio Descripción Validez Notas
+1533897800 ELECTR.2G￿24V￿DC  
+2966026000 DOBLADORA￿DE￿TUBO  
+3220000022 TUBO￿TEFLON￿D￿4X6  
+4533902600 EV￿2￿VÍAS￿ACOP.￿ROSCADOS  
+5532656800 RAC.T￿VERT.D.6-G1/8￿M  
+6966429000 BOQUILLA￿Diám.￿0,6￿mm  
+7220000061F TUBO￿SILICONA  
+8934010010 SOPORTE￿VENTILADOR￿AXIAL￿60mm  
+9966149010 TUBO￿DE￿ASPIRACIÓN￿MIXER  
+10532305700 RACOR￿EN￿"T"￿Diám.￿22  
+11220000024 TUBO￿DE￿SILICONA￿D￿15X21  
+12936299000 PORTAGOMA￿DOBLE￿D8￿D16  
+13220000016 TUBO￿DE￿SILICONA￿D￿6X10  
+14532302720 EMPALME￿A￿"Y"  
+15533898000 ELECTROV.DESVIADORA￿24V￿DC  
+16966409000 RACOR￿P.GOMA￿EMP.￿RÁPIDO￿D.4  
+17981163000F CONJUNTO￿ADAPTADOR￿QUICK-FIT  
+18966770000 CONJUNTO￿BASE￿+￿MOTOR￿MEZCLADOR￿CV  
+19966419000 JUNTA￿TÓRICA￿ROJA  
+20966402010 TURBINA￿MIXER  
+21966184000 CAJÓN￿ASPIRACIÓN￿FIJO  
+22946243000 JUNTA￿INT.￿PLACA￿Diám.￿4  
+23966049000 CAJÓN￿ASPIRACIÓN  
+24966404000 TAPA￿CUERPO￿MIXER  
+25946809000 CONJ.￿CUERPO￿MIXER  
+26966405010 PIPA￿SALIDA￿MIXER  
+27946397000F BOQUILLA￿2.5￿mm  Máquinas para café superautomáticas S30
+Page 41 of 73 INSTALACION HIDRÁULICA THERMODRIVE 26/01/2020 ed. 1 tab. DE-E07
+Máquinas para café superautomáticas S30
+Page 42 of 73 INSTALACION HIDRÁULICA THERMODRIVE 26/01/2020 ed. 1 tab. DE-E07Pos Recambio Descripción Validez Notas
+1220000021 TUBO￿TEFLON￿D￿2,5X4  
+2532656600 RACOR￿EN￿T  
+3532655900 RAC.GOM.￿G1/8￿M  
+4920658010 VALVULA￿REGULADORA￿AGUA  
+5533897800 ELECTR.2G￿24V￿DC  
+6532656800 RAC.T￿VERT.D.6-G1/8￿M  
+7220000022 TUBO￿TEFLON￿D￿4X6  
+8966026000 DOBLADORA￿DE￿TUBO  Máquinas para café superautomáticas S30
+Page 43 of 73 EROGADOR 26/01/2020 ed. 1 tab. DE-G01
+Máquinas para café superautomáticas S30
+Page 44 of 73 EROGADOR 26/01/2020 ed. 1 tab. DE-G01Pos Recambio Descripción Validez Notas
+1966271001 DENTADO  
+2966222000 VARILLA￿GUÍA￿DISTRIBUIDOR  
+3532657500 RACOR￿PASAMAMPARA￿D4  
+4432544010 CORREDIZO￿EROGADOR  
+5966266000 COMPUERTA￿BOQUILLA  
+6532658100 RACOR￿EN￿CODO￿EMP.￿RÁPIDO￿D4  
+7532658900 RACOR￿EN￿CODO￿EMP.￿RÁPIDO￿D4  
+8966264000 BASTIDOR￿BOQUILLA￿LADO￿DER.  
+9966260000 CÁRTER￿EMPALME￿BOQUILLA￿MOTORIZ.  
+10940168000 BICO￿EROGADOR￿1￿VIA  
+11943456010 SUJECIÓN￿TUBO￿DISTRIBUCIONES￿BOQUILLA  
+12966265000 BASTIDOR￿BOQUILLA￿LADO￿IZQ.  
+13220000021 TUBO￿TEFLON￿D￿2,5X4  
+14532655600 RACOR￿RECTO￿G1/8￿M  
+15966254000 CUBIERTA￿BOQUILLA￿-￿CON￿TABLAS￿S30-  
+16532657600 RACOR￿EN￿Y￿D.4￿G1/8  
+17946740000 CONJ.￿PICO￿LECHE￿REP.  
+18966545000 CONJ.￿FUNDA￿FRONTAL￿BOQUILLA  
+19966544000 CONJ.￿FUNDA￿INFERIOR￿BOQUILLA  
+20966225007 BOQUILLA  
+21946813000 CONJ.￿BOQUILLA￿DE￿CAFÉ  
+22946805010 CONJ.￿CUBETA￿DE￿LAVADO￿S30  
+23966316000 DESCARGA￿TUBO￿SOLUBLES  
+24401400000 JUNTA￿TÓRICA￿5,28x1,78￿NBR￿DE￿SILICONA  
+25966303000 RACOR￿PARA￿TUBO￿DE￿SUCCIÓN  
+26220000052 TUBO￿TYGON  Máquinas para café superautomáticas S30
+Page 45 of 73 EROGADOR A MOTOR 26/01/2020 ed. 1 tab. DE-G02
+Máquinas para café superautomáticas S30
+Page 46 of 73 EROGADOR A MOTOR 26/01/2020 ed. 1 tab. DE-G02Pos Recambio Descripción Validez Notas
+1966262010 CÁRTER￿CORREA￿NEW  
+2532141400 SOPORTE￿FIJACION￿CABLES  
+3535303200 CORREA￿DENTADA  
+4946260000 ENGRANAJE￿Z35￿M1￿CONDUCTOR  
+5946261000 ENGRANAJE￿Z35￿M1￿CONDUCIDO  
+6538119000 TARJETA￿ENCODER￿BOQUILLA  
+7966442010 FOTOCÉLULA￿FINAL￿DE￿CARRERA￿BOQUILLA  
+8966424000 VARILLA￿GUÍA￿DISTRIBUIDOR￿CROMADA  
+9966557000 CONJ.￿CORREDERA￿DISTRIBUIDOR￿S30  
+10530892410 MOTORREDUCTOR￿ACOPLAMIENTO￿ESTRELLA  Máquinas para café superautomáticas S30
+Page 47 of 73 PISTÓN SUPERIOR 26/01/2020 ed. 1 tab. DE-H01
+Máquinas para café superautomáticas S30
+Page 48 of 73 PISTÓN SUPERIOR 26/01/2020 ed. 1 tab. DE-H01Pos Recambio Descripción Validez Notas
+1936073010 DISTANCIADOR￿CON￿COLLARÍN￿M4￿GR.￿CAFÉ  
+2931197020 PROTECCION￿IZQ.￿CAMARA￿GRUPO  
+3966486000 SENSOR￿DE￿TEMPERATURA  
+4931198030 PROTECCION￿DERECHA￿CAMARA￿GRUPO  
+5431257010 RONDANA￿GRUPO  
+6431151000 SUPORTE￿CABLE￿RESIST.￿-￿KTY￿GR.  
+7966485000 RES.￿DE￿CARTUCHO￿C/CON.  
+8938065000 ALOJAMIENTO￿PARA￿TUERCA  
+9537050710 KIT￿SERPENTINAS-TORNILLO￿GRUPO￿CAFÉ  
+10537050610 KIT￿SERPENTINAS￿GRUPO￿CAFÉ  
+11220000021 TUBO￿TEFLON￿D￿2,5X4  
+12532652000 EMPALME￿RAPIDO￿A￿CODO  
+13532652210 RACCORD  
+14936045000 ANILLO￿BENZING￿OPTURADOR￿FOTOCELULA  
+15936046000 SOPORTE￿PISTON￿CON￿4￿FOTOCELULAS  
+16431031040 CASQUILLO￿PISTON￿SUP.  
+17461079000 RESORTE￿GUIA￿PISTON￿SUP.  
+18461115015 PORTEPISTON￿D.44 G:D44
+18461114015 PORTEPISTON￿D.50 G:D50
+19461086000 ARANDELA￿PIST.SUP.￿D.44 G:D44
+19461083000 ARANDELA￿PIST.SUP.￿D.50 G:D50
+20402186010 JUNTA￿TÓRICA￿34,52X3,53￿PLATIN. G:D44
+20402187010 EMPAQUE￿OR￿39.69X3.53￿PLATIN. G:D50
+21401374000 JUNTA￿TORICA  
+22461080000 RESORTE￿PISTON￿SUP.  
+23461110000 PISTON￿SUPERIOR￿D.44 G:D44
+23461111000 PISTON￿SUPERIOR￿D.50 G:D50
+24461518000 DUCHA￿PARA￿D.44￿Y￿D.50  
+25936188000 COLLARIN￿PISTON￿SUPERIOR  
+26936197000 TORNILLO￿.SV.M4￿X￿14￿INOX￿C/RIP.  
+27431914010 MOTOR￿24V￿420RPM  Máquinas para café superautomáticas S30
+Page 49 of 73 PISTÓN INFERIOR 26/01/2020 ed. 1 tab. DE-H02
+Máquinas para café superautomáticas S30
+Page 50 of 73 PISTÓN INFERIOR 26/01/2020 ed. 1 tab. DE-H02Pos Recambio Descripción Validez Notas
+1431055020 MUELLE￿2￿DESENGANCHE￿PIST.￿INF.  
+2431153020 MUELLE￿1￿DESENGANCHE￿PIST.￿INF.  
+3431025015 CUERPO￿TERMINAL  
+4431260000 ANILLO￿CONTENEDOR￿RASPADOR  
+5401397000 RASPADOR  
+6431023027 TUBO  
+7431036020 MEULLE￿CONTRAPOSICION￿PIST.￿INF.  
+8966412010 PROTECCIÓN￿INFERIOR￿GRUPO  
+9537046300 KIT￿CASQUILLO￿POR￿TORNILLO￿MOVIMIENTO  
+10431034000 CHAPITA￿PARA￿RODAMIENTO  
+11580105600 COJINETE￿A￿ESFERAS￿35X10X11  
+12944704030 CONJ.￿PISTÓN￿C/FOND.￿44￿STEPSEAL￿REC. G:D44
+12944705030 CONJ.￿PISTÓN￿C/FOND.￿50￿STEPSEAL￿REC. G:D50
+13431516030 PALANCA￿EXPULSION￿FONDOS  
+14931301000GUIA￿DESENGANCHE￿PALANCA￿EXPULSION
+FOND. 
+15431054010 EJE￿PALANCA￿EXPULSION  
+16431021020 PERNO￿PALANCA  
+17431022010 PALANCA  
+18431020030 ESCUADRA￿ASEG.￿PALANCA￿EXPULS.￿FONDOS  
+19429600000 TORNILLO￿.SV.M4￿X￿8￿INOX￿C/RIP.  
+20944087000F FILTRO￿D.￿44￿250￿MICRAS G:D44
+20944088000F FILTRO￿D.50￿250￿MICRAS G:D50
+21944706020 CONJ.￿PISTÓN￿44￿STEPSEAL￿REC. G:D44
+21944707020 CONJ.￿PISTÓN￿50￿STEPSEAL￿REC. G:D50
+22402186010 JUNTA￿TÓRICA￿34,52X3,53￿PLATIN. G:D44
+22402187010 EMPAQUE￿OR￿39.69X3.53￿PLATIN. G:D50
+23402217000 JUNTA￿TORICA￿8,73X1,78￿NF  
+24402245000 JUNTA￿50,47X2,62 G:D44
+24402246000 EMPAQUE￿OR￿55,25X2,62 G:D50
+25936159045F FONDO￿CÁMARA￿Diám.￿44 G:D44
+￿936159035F FONDO￿CÁMARA￿DIÁM.￿44 G:D44
+25936175035F FONDO￿CÁMARA￿DIÁM.￿50 G:D50
+26944708000 KIT￿EMPAQUE￿RASPADOR  
+27936161000 ESTRIBO￿DE￿GUÍA￿VÁSTAGO￿STEPSEAL  
+28431067000 FILTRO￿CAFÉ￿diám.￿44 G:D44
+28431416000 FILTRO￿CAFÉ￿diám.￿50 G:D50
+29944050000F APOYO￿FILTRO￿INOX  
+30932768000 FILTRO￿§￿44￿M2 G:D44￿MF
+30933735000 FILTRO￿§￿50￿M2 G:D50￿MF
+31936210000 FIJACIÓN￿TUBO￿FONDO￿CÁMARA  
+32532650800 EMPALME￿RAPIDO￿1/8￿X￿BOCA  
+33220000021 TUBO￿TEFLON￿D￿2,5X4  
+34220000052 TUBO￿TYGON  Máquinas para café superautomáticas S30
+Page 51 of 73 GRUPO CAFÉ 26/01/2020 ed. 1 tab. DE-H03
+Máquinas para café superautomáticas S30
+Page 52 of 73 GRUPO CAFÉ 26/01/2020 ed. 1 tab. DE-H03Pos Recambio Descripción Validez Notas
+1932027030 MUELLE￿SOLAPA￿(SUST.￿932027020)  
+2523135120 TORNILLO￿AUT.T.C.CR.￿3,5X12  
+3532141400 SOPORTE￿FIJACION￿CABLES  
+4535725008 CABLEADO￿CON￿4￿FOTOCELULAS  
+5523104080 TORNILLO￿AUTORROSCANTE￿4X8  
+6932012000 SOPORTE￿EJE￿ABATIBLE  
+7932028010 CLAVIJA￿SOLAPA  
+8537056100 KIT￿CONDUCTO  
+9932013010 SOPORTE￿SOLAPA  
+10932014040 PLACA￿SOLAPA  
+11966408020 ESCUADRA￿CONECTORES  
+12532162200 SUJETACABLE  
+13431162020 ESCUADRA￿DETECCION￿POSICION￿CASQUILLO  
+14938890010CÁMARA￿D.￿44￿REPUESTOS￿(SUST.
+938890000)G:D44
+14938891010 CÁMARA￿D.￿50￿REPUESTOS G:D50
+15944715000 DESLIZADOR￿FONDOS  
+16461054050 RESORTE  
+17966368010 TORNILLO￿DE￿HOMBRO  
+18431030060 PLANCHA￿DE￿SOPORTE  
+19542908080 TUERCA￿M8￿INOX  
+20431237000ESCUADRA￿PROTECCION￿RES.
+CALIENTATAZAS 
+21938064000 ARANDELA￿VARILLA￿GRUPO  
+22431380040 PLACA￿GR.CAFÉ￿INFERIOR  
+23966313020 ANCLAJE￿GRUPO￿INFERIOR  
+24966484001 DISTANCIADOR￿FIJACIÓN  
+25932011000 MANIJA  
+26537043920 COMPUERTA￿CAFÉ  
+27936142000 EJE￿GUIA￿CROMATO  
+28966554000 SOPORTE￿BOQUILLA￿SUPERIOR  
+29431173010 EJE￿GUIA￿EROGADOR  Máquinas para café superautomáticas S30
+Page 53 of 73 GRUPO CAFÉ 26/01/2020 ed. 1 tab. DE-H03A
+Máquinas para café superautomáticas S30
+Page 54 of 73 GRUPO CAFÉ 26/01/2020 ed. 1 tab. DE-H03APos Recambio Descripción Validez Notas
+1946204000 SOPORTE￿PLACA￿TRASERO  
+2593820001 TORNILLO￿T.E.￿M6￿X￿12  
+3946213000 PLACA￿SUPERIOR￿GRUPO  
+4976727000 CHAPA￿CIERRE￿CÁMARA  
+5946206000 SUJECIÓN￿CHAPA￿CIERRE￿CÁMARA  
+6946232000 ESCUADRA￿POSICIÓN￿CÁMARA  
+7966574000 CÁMARA￿D.￿44￿C/CASQUILLO G:D44
+7966575000 CÁMARA￿D.￿50￿C/CASQUILLO G:D50
+8946212010 PLACA￿INFERIOR￿GRUPO  
+9946263000 FIJACIÓN￿GRUPO￿CAFÉ￿INFERIOR  
+10946207010 ESTRIBO￿ANGULAR￿GRUPO  
+11946211010 SOPORTE￿BOQUILLA￿SUPERIOR  Máquinas para café superautomáticas S30
+Page 55 of 73 ELECTROBOMBA VOLUMETRICA 26/01/2020 ed. 1 tab. DE-J01
+Máquinas para café superautomáticas S30
+Page 56 of 73 ELECTROBOMBA VOLUMETRICA 26/01/2020 ed. 1 tab. DE-J01Pos Recambio Descripción Validez Notas
+1531494300 CONDENSADOR￿10￿Uf  
+1531492900 CONDENSADOR￿10mF N:UL
+2530298120 MOTOR￿BOMBA￿220-240/50-60  
+2530299600 MOTOR￿BOMBA￿220-240/50-60￿UL N:UL
+33251133418 GOMA￿ANTIVIBRACION  
+43251133417 GOMA￿ANTIVIBR.CON￿SOPORTE  
+54821023082 SEMICUERPO￿JUNTA￿MOTOR  
+64081021923 ANILLO  
+74821108987 SEMICUERPO￿JUNTA￿BOMBA  
+8533100600 RACOR￿3/8￿GAS￿X￿3/8￿GAS￿PORTAFILTRO￿-  
+9401183010 EMPAQUE￿22X17X1,5  
+10533100400FILTRO￿INTERNO￿DE￿RED￿70￿MESH￿-￿CON
+TABL 
+113951130515 TUBO￿RETIN.3/8X3/8￿120øMM2200  
+11532304300 TUBO￿RETIN.3/8￿NF N:NSF
+12532662300F RACOR￿CODO￿G3/8￿M￿ORIENTABLE￿D8  
+134004136622 TORNILLO￿A￿CUELLO￿M6  
+14533180010BOMBA￿VOLUMÉTRICA￿180￿L/h￿INOX.￿C/
+FILTRO 
+15532656300 RACOR￿EN￿CODO￿EMPALME￿RÁPIDO  
+16220000022 TUBO￿TEFLON￿D￿4X6  
+17966026000 DOBLADORA￿DE￿TUBO  Máquinas para café superautomáticas S30
+Page 57 of 73 CAJA ELÉCTRICA/COMPONENTES ELÉCTRICOS 26/01/2020 ed. 0 tab. DE-K01
+Máquinas para café superautomáticas S30
+Page 58 of 73 CAJA ELÉCTRICA/COMPONENTES ELÉCTRICOS 26/01/2020 ed. 0 tab. DE-K01Pos Recambio Descripción Validez Notas
+1532735600 PERFIL￿BISAGRA  
+2532160200 HORQUILLA￿APRETACABLE  
+3532160300 SUJETADOR￿CABLE￿FIJO  
+4532160400 SUJETADOR￿CABLE￿MOVIL  
+5530112900 CABLE N:UL
+5910414010 CABLE￿ALIM.￿4￿X￿3,5￿'PSE' M:JP
+5421214000 CABLE￿ALIMENTACION  
+5423060000 CABLE￿ALIMENTACION  
+5530491000 CABLE￿ALIMENTACION￿MONO3X4  
+5946296000 CABLE￿ALIMENTACIÓN￿5x1,5mm2 N:KTL
+5530112100 CABLE￿ALIMENTACION￿3X1,5  
+6535668000 FILTRO￿C￿TRIFASICO  
+7532161500 TERMINAL￿DE￿CONEXION￿4￿POLI  
+8532163000 ABRAZADERA  
+9532805300 PIE￿A￿PRESIÓN  
+10530111000 PORTAFUSIBLE N:UL
+11530112200 FUSIBLE￿15￿A N:UL
+12966455000 HOJA￿MYLAR  
+13537058400 ALIMENTADOR￿S30  
+￿966847000 CONJ.￿PAQ.￿ALIMENTADOR￿S30￿REP.  
+14537060800 TARJETA￿TRIAC￿S30  
+￿966845010 TARJETA￿TRIAC￿S30￿REC.  
+15966490000 VENTILADOR￿DE￿REFRIGERACIÓN￿TRIAC  
+16535933000 Regleta￿conexiones  
+16532177500 REGLETA￿CONEXIONES￿5￿Polos N:UL
+17531503520 CONTACTOR￿4P￿220/240V  
+17531508600 MINICONTACTOR￿20A200V￿50/60Hz M:JP
+18531404200 FILTRO  
+19535917040 CIRCUITO￿ELÉCTRICO  Máquinas para café superautomáticas S30
+Page 59 of 73 CAJA ELÉCTRICA/COMPONENTES ELÉCTRICOS 26/01/2020 ed. 1 tab. DE-K02
+Máquinas para café superautomáticas S30
+Page 60 of 73 CAJA ELÉCTRICA/COMPONENTES ELÉCTRICOS 26/01/2020 ed. 1 tab. DE-K02Pos Recambio Descripción Validez Notas
+1940410000 VENTILADOR￿24V￿DC  
+2966846030 ASS.SCHEDA￿CPU￿S30￿RIC  
+￿966846020 CONJ.￿TARJETA￿CPU￿S30  
+3532143400 COLLARIN￿HEXAGONAL￿M3XH.5  
+4916072010 PERNO￿PARO￿PANEL￿DE￿COMANDOS  
+5532141400 SOPORTE￿FIJACION￿CABLES  
+63341133478 INTERRUPTOR￿DE￿SEGURIDAD  
+7946842000 KIT￿SERVICE  
+8946396000 CAPUCHÓN￿INTERRUPTOR￿PUERTA  
+9532091300 INTERRUPTOR N:KTL
+9532024500 INTERRUPTOR  
+10535925030 CABLEADO  Máquinas para café superautomáticas S30
+Page 61 of 73 MOLEDOR DOSIFICADOR/CAM.DE MOLTURACIÓN 26/01/2020 ed. 0 tab. DE-P01
+Máquinas para café superautomáticas S30
+Page 62 of 73 MOLEDOR DOSIFICADOR/CAM.DE MOLTURACIÓN 26/01/2020 ed. 0 tab. DE-P01Pos Recambio Descripción Validez Notas
+1971014010 TORNILLO￿SINFÍN￿CONIK￿BT  
+2971015010 ARANDELA￿AXIAL￿PARA￿CONIK￿BT  
+3971016000 CASQUILLO￿PARA￿CONIK￿MOTORIZADO  
+4568208080 ANILLO￿8￿UNI￿INOX  
+5946453000 ENGRANAJE￿CÓNICO￿Z25  
+6512604060 TORNILLO￿M3X5￿INOX  
+7946135000 DISTANCIADOR￿PAR￿CÓNICO￿REG.MUELAS  
+8531494200 CONDENSADOR￿14mf￿MET.￿416333929  
+8531494600 CONDENSADOR￿18￿µF N:UL
+9532744200 CHAVETA  
+10966519000 MOTORREDUCTOR￿UNIFICADO  
+11966186010 MOTOR￿MD￿UNIFICADO  
+11966187000 MOTOR￿MD￿Vers.￿USA￿(UL) N:UL
+12537057500 PAREJA￿MUELAS￿A￿DERECHAS￿54X8  
+￿537054800 PAR￿MUELAS￿ROT.HORARIA￿54X7,4  
+13946502000 CONJUNTO￿CONDUCTO  
+14946700000 CONJ.￿PORTAMOTOR  
+14946700008 CONJ.￿CUERPO￿Y￿TUERCA￿ANULAR￿NSF N:NSF
+15971011000 RUEDA￿DENTADA￿CONIK￿BT  
+16402246000 EMPAQUE￿OR￿55,25X2,62  
+17500004080 TORNILLO￿4X8￿UNI￿6107￿INOX  
+18944052000F TORN.￿C.￿AV.￿M5X10  
+19936318000 AGITADOR￿PARA￿MOLINILLO  
+20946008020 PORTA￿MUELAS  
+21532803100 RUVEBLOC  
+22946781000 CONJUNTO￿MOLEDOR￿DCH.￿COMPLETO￿REP.  
+22946914000 CONJUNTO￿MOLEDOR￿DCH.￿UL￿REC. N:UL
+23946782000 CONJUNTO￿MOLEDOR￿IZQ.￿COMPLETO￿REP.  
+23946915000 CONJUNTO￿MOLEDOR￿IZQ.￿UL￿REC. N:UL
+24537056100 KIT￿CONDUCTO  
+25946295000 CUCHARA￿PARA￿PESAJE  Máquinas para café superautomáticas S30
+Page 63 of 73 BASE TOLVAS 26/01/2020 ed. 1 tab. DE-P02
+Máquinas para café superautomáticas S30
+Page 64 of 73 BASE TOLVAS 26/01/2020 ed. 1 tab. DE-P02Pos Recambio Descripción Validez Notas
+1966563000 CHAPA￿SUPERIOR￿MONTADA￿SOLO￿CAFÉ  
+2966562000 CHAPA￿SUPERIOR￿MONTADA￿COMPLETA  
+3946918000 CONJ.￿PANEL￿SUP.￿COMPLETO￿NSF N:NSF
+3946819000 CONJ.￿PANEL￿SUP.￿COMPLETO  
+4946932000 CONJ.￿PANEL￿SUP.￿COMPLETO￿NSF N:NSF
+4946818000 CONJ.￿PANEL￿SUP.￿COMPLETO￿CS  
+5535536018 FOTOCÉLULA￿TX  
+6535535008 TARJETA￿RECEPTORES￿TOLVA  
+7532024800 MICRO￿(6)A￿250V  
+7532025000 MICRO￿21￿A-250￿V N:UL
+8940253000 AISLANTE￿MICROINT  
+9966229000 VIDRIO￿SENSORES￿CAFÉ  
+10966234000 BASE￿TOLVAS￿DE￿CAFÉ￿DOBLE  
+11946814010 CONJ.￿RAMPA￿DESCAFEINADO  
+￿946814000 CONJ.￿DESLIZADERO￿DE￿CAFÉ￿DESCAFEINADO  
+12966452000F EJE￿BISAGRA￿DESLIZADERO￿DESCAFEINADO  
+13535947000SENSOR￿DE￿PRESENCIA￿CUBETA￿DE￿LAVADO
+S30 
+14535929020 SENSOR￿CAFÉ￿/￿DESCAFEINADO  
+15530602000 IMÁN  Máquinas para café superautomáticas S30
+Page 65 of 73 TOLVAS CAFÈ 26/01/2020 ed. 0 tab. DE-P03
+Máquinas para café superautomáticas S30
+Page 66 of 73 TOLVAS CAFÈ 26/01/2020 ed. 0 tab. DE-P03Pos Recambio Descripción Validez Notas
+1534194300 CERRADURA￿UNIVERSAL￿-G45T2KA.000-  
+2946387000 BASE￿CERRADURA￿TOLVAS  
+3966899000 TAPA￿TOLVA￿C/CERRADURA  
+4966900000 TAPA￿TOLVA￿CAFÉ￿C/CERRADURA￿Rec.  
+5966231010 TAPA￿TOLVA  
+6946557000F REJILLA￿TOLVA N:NSF
+￿946286000 REJILLA￿CONTRA￿INTRUSIÓN￿1 N:NSF
+7501703081 TORNILLO￿TSVTC￿M3X8￿NAILON  
+8946917000 CONJ.￿TOLVA￿KG.￿1,2￿DER.￿UL￿REC. N:NSF
+8946801000 CONJ.￿TOLVA￿1,2￿Kg.￿Dch.  
+9966227000 CASQUILLO￿DESLIZAMIENTO￿COMPUERTA  
+10966578000F PUERTA￿TOLVA￿DCH.  
+11946924000 CONJ.￿TOLVA￿KG.￿1,2￿DCH.￿UL￿C/REJILLA N:NSF
+12966233010 TAPA￿TOLVA￿DE￿CAFÉ￿PEQUEÑA  
+13946558000F REJILLA￿TOLVA N:NSF
+￿946287000 REJILLA￿CONTRA￿INTRUSIÓN￿2 N:NSF
+14946802000 CONJ.￿TOLVA￿1￿Kg.￿Dch.  
+14946919000 CONJ.￿TOLVA￿KG.1￿UL N:NSF
+15946955000 CONJ.￿TOLVA￿KG.1￿UL￿C/REJILLA N:NSF
+16946800000 CONJ.￿TOLVA￿1,2￿Kg.  
+16946916000 CONJ.￿TOLVA￿KG.￿1,2￿IZQ.￿UL￿REC. N:NSF
+17966579000F PUERTA￿TOLVA￿IZQ.  
+18946923000 CONJ.￿TOLVA￿KG.￿1,2￿IZQ.￿UL￿C/REJILLA N:NSF
+19946417000TAPÓN￿PARA￿CIERRE￿ORIFICIO￿MOLINILLO
+DCH Máquinas para café superautomáticas S30
+Page 67 of 73 TOLVAS CHOCOLATE 26/01/2020 ed. 1 tab. DE-P04
+Máquinas para café superautomáticas S30
+Page 68 of 73 TOLVAS CHOCOLATE 26/01/2020 ed. 1 tab. DE-P04Pos Recambio Descripción Validez Notas
+1946803000 CONJ.￿TOLVA￿SOLUBLES  
+2966181000 CORONA￿DE￿FIJACIÓN￿TRASERA  
+3966175000 PERNO￿ARRASTRE￿ESPIRAL  
+4402215000 JUNTA￿TORICA  
+5966174000 MUELLE￿DISTRIBUCIÓN￿SOLUBLES￿PASO￿9MM  
+6530892410 MOTORREDUCTOR￿ACOPLAMIENTO￿ESTRELLA  
+7966176000 PIÑÓN￿DE￿HORQUILLA  
+8532715400 ARANDELA￿8,4X17X1,6  
+9532745700 ANILLO￿DE￿BLOQUEO  
+10966293000 MUELLE￿DE￿TRACCIÓN  
+11966178000PERNO￿DE￿CENTRADO￿CONTENEDOR
+SOLUBLES 
+12940414000 TUERCA￿M3  
+13946047020 PALETAS￿INOXIDABLES  
+￿946047010 PALETAS￿INOX￿PARA￿SOLUBLES  
+14946048010 PERNO￿AGITADOR  
+15946046000 RUEDA￿DENTADA￿MEZCLA￿SOLUBLES  
+16946815000 TOLVA￿SOLUBLES￿CON￿ADAPTADOR  
+17966171000 RAMPA￿SALIDA￿PRODUCTOS  
+18966172000 CIERRE￿RAMPA￿PRODUCTO  
+19966182020 PERNO￿DESLIZAMIENTO￿ENGANCHE  
+￿966182010 PERNO￿DESLIZAMIENTO￿ENGANCHE￿RUV  
+20966241010 TAPA￿TOLVA￿SOLUBLE  
+21966242000 ADAPTADOR￿TOLVA￿SOLUBLE  
+22966898000 TOLVA￿CACAO￿C/CERRADURA  
+23534194300 CERRADURA￿UNIVERSAL￿-G45T2KA.000-  
+24946392000 TAPA￿TOLVA￿SOLUBLE￿CON￿CERRADURA  
+25946395000 BASE￿CERRADURA￿TOLVA￿SOLUBLES  
+26946394000 VARILLA￿TOLVA￿SOLUBLE￿CON￿CERRADURA  
+27946393000 TOLVA￿SOLUBLE￿CON￿CERRADURA  Máquinas para café superautomáticas S30
+Page 69 of 73 BASE TOLVAS 3MD 26/01/2020 ed. 1 tab. DE-P05
+Máquinas para café superautomáticas S30
+Page 70 of 73 BASE TOLVAS 3MD 26/01/2020 ed. 1 tab. DE-P05Pos Recambio Descripción Validez Notas
+1966241010 TAPA￿TOLVA￿SOLUBLE  
+2946347000F REJILLA￿TOLVA￿3￿MOLEDOR  
+3946534000F CONJ.￿TOLVA￿CAFÉ￿TERCER￿MOLEDOR  
+4966227000 CASQUILLO￿DESLIZAMIENTO￿COMPUERTA  
+5946535000F CONJ.￿COMPUERTA￿3￿MOLEDOR  
+6946348000F BASE￿TOLVA￿3￿MOLEDOR  
+7946531000CHAPA￿SUPERIOR￿MONTADA￿CON￿3
+MOLEDOR 
+8532024800 MICRO￿(6)A￿250V  
+9940253000 AISLANTE￿MICROINT  Máquinas para café superautomáticas S30
+Page 71 of 73MOLEDOR DOSIFICADOR/
+CAM.MOLTURACIÓN 3MD26/01/2020 ed. 0 tab. DE-P06
+Máquinas para café superautomáticas S30
+Page 72 of 73 MOLEDOR DOSIFICADOR/CAM.MOLTURACIÓN 3MD 26/01/2020 ed. 0 tab. DE-P06Pos Recambio Descripción Validez Notas
+1946949000 CONJUNTO￿REDUCTOR￿Y￿JUNTA￿3￿MOLEDOR  
+2532803100 RUVEBLOC  
+3946902000 CONJUNTO￿MOTOR￿TERCER￿MOLEDOR  
+4946365000F RUEDA￿REGULACIÓN￿MOLEDOR  
+5969032000 TUERCA  
+6969031000 CHAPA￿PARA￿MUELA  
+7946358000F PAR￿MUELAS￿TERCER￿MOLEDOR  
+8946357000F PORTAMUELA￿INFERIOR￿TERCER￿MOLEDOR  
+9969046000 RANGUA  
+10969047000 JAULA￿AXIAL￿DE￿RODILLOS  
+11512603080 TORNILLO￿SIN￿CABEZA￿M3X8￿UNI5923￿INOX  
+12401310000 EMPAQUE￿OR￿50,52X1,78  
+13946536000F CONJ.￿CONDUCTO￿3￿MOLEDOR  
+14532745700 ANILLO￿DE￿BLOQUEO  
+15568305060 ANILLO￿BENZING￿5  
+16946970010 CONJUNTO￿CUERPO￿Y￿VIROLA￿3￿MOLINILLOS  
+￿946970000 CONJUNTO￿CUERPO￿Y￿VIROLA￿3￿MOLEDOR  
+17940087000 TORNILLO  
+18402195000 EMPAQUE￿OR￿9,25X1,78￿NF  Copyright © 2014 Gruppo Cimbali S.p.A.

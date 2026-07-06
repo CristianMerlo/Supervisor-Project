@@ -62,5 +62,22 @@ def actualizar_ficha_local(sigla, nombre_local, tecnico, ticket, ppm, shots, maq
                 f.write(h_line)
                 
         print(f"[LOCAL-FICHA] Ficha del local {sigla} actualizada exitosamente en: brain/locales/{sigla}.md")
+        
+        # Sincronizar con NotebookLM en segundo plano para no demorar la respuesta
+        try:
+            import threading
+            import sys
+            # Asegurar import de producción
+            ruta_dir = "/home/cristian/Documentos/Supervisor"
+            if ruta_dir not in sys.path:
+                sys.path.append(ruta_dir)
+            import sincronizar_notebooklm
+            t = threading.Thread(target=sincronizar_notebooklm.sincronizar_local_especifico, args=(sigla,))
+            t.daemon = True
+            t.start()
+            print(f"[LOCAL-FICHA-NLM] Iniciando sincronización de NotebookLM para {sigla}...")
+        except Exception as e_nlm:
+            print(f"[LOCAL-FICHA-NLM-ERROR] Falló inicio de sincronización NLM: {e_nlm}")
+            
     except Exception as e_write:
         print(f"[LOCAL-FICHA-ERROR] Falló escritura de ficha para {sigla}: {e_write}")

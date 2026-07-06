@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 load_dotenv("/home/cristian/PROYECTOS/Supervisor-Project/.env")
 SHEET_URL = os.environ.get("GOOGLE_SHEET_URL")
 
+# Alcances para Google Sheets API
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
@@ -40,16 +41,19 @@ def orquestar_kanban():
             registros_historial = hoja_historial.get_all_records()
             for r in registros_historial:
                 if str(r.get("ESTADO", "")).strip().lower() == "pendiente":
+                    # Evitar tickets de "Lista de Mantenimiento"
+                    categoria = str(r.get("CATEGORIA", r.get("CATEGORÍA", r.get("Categoria", r.get("Categoría", ""))))).strip().upper()
+                    if "LISTA DE MANTENIMIENTO" in categoria:
+                        continue
                     try:
                         fecha_str = str(r.get("FECHA_REPORTE", ""))
-                        # Intentar parsear formato "%Y-%m-%d %H:%M:%S"
                         fecha_obj = datetime.strptime(fecha_str, "%Y-%m-%d %H:%M:%S")
                         if fecha_obj < limite_48hs:
                             tecnico = str(r.get("TECNICO", "Desconocido"))
                             local = str(r.get("SIGLA", "N/A"))
                             ticket = str(r.get("TICKET", "N/A"))
                             mensajes_alerta.append(f"🛠️ *Local:* {local} | *Ticket:* {ticket}\n⏰ Lleva PENDIENTE desde el {fecha_str}.\n🧑‍🔧 *Técnico asignado:* {tecnico}\n👉 *Requiere actualización urgente en el grupo.*")
-                    except Exception as e:
+                    except Exception:
                         pass
         except gspread.exceptions.WorksheetNotFound:
             pass
@@ -60,6 +64,10 @@ def orquestar_kanban():
             registros_alertas = hoja_alertas.get_all_records()
             for a in registros_alertas:
                 if str(a.get("ESTADO", "")).strip().upper() == "ABIERTA":
+                    # Evitar alertas de "Lista de Mantenimiento"
+                    categoria = str(a.get("CATEGORIA", a.get("CATEGORÍA", a.get("Categoria", a.get("Categoría", a.get("TIPO_ALERTA", "")))))).strip().upper()
+                    if "LISTA DE MANTENIMIENTO" in categoria:
+                        continue
                     try:
                         fecha_str = str(a.get("FECHA", ""))
                         fecha_obj = datetime.strptime(fecha_str, "%Y-%m-%d %H:%M:%S")
@@ -68,18 +76,53 @@ def orquestar_kanban():
                             tipo = str(a.get("TIPO_ALERTA", "N/A"))
                             nivel = str(a.get("NIVEL", "N/A"))
                             mensajes_alerta.append(f"⚠️ *ALERTA ABIERTA (>48hs)*\n🏢 *Local:* {local}\n🚨 *Nivel:* {nivel} | *Tipo:* {tipo}\n📅 Creada: {fecha_str}\n👉 *Requiere intervención o cierre de la alerta.*")
-                    except Exception as e:
+                    except Exception:
                         pass
         except gspread.exceptions.WorksheetNotFound:
             pass
             
         # Si hay alertas, enviarlas
         if mensajes_alerta:
-            titulo = "🔔 *[ORQUESTADOR KANBAN] Tareas Demoradas (>48hs)* 🔔\n\nEl sistema detectó los siguientes tickets colgados sin resolución:\n\n"
-            cuerpo = "\n---\n".join(mensajes_alerta)
-            mensaje_final = titulo + cuerpo
-            # Enviar notificación privada al supervisor para que él coordine en el grupo
-            notificador_telegram.enviar_alerta(mensaje_final, agente="Hermes Analytics")
+            if len(mensajes_alerta) > 5:
+                report_path = "/home/cristian/Documentos/Supervisor/brain/tareas_demoradas.txt"
+                os.makedirs(os.path.dirname(report_path), exist_ok=True)
+                
+                with open(report_path, "w", encoding="utf-8") as f:
+                    f.write("=== REPORTE DETALLADO DE TAREAS Y TICKETS DEMORADOS (>48HS) ===\n")
+                    f.write(f"Fecha de generación: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+                    f.write("============================================================\n\n")
+                    for idx, msg in enumerate(mensajes_alerta, 1):
+                        clean_msg = msg.replace("**", "").replace("*", "").replace("👉 ", "")
+                        f.write(f"[{idx}] {clean_msg}\n")
+                        f.write("-" * 60 + "\n")
+                
+                resumen_locales = {}
+                for msg in mensajes_alerta:
+                    import re
+                    local_match = re.search(r'Local:\*?\s*(\w+)', msg)
+                    if not local_match:
+                        local_match = re.search(r'🏢 \*Local:\*?\s*(\w+)', msg)
+                    if local_match:
+                        loc = local_match.group(1)
+                        resumen_locales[loc] = resumen_locales.get(loc, 0) + 1
+                
+                resumen_texto = "\n".join([f"• *{loc}:* {cnt} tareas" for loc, cnt in sorted(resumen_locales.items())])
+                
+                titulo = (
+                    "🔔 *[ORQUESTADOR KANBAN] Tareas Demoradas (>48hs)* 🔔\n\n"
+                    f"El sistema detectó **{len(mensajes_alerta)}** tickets y alertas colgados sin resolución.\n\n"
+                    "📊 *Resumen por Local:*\n"
+                    f"{resumen_texto}\n\n"
+                    "📄 _Se adjunta el reporte detallado con cada ticket en un archivo de texto para no saturar el chat._"
+                )
+                
+                notificador_telegram.enviar_alerta(titulo, agente="Hermes Analytics")
+                notificador_telegram.enviar_archivo(report_path, caption="Detalle de tareas demoradas")
+            else:
+                titulo = "🔔 *[ORQUESTADOR KANBAN] Tareas Demoradas (>48hs)* 🔔\n\nEl sistema detectó los siguientes tickets colgados sin resolución:\n\n"
+                cuerpo = "\n---\n".join(mensajes_alerta)
+                mensaje_final = titulo + cuerpo
+                notificador_telegram.enviar_alerta(mensaje_final, agente="Hermes Analytics")
         else:
             print("[KANBAN] No hay tickets o alertas demorados.")
 

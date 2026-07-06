@@ -72,11 +72,7 @@ def extraer_cuerpo(msg):
     return cuerpo.strip()
 
 def procesar_con_ia(asunto, remitente, cuerpo, locales):
-    if not GEMINI_KEY:
-        return "GENERAL", "No se pudo generar resumen (Falta API Key)."
-        
-    genai.configure(api_key=GEMINI_KEY)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    import llm_fallback
     
     locales_str = "\n".join([f"- {l['sigla']}: {l['nombre']}" for l in locales])
     prompt = f"""Analiza el siguiente correo electrónico:
@@ -94,12 +90,11 @@ SIGLA: [SIGLA_DEL_LOCAL o "GENERAL" si no aplica ninguno]
 RESUMEN: [Tu resumen aquí]
 """
     try:
-        response = model.generate_content(prompt)
-        text = response.text.strip()
+        response_text = llm_fallback.generar_texto(prompt)
         sigla = "GENERAL"
         resumen = "Resumen no disponible"
         
-        for line in text.split('\n'):
+        for line in response_text.split('\n'):
             if line.startswith("SIGLA:"):
                 sigla = line.replace("SIGLA:", "").strip()
             elif line.startswith("RESUMEN:"):

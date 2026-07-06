@@ -57,6 +57,7 @@ client = TelegramClient('supervisor', API_ID, API_HASH)
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 from pathlib import Path
 DIR_AUDIOS = Path("temp_audios")
+last_voice_notes = {}
 import threading
 import json
 STATE_FILE = "/home/cristian/Documentos/Supervisor/telegram_bridge/bridge_state.json"
@@ -214,6 +215,27 @@ async def esperar_respuesta_timeout(chat_id_str, expected_status, timeout_second
     await asyncio.sleep(timeout_seconds)
     estado_actual = cargar_estado()
     if estado_actual.get("chat_id") == chat_id_str and estado_actual.get("status") == expected_status:
+        if expected_status == "waiting_technician_local":
+            pdf_path = estado_actual.get("pdf_path")
+            file_name = estado_actual.get("file_name", "documento.pdf")
+            sender_name = estado_actual.get("sender_name", "Un técnico")
+            
+            limpiar_estado()
+            
+            # Mover a errores
+            dir_errores = Path("/home/cristian/Documentos/Supervisor/errores")
+            dir_errores.mkdir(exist_ok=True, parents=True)
+            dest_err = dir_errores / file_name
+            try:
+                if pdf_path and os.path.exists(pdf_path):
+                    import shutil
+                    shutil.move(pdf_path, str(dest_err))
+            except Exception as e_move:
+                logging.info(f"[TIMEOUT] Error moviendo archivo a errores: {e_move}")
+                
+            asyncio.create_task(escalar_a_cristian(str(dest_err), sender_name))
+            return
+
         files = estado_actual.get("files", [])
         desc_files = ""
         if files:
@@ -516,6 +538,202 @@ def filtrar_palabras(mensaje):
             palabras_filtradas.append(p_clean)
     return palabras_filtradas
 
+pending_classifications = {}
+
+async def escalar_a_cristian(pdf_path, sender_name):
+    import uuid
+    import os
+    req_id = str(uuid.uuid4())[:6].lower()
+    pending_classifications[req_id] = {
+        "pdf_path": pdf_path,
+        "sender_name": sender_name,
+        "file_name": os.path.basename(pdf_path)
+    }
+    
+    mensaje = (
+        f"🔍 **[Antigravity] Reporte Pendiente de Clasificación**\n\n"
+        f"El técnico *{sender_name}* subió el reporte `{os.path.basename(pdf_path)}` pero no pudimos identificar el local (el técnico tampoco respondió).\n\n"
+        f"👉 Presiona un comando para clasificarlo con un toque:\n"
+        f"• `/local_{req_id}_FLIN` ➔ Liniers\n"
+        f"• `/local_{req_id}_FLOZ` ➔ Lomas\n"
+        f"• `/local_{req_id}_FMORE` ➔ Moreno\n"
+        f"• `/local_{req_id}_FPPI` ➔ Palmas Pilar\n"
+        f"• `/local_{req_id}_manual` ➔ Mover a Carpeta de Manuales\n"
+        f"• `/local_{req_id}_error` ➔ Dejar en errores\n\n"
+        f"O responde con:\n"
+        f"`/local_{req_id}_custom_[sigla]`"
+    )
+    
+    try:
+        await client.send_message(MI_TELEGRAM_ID, mensaje)
+        logging.info(f"[ESCALACION] Enviada escalación para req_id: {req_id}")
+    except Exception as e:
+        logging.info(f"[ERROR ESCALACION] No se pudo enviar escalación a Cristian: {e}")
+
+async def procesar_reporte_directo(pdf_path, sigla_manual=None):
+    try:
+        import motor_supervisor
+        import fase3_sheets
+        import archivador_drive
+        import gestion_locales
+        import re
+        import shutil
+        import subprocess
+        
+        pdf_path = Path(pdf_path)
+        # 1. Fase 1 y 2 (Parser y Reglas)
+        datos_extraidos, alertas_negocio, texto_pdf = motor_supervisor.procesar_reporte(str(pdf_path))
+        
+        if sigla_manual:
+            datos_extraidos["sigla"] = sigla_manual.upper().strip()
+            # Actualizar el nombre del local desde la BD
+            datos_extraidos = motor_supervisor.resolver_sigla_desde_db(datos_extraidos)
+            
+        sigla = datos_extraidos.get("sigla", "")
+        if not sigla:
+            return False, "No se pudo identificar la sigla del local."
+            
+        # 2. Fase 3 (Google Sheets)
+        SHEET_URL = os.getenv("SHEETS_SABANA_URL", "https://docs.google.com/spreadsheets/d/18vwFQb3sNTDqqHdac58o_8carqEMCpNlLpYiT3Ymi1Y/edit?usp=sharing")
+        fase3_sheets.inyectar_en_sabana(datos_extraidos, alertas_negocio, SHEET_URL)
+        
+        try:
+            import seguimiento_ppm
+            seguimiento_ppm.actualizar_datos_hidricos(sigla, datos_extraidos)
+        except Exception as e_hidrico:
+            logging.info(f"[PROCESAR-DIRECTO] Error actualizando Agua Seguimiento: {e_hidrico}")
+            
+        # 3. Archivar en Google Drive
+        exito_drive = archivador_drive.archivar_reporte_en_drive(str(pdf_path), sigla)
+        
+        if exito_drive:
+            # Actualizar ficha local en Obsidian
+            try:
+                estado_caf = ""
+                try:
+                    import ingestor_formulario
+                    estado_caf = ingestor_formulario.extraer_estado_cafetera(texto_pdf)
+                except Exception:
+                    pass
+                
+                sn_match = re.search(r"SN:\s*(\w+)", texto_pdf)
+                gestion_locales.actualizar_ficha_local(
+                    sigla=sigla,
+                    nombre_local=datos_extraidos.get("local", ""),
+                    tecnico=datos_extraidos.get("tecnico", ""),
+                    ticket=datos_extraidos.get("ticket", ""),
+                    ppm=datos_extraidos.get("ppm", 0),
+                    shots=datos_extraidos.get("shots", 0),
+                    maquina=datos_extraidos.get("maquina", ""),
+                    sn=sn_match.group(1) if sn_match else "",
+                    estado_cafetera=estado_caf,
+                    estado_general=alertas_negocio.get("estado_general", "VERDE_NORMAL"),
+                    repuestos=datos_extraidos.get("repuestos", ""),
+                    fecha_reporte=datos_extraidos.get("fecha", None)
+                )
+                
+                # Sincronización a NotebookLM
+                script_nlm = str(Path(__file__).parent / "actualizar_notebook_local.py")
+                subprocess.Popen(["python3", script_nlm, sigla])
+                
+            except Exception as e_ficha:
+                logging.info(f"[PROCESAR-DIRECTO] Error al actualizar ficha local de {sigla}: {e_ficha}")
+                
+            # Mover archivo a procesados/
+            dir_procesados = Path("/home/cristian/Documentos/Supervisor/procesados")
+            dir_procesados.mkdir(exist_ok=True, parents=True)
+            if pdf_path.exists():
+                shutil.move(str(pdf_path), str(dir_procesados / pdf_path.name))
+                
+            return True, f"Reporte procesado exitosamente para {datos_extraidos.get('local', sigla)} ({sigla})."
+        else:
+            return False, "Error al subir el archivo a Google Drive."
+            
+    except Exception as e:
+        return False, str(e)
+
+async def procesar_evidencia_directo(image_path, sigla, descripcion_ia):
+    try:
+        import subidor_evidencias
+        import seguimiento_ppm
+        import os
+        
+        # Validar sigla
+        mapa_locales = cargar_mapa_locales()
+        res_mapa = buscar_local_criterio_amplio(sigla, mapa_locales)
+        if not res_mapa:
+            return False, f"La sigla '{sigla}' no corresponde a ningún local oficial."
+            
+        sigla_real = res_mapa["sigla"]
+        
+        url_foto = subidor_evidencias.subir_evidencia(image_path, sigla=sigla_real)
+        if not url_foto:
+            return False, "Error al subir la imagen a Google Drive."
+            
+        exito, msj_excel = seguimiento_ppm.adjuntar_evidencia_visual(sigla_real, descripcion_ia, url_foto)
+        if exito:
+            if os.path.exists(image_path):
+                try:
+                    os.remove(image_path)
+                except Exception:
+                    pass
+            return True, f"[Hermes] Evidencia visual adjuntada correctamente al local {res_mapa['nombre']} ({sigla_real})."
+        else:
+            return False, f"Evidencia subida a Drive pero error al escribir en Excel: {msj_excel}"
+    except Exception as e:
+        return False, f"Excepción procesando evidencia: {e}"
+
+async def escalar_imagen_a_cristian(ruta_imagen, sender_name, chat_title, descripcion_ia):
+    import uuid
+    import os
+    import shutil
+    
+    req_id = str(uuid.uuid4())[:6].lower()
+    
+    dir_errores = Path("/home/cristian/Documentos/Supervisor/errores")
+    dir_errores.mkdir(exist_ok=True, parents=True)
+    nombre_archivo = os.path.basename(ruta_imagen)
+    dest_path = dir_errores / nombre_archivo
+    try:
+        shutil.copy(ruta_imagen, str(dest_path))
+    except Exception as e_copy:
+        logging.info(f"[ERROR COPIAR IMAGEN ESCALACION] {e_copy}")
+        dest_path = Path(ruta_imagen)
+        
+    pending_classifications[req_id] = {
+        "image_path": str(dest_path),
+        "sender_name": sender_name,
+        "file_name": nombre_archivo,
+        "descripcion_ia": descripcion_ia,
+        "is_image": True
+    }
+    
+    mensaje = (
+        f"📸 **[Antigravity] Evidencia Visual sin Local Identificado**\n\n"
+        f"El técnico *{sender_name}* subió una imagen en *'{chat_title}'* pero no pudimos identificar el local automáticamente.\n\n"
+        f"📋 *Diagnóstico de IA:* _{descripcion_ia}_\n\n"
+        f"👉 Presiona un comando para clasificarla con un toque:\n"
+        f"• `/local_{req_id}_FLIN` ➔ Liniers\n"
+        f"• `/local_{req_id}_FLOZ` ➔ Lomas\n"
+        f"• `/local_{req_id}_FMORE` ➔ Moreno\n"
+        f"• `/local_{req_id}_FPPI` ➔ Palmas Pilar\n"
+        f"• `/local_{req_id}_manual` ➔ Mover a Carpeta de Manuales\n"
+        f"• `/local_{req_id}_error` ➔ Descartar imagen/borrar\n\n"
+        f"O responde con:\n"
+        f"`/local_{req_id}_custom_[sigla]`"
+    )
+    
+    try:
+        await client.send_file(MI_TELEGRAM_ID, str(dest_path), caption=mensaje)
+        logging.info(f"[ESCALACION IMAGEN] Enviada escalación de imagen para req_id: {req_id}")
+        if os.path.exists(ruta_imagen):
+            try:
+                os.remove(ruta_imagen)
+            except Exception:
+                pass
+    except Exception as e:
+        logging.info(f"[ERROR ESCALACION IMAGEN] No se pudo enviar imagen a Cristian: {e}")
+
 @client.on(events.NewMessage(incoming=True))
 async def handler(event):
     import os
@@ -532,76 +750,277 @@ async def handler(event):
 
     mensaje = event.text or ""
     
+    # ESCALACIÓN DE CLASIFICACIÓN INTERACTIVA (Supervisor Cristian)
+    if mensaje and mensaje.startswith("/local_") and remitente_id == MI_TELEGRAM_ID:
+        try:
+            partes = mensaje.split("_")
+            if len(partes) >= 3:
+                req_id = partes[1].strip().lower()
+                accion = partes[2].strip().upper()
+                
+                if req_id in pending_classifications:
+                    req_data = pending_classifications[req_id]
+                    is_image = req_data.get("is_image", False)
+                    
+                    if is_image:
+                        image_path = req_data["image_path"]
+                        file_name = req_data["file_name"]
+                        descripcion_ia = req_data["descripcion_ia"]
+                        
+                        if accion == "MANUAL":
+                            dest_dir = "/home/cristian/Documentos/Supervisor/brain/manuales"
+                            os.makedirs(dest_dir, exist_ok=True)
+                            dest_path = os.path.join(dest_dir, f"Manual - {file_name}")
+                            if os.path.exists(image_path):
+                                shutil.move(image_path, dest_path)
+                            del pending_classifications[req_id]
+                            await event.respond(f"✅ Se movió la imagen `{file_name}` a la carpeta de Manuales.")
+                            
+                        elif accion == "ERROR":
+                            if os.path.exists(image_path):
+                                try:
+                                    os.remove(image_path)
+                                except Exception:
+                                    pass
+                            del pending_classifications[req_id]
+                            await event.respond(f"✅ Se descartó/eliminó la imagen `{file_name}`.")
+                            
+                        elif accion == "CUSTOM":
+                            if len(partes) >= 4:
+                                sigla_manual = partes[3].strip().upper()
+                                await event.respond(f"⏳ Procesando evidencia `{file_name}` para sigla manual **{sigla_manual}**...")
+                                exito, msg_proc = await procesar_evidencia_directo(image_path, sigla_manual, descripcion_ia)
+                                if exito:
+                                    del pending_classifications[req_id]
+                                    await event.respond(f"✅ {msg_proc}")
+                                else:
+                                    await event.respond(f"❌ Error: {msg_proc}")
+                            else:
+                                await event.respond("⚠️ Formato incorrecto. Usa `/local_{req_id}_custom_SIGLA`.")
+                                
+                        else:
+                            await event.respond(f"⏳ Procesando evidencia `{file_name}` para **{accion}**...")
+                            exito, msg_proc = await procesar_evidencia_directo(image_path, accion, descripcion_ia)
+                            if exito:
+                                del pending_classifications[req_id]
+                                await event.respond(f"✅ {msg_proc}")
+                            else:
+                                await event.respond(f"❌ Error: {msg_proc}")
+                    else:
+                        pdf_path = req_data["pdf_path"]
+                        file_name = req_data["file_name"]
+                        
+                        if accion == "MANUAL":
+                            dest_dir = "/home/cristian/Documentos/Supervisor/brain/manuales"
+                            os.makedirs(dest_dir, exist_ok=True)
+                            dest_path = os.path.join(dest_dir, f"Manual - {file_name}")
+                            if os.path.exists(pdf_path):
+                                shutil.move(pdf_path, dest_path)
+                            del pending_classifications[req_id]
+                            await event.respond(f"✅ Se movió el archivo `{file_name}` a la carpeta de Manuales.")
+                            
+                        elif accion == "ERROR":
+                            del pending_classifications[req_id]
+                            await event.respond(f"✅ Se mantuvo el archivo `{file_name}` en la carpeta de Errores.")
+                            
+                        elif accion == "CUSTOM":
+                            if len(partes) >= 4:
+                                sigla_manual = partes[3].strip().upper()
+                                await event.respond(f"⏳ Procesando reporte `{file_name}` para sigla manual **{sigla_manual}**...")
+                                exito, msg_proc = await procesar_reporte_directo(pdf_path, sigla_manual=sigla_manual)
+                                if exito:
+                                    del pending_classifications[req_id]
+                                    await event.respond(f"✅ {msg_proc}")
+                                else:
+                                    await event.respond(f"❌ Error al procesar reporte: {msg_proc}")
+                            else:
+                                await event.respond("⚠️ Formato incorrecto. Usa `/local_{req_id}_custom_SIGLA`.")
+                                
+                        else:
+                            await event.respond(f"⏳ Procesando reporte `{file_name}` para **{accion}**...")
+                            exito, msg_proc = await procesar_reporte_directo(pdf_path, sigla_manual=accion)
+                            if exito:
+                                del pending_classifications[req_id]
+                                await event.respond(f"✅ {msg_proc}")
+                            else:
+                                await event.respond(f"❌ Error al procesar reporte: {msg_proc}")
+                else:
+                    await event.respond("❌ ID de solicitud de clasificación no encontrado o ya expirado.")
+            else:
+                await event.respond("⚠️ Formato de comando incorrecto.")
+        except Exception as e_cmd:
+            await event.respond(f"❌ Error al procesar comando de clasificación: {e_cmd}")
+        return
+
+    # COMANDO DE CAMBIO DE MODELO EN PRODUCCIÓN
+    if mensaje and mensaje.startswith("/switch_model_") and remitente_id == MI_TELEGRAM_ID:
+        try:
+            parts = mensaje.split("_", 4)
+            if len(parts) >= 5:
+                provider = parts[2].strip().lower()
+                var_key = parts[3].strip()
+                model_name = parts[4].strip().replace("_", "/")
+                
+                await event.respond(f"⏳ Modificando configuración: estableciendo **{var_key}** = `{model_name}`...")
+                import config_manager
+                config_manager.set_env_var(var_key, model_name)
+                
+                import subprocess
+                await event.respond("🔄 Reiniciando servicios (`antigravity-api` y `supervisor-userbot`)...")
+                subprocess.Popen(["systemctl", "--user", "restart", "antigravity-api.service", "supervisor-userbot.service"])
+                
+                await event.respond(f"✅ ¡Configuración actualizada con éxito! El bot se está reiniciando para aplicar **{model_name}**.")
+            else:
+                await event.respond("⚠️ Formato de comando de modelo incorrecto.")
+        except Exception as e_switch:
+            await event.respond(f"❌ Error al cambiar de modelo: {e_switch}")
+        return
+    
     # NUEVO: Procesar audio ANTES de revisar comandos
     if event.message.media and hasattr(event.message.media, 'document') and getattr(event.message, 'voice', False):
         logging.info("Descargando nota de voz al inicio del handler...")
         try:
             archivo = await event.message.download_media(file=DIR_AUDIOS)
             texto = transcribir_audio_groq(archivo)
-            if texto:
+            if texto and not texto.startswith("[Error"):
                 mensaje = texto.strip()
                 logging.info(f"Transcripción inicial: {mensaje}")
+                last_voice_notes[(event.chat_id, remitente_id)] = {
+                    "text": mensaje,
+                    "timestamp": datetime.datetime.now()
+                }
             import os
             os.remove(archivo)
         except Exception as e:
             logging.info(f"Error procesando audio: {e}")
 
-    # NUEVO: Análisis de Visión Computacional (Skill 16)
-    if event.media:
-        if getattr(event.media, "photo", None):
-            try:
-                ruta_descarga = await event.download_media(file="/tmp/")
-                if ruta_descarga:
-                    import analizador_imagenes
-                    import subidor_evidencias
-                    import seguimiento_ppm
+    # NUEVO: Análisis de Visión Computacional Unificado (Fotos y Capturas como Documento)
+    is_photo = (event.message.photo is not None)
+    is_image_doc = False
+    file_name_img = ""
+    if event.message.media and hasattr(event.message.media, 'document') and not event.message.voice:
+        for attr in event.message.media.document.attributes:
+            if hasattr(attr, 'file_name'):
+                file_name_img = attr.file_name
+                break
+        if file_name_img.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif')):
+            is_image_doc = True
+
+    if is_photo or is_image_doc:
+        try:
+            # Si es doc, usamos su nombre, si no, uno por id
+            if is_photo:
+                file_name_img = f"foto_{event.message.id}.jpg"
+            
+            ruta_descarga = os.path.join("/tmp/", file_name_img)
+            archivo = await event.message.download_media(file=ruta_descarga)
+            
+            if archivo:
+                import analizador_imagenes
+                import subidor_evidencias
+                import seguimiento_ppm
+                import json
+                import shutil
+                
+                # Recuperar contexto de mensajes si no hay texto adjunto
+                contexto_mensaje = mensaje
+                
+                # Intentar recuperar transcripción de audio reciente
+                now = datetime.datetime.now()
+                key = (event.chat_id, remitente_id)
+                if not contexto_mensaje and key in last_voice_notes:
+                    v_data = last_voice_notes[key]
+                    if (now - v_data["timestamp"]).total_seconds() < 60:
+                        contexto_mensaje = v_data["text"]
+                        logging.info(f"[VISION AUDIO CONTEXTO] Recuperado de nota de voz reciente: {contexto_mensaje}")
+                
+                if not contexto_mensaje:
+                    try:
+                        mensajes_recientes = await client.get_messages(event.chat_id, limit=5)
+                        textos_contexto = []
+                        for msg in mensajes_recientes:
+                            if msg.sender_id == remitente_id and msg.text:
+                                textos_contexto.append(msg.text)
+                        if textos_contexto:
+                            contexto_mensaje = " | ".join(textos_contexto)
+                            logging.info(f"[VISION CONTEXTO] Recuperado del chat: {contexto_mensaje}")
+                    except Exception as e_context:
+                        logging.info(f"Error recuperando contexto de mensajes: {e_context}")
+                
+                locales_db = obtener_lista_locales()
+                contexto_cronograma = obtener_contexto_cronograma(event.sender)
+                
+                resultado_ia = analizador_imagenes.analizar_foto(ruta_descarga, contexto_mensaje, locales_db, contexto_cronograma)
+                
+                tipo_imagen = resultado_ia.get("tipo_imagen", "OTRO")
+                descripcion_ia = resultado_ia.get("descripcion_tecnica", "")
+                sigla_encontrada = resultado_ia.get("local_detectado", None)
+                
+                logging.info(f"[VISION UNIFICADO] Tipo detectado: {tipo_imagen} | Desc: {descripcion_ia}")
+                
+                if tipo_imagen == "PLANIFICACION":
+                    cronograma_datos = resultado_ia.get("cronograma_datos")
+                    if cronograma_datos:
+                        cronograma_path = "/home/cristian/PROYECTOS/Supervisor-Project/cronograma_tecnicos.json"
+                        cronograma_path_doc = "/home/cristian/Documentos/Supervisor/cronograma_tecnicos.json"
+                        with open(cronograma_path, "w", encoding="utf-8") as f_json:
+                            json.dump(cronograma_datos, f_json, indent=2, ensure_ascii=False)
+                        # Sincronizar a Documentos
+                        shutil.copy(cronograma_path, cronograma_path_doc)
+                        
+                        await event.respond("📅 *[Hermes] Planificación de técnicos detectada y actualizada con éxito.* Las nuevas rutas de ruteo semanal han sido cargadas en el sistema.")
+                    else:
+                        await event.respond("⚠️ *[Hermes] Detecté la planificación de técnicos, pero no pude extraer los datos de forma estructurada.*")
                     
-                    # Recuperar contexto si la foto no tiene caption
-                    contexto_mensaje = mensaje
-                    if not contexto_mensaje:
-                        try:
-                            # Buscar en los últimos 5 mensajes del mismo chat/usuario para recuperar contexto
-                            mensajes_recientes = await client.get_messages(event.chat_id, limit=5)
-                            textos_contexto = []
-                            for msg in mensajes_recientes:
-                                if msg.sender_id == remitente_id and msg.text:
-                                    textos_contexto.append(msg.text)
-                            if textos_contexto:
-                                contexto_mensaje = " | ".join(textos_contexto)
-                                logging.info(f"[VISION CONTEXTO] Recuperado del chat: {contexto_mensaje}")
-                        except Exception as e_context:
-                            logging.info(f"Error recuperando contexto de mensajes: {e_context}")
+                    if os.path.exists(ruta_descarga):
+                        os.remove(ruta_descarga)
+                    return
                     
-                    locales_db = obtener_lista_locales()
-                    contexto_cronograma = obtener_contexto_cronograma(event.sender)
-                    if contexto_cronograma:
-                        logging.info(f"[VISION CRONOGRAMA] Contexto: {contexto_cronograma}")
-                    resultado_ia = analizador_imagenes.analizar_foto(ruta_descarga, contexto_mensaje, locales_db, contexto_cronograma)
+                elif tipo_imagen == "MANUAL_TECNICO":
+                    # Mover a manuales
+                    dest_dir = "/home/cristian/Documentos/Supervisor/brain/manuales"
+                    os.makedirs(dest_dir, exist_ok=True)
+                    dest_path = os.path.join(dest_dir, file_name_img)
+                    shutil.move(ruta_descarga, dest_path)
                     
-                    es_evidencia = resultado_ia.get("es_evidencia_tecnica", False)
-                    descripcion_ia = resultado_ia.get("descripcion_tecnica", "")
-                    sigla_encontrada = resultado_ia.get("local_detectado", None)
+                    # Transcribir en segundo plano si es imagen
+                    nombre_sin_ext = os.path.splitext(dest_path)[0]
+                    md_dest_path = f"{nombre_sin_ext}.md"
+                    t = threading.Thread(target=transcribir_y_guardar_imagen, args=(dest_path, md_dest_path))
+                    t.start()
                     
-                    if not es_evidencia:
-                        logging.info("La foto no califica como evidencia técnica relevante (remito, selfie, etc.). Ignorando de forma silenciosa.")
-                        import os
+                    await event.respond(f"📚 *[Hermes] He detectado y guardado este documento técnico en la base de conocimientos.* (`{file_name_img}`)")
+                    return
+                    
+                elif tipo_imagen == "EVIDENCIA_TECNICA":
+                    if sigla_encontrada:
+                        url_foto = subidor_evidencias.subir_evidencia(ruta_descarga, sigla=sigla_encontrada)
+                        if url_foto:
+                            exito, msj_excel = seguimiento_ppm.adjuntar_evidencia_visual(sigla_encontrada, descripcion_ia, url_foto)
+                            if exito:
+                                await event.respond(f"✅ [Hermes] Evidencia visual analizada y adjuntada al local {sigla_encontrada}.\nDiagnóstico:\n{descripcion_ia}")
+                            else:
+                                if event.is_group:
+                                    await client.send_message(MI_TELEGRAM_ID, f"⚠️ *[Hermes Alerta]*\nEvidencia analizada para local {sigla_encontrada} en el grupo, pero hubo un error en Excel: {msj_excel}")
+                                else:
+                                    await event.respond(f"⚠️ [Hermes] Evidencia analizada pero hubo un error en Excel: {msj_excel}")
+                        else:
+                            if event.is_group:
+                                await client.send_message(MI_TELEGRAM_ID, f"⚠️ *[Hermes Alerta]*\nEvidencia analizada para local {sigla_encontrada} en el grupo, pero falló la subida a Drive.")
+                            else:
+                                await event.respond(f"⚠️ [Hermes] Evidencia analizada pero falló la subida a Drive.")
+                        
                         if os.path.exists(ruta_descarga):
                             os.remove(ruta_descarga)
+                        return
                     else:
-                        if sigla_encontrada:
-                            url_foto = subidor_evidencias.subir_evidencia(ruta_descarga)
-                            if url_foto:
-                                exito, msj_excel = seguimiento_ppm.adjuntar_evidencia_visual(sigla_encontrada, descripcion_ia, url_foto)
-                                if exito:
-                                    await event.respond(f"✅ [Hermes] Foto analizada y adjuntada como evidencia al local {sigla_encontrada}.\nDiagnóstico:\n{descripcion_ia}")
-                                else:
-                                    await event.respond(f"⚠️ [Hermes] Foto analizada pero hubo un error en Excel: {msj_excel}")
-                            else:
-                                await event.respond(f"⚠️ [Hermes] Foto analizada pero falló la subida a Drive.")
-                            
-                            import os
-                            if os.path.exists(ruta_descarga):
-                                os.remove(ruta_descarga)
+                        chat = await event.get_chat()
+                        is_group = event.is_group or (chat and hasattr(chat, 'title') and chat.title)
+                        
+                        if is_group:
+                            chat_title = chat.title if (chat and hasattr(chat, 'title') and chat.title) else "Grupo"
+                            asyncio.create_task(escalar_imagen_a_cristian(ruta_descarga, remitente_nombre, chat_title, descripcion_ia))
+                            return
                         else:
                             chat_id_str = str(event.sender_id)
                             estado_tmp = cargar_estado()
@@ -609,23 +1028,23 @@ async def handler(event):
                             estado_tmp["status"] = "waiting_evidence_local"
                             estado_tmp["ruta_descarga"] = ruta_descarga
                             estado_tmp["descripcion_ia"] = descripcion_ia
-                            
-                            # Info para watchdog
                             estado_tmp["sender_name"] = remitente_nombre
-                            chat = await event.get_chat()
-                            chat_title = "Grupo"
-                            if chat and hasattr(chat, 'title') and chat.title:
-                                chat_title = chat.title
-                            estado_tmp["chat_title"] = chat_title
+                            estado_tmp["chat_title"] = "Privado"
                             
                             guardar_estado(estado_tmp)
                             await event.respond(f"📸 Recibí la evidencia visual, pero no detecto el local.\n¿De qué local estás hablando? (Ej: 9 de julio o FM9JU)")
                             asyncio.create_task(esperar_respuesta_timeout(chat_id_str, "waiting_evidence_local", 600))
                             return
-                    
-                    mensaje = f"{mensaje}\n\n[IMAGEN ADJUNTA] {descripcion_ia}".strip()
-            except Exception as e:
-                logging.info(f"Error analizando imagen: {e}")
+                
+                else: # tipo_imagen == "OTRO"
+                    # Se descarta silenciosamente si no tiene texto adjunto, o se continúa si tiene texto
+                    if os.path.exists(ruta_descarga):
+                        os.remove(ruta_descarga)
+                    if not mensaje:
+                        return
+            
+        except Exception as e:
+            logging.info(f"Error analizando imagen unificada: {e}")
 
     if not mensaje and not event.media:
         return
@@ -645,6 +1064,27 @@ async def handler(event):
                 await event.respond(f"Error interno: {resultado}")
         except Exception as e:
             await event.respond(f"❌ Fallo crítico armando el Excel: {e}")
+        return
+
+    if mensaje and mensaje.lower().strip() == "/crear_grupo" and remitente_id == MI_TELEGRAM_ID:
+        await event.respond("⏳ Intentando crear el grupo de pruebas 'Mostaza - Grupo de Pruebas'...")
+        try:
+            from telethon.tl.functions.messages import CreateChatRequest
+            result = await client(CreateChatRequest(users=['@BotFather'], title='Mostaza - Grupo de Pruebas'))
+            chat_id = "Desconocido"
+            if hasattr(result, 'chats') and result.chats:
+                chat_id = result.chats[0].id
+            elif hasattr(result, 'updates'):
+                for u in result.updates:
+                    if hasattr(u, 'channel_id'):
+                        chat_id = u.channel_id
+                        break
+                    elif hasattr(u, 'chat_id'):
+                        chat_id = u.chat_id
+                        break
+            await event.respond(f"✅ ¡Grupo de pruebas creado con éxito!\n• **ID:** {chat_id}\n\nAgrega reportes de prueba aquí para simular el comportamiento de los técnicos.")
+        except Exception as e:
+            await event.respond(f"❌ Error al crear el grupo de pruebas: {e}")
         return
         
     # LÓGICA DE ANTIGRAVITY Y ESTADO DE CHAT
@@ -682,9 +1122,17 @@ async def handler(event):
                 respuesta = model.generate_content(prompt).text.strip()
                 await event.respond(f"✨ [AntiGravity]\n{respuesta}")
             else:
-                await event.respond("❌ Falta GEMINI_API_KEY en .env")
+                await client.send_message(MI_TELEGRAM_ID, "❌ Falta GEMINI_API_KEY en .env")
         except Exception as e:
-            await event.respond(f"❌ Error de AntiGravity: {e}")
+            chat_title = "Privado"
+            try:
+                chat = await event.get_chat()
+                if chat and hasattr(chat, 'title') and chat.title:
+                    chat_title = chat.title
+            except Exception:
+                pass
+            msg_err = f"❌ *[Falla Directa de AntiGravity]*\nOcurrió una excepción al procesar la consulta directa de {remitente_nombre} en '{chat_title}': {e}"
+            await client.send_message(MI_TELEGRAM_ID, msg_err)
         return
 
     # LOGICA DE APROBACIÓN POR COMANDOS (SOLUCIONES WIKI)
@@ -745,6 +1193,53 @@ async def handler(event):
         status = estado.get("status")
         files = estado.get("files", [])
         
+        if status == "waiting_technician_local":
+            local = mensaje.strip()
+            if local.lower() in ["no", "cancelar", "cancel"]:
+                await event.respond("❌ Operación cancelada. El reporte se enviará a revisión manual.")
+                pdf_path = estado.get("pdf_path")
+                limpiar_estado()
+                asyncio.create_task(escalar_a_cristian(pdf_path, remitente_nombre))
+                return
+                
+            # Validar local con criterio amplio
+            mapa_locales = cargar_mapa_locales()
+            res_mapa = buscar_local_criterio_amplio(local, mapa_locales)
+            
+            if not res_mapa:
+                sugerencias = []
+                for key, datos in mapa_locales.items():
+                    if len(key) > 3 and (key in local.lower() or local.lower() in key):
+                        sugerencia = f"{datos['nombre']} ({datos['sigla']})"
+                        if sugerencia not in sugerencias:
+                            sugerencias.append(sugerencia)
+                msg_sug = ""
+                if sugerencias:
+                    msg_sug = f"\n¿Tal vez quisiste decir alguno de estos?: " + ", ".join(sugerencias)
+                    
+                await event.respond(f"⚠️ No encontré el local '{local}'.{msg_sug}\nPor favor, responde escribiendo la sigla exacta o cancela enviando 'no'.")
+                return
+                
+            sigla_real = res_mapa["sigla"]
+            nombre_real = res_mapa["nombre"]
+            pdf_path = estado.get("pdf_path")
+            
+            limpiar_estado()
+            await event.respond(f"⏳ Procesando reporte para **{nombre_real} ({sigla_real})**...")
+            
+            exito, msg_proc = await procesar_reporte_directo(pdf_path, sigla_manual=sigla_real)
+            if exito:
+                await event.respond(f"✅ {msg_proc}")
+            else:
+                await event.respond(f"⚠️ Error al procesar reporte: {msg_proc}. Se movió a la carpeta de errores.")
+                dir_errores = Path("/home/cristian/Documentos/Supervisor/errores")
+                dir_errores.mkdir(exist_ok=True, parents=True)
+                dest_err = dir_errores / Path(pdf_path).name
+                if Path(pdf_path).exists():
+                    shutil.move(str(pdf_path), str(dest_err))
+                asyncio.create_task(escalar_a_cristian(str(dest_err), remitente_nombre))
+            return
+
         if status == "waiting_manual_confirm":
             respuesta_clean = mensaje.lower().strip()
             if respuesta_clean.startswith("s") or respuesta_clean in ["yes", "ok", "bueno", "dale"]:
@@ -965,15 +1460,21 @@ async def handler(event):
             import subidor_evidencias
             import seguimiento_ppm
             
-            url_foto = subidor_evidencias.subir_evidencia(ruta_descarga)
+            url_foto = subidor_evidencias.subir_evidencia(ruta_descarga, sigla=sigla_real)
             if url_foto:
                 exito, msj_excel = seguimiento_ppm.adjuntar_evidencia_visual(sigla_real, descripcion_ia, url_foto)
                 if exito:
                     await event.respond(f"✅ [Hermes] Foto analizada y adjuntada como evidencia al local {sigla_real}.\nDiagnóstico:\n{descripcion_ia}")
                 else:
-                    await event.respond(f"⚠️ [Hermes] Foto analizada pero hubo un error en Excel: {msj_excel}")
+                    if event.is_group:
+                        await client.send_message(MI_TELEGRAM_ID, f"⚠️ *[Hermes Alerta]*\nFoto analizada para local {sigla_real} en el grupo, pero hubo un error en Excel: {msj_excel}")
+                    else:
+                        await event.respond(f"⚠️ [Hermes] Foto analizada pero hubo un error en Excel: {msj_excel}")
             else:
-                await event.respond(f"⚠️ [Hermes] Foto analizada pero falló la subida a Drive.")
+                if event.is_group:
+                    await client.send_message(MI_TELEGRAM_ID, f"⚠️ *[Hermes Alerta]*\nFoto analizada para local {sigla_real} en el grupo, pero falló la subida a Drive.")
+                else:
+                    await event.respond(f"⚠️ [Hermes] Foto analizada pero falló la subida a Drive.")
                 
             try:
                 os.remove(ruta_descarga)
@@ -1007,6 +1508,8 @@ async def handler(event):
         
         async def procesar_video_async():
             print("🎬 Iniciando procesar_video_async...", flush=True)
+            # Esperar 4 segundos para agrupar notas de voz enviadas después del video
+            await asyncio.sleep(4)
             try:
                 # Obtener info de remitente y grupo antes de procesar
                 sender = await event.get_sender()
@@ -1024,6 +1527,37 @@ async def handler(event):
                 if chat and hasattr(chat, 'title') and chat.title:
                     chat_title = chat.title
                 
+                # Buscar transcripción de audio reciente
+                descripcion_audio = None
+                now = datetime.datetime.now()
+                key = (event.chat_id, remitente_id)
+                if key in last_voice_notes:
+                    v_data = last_voice_notes[key]
+                    if (now - v_data["timestamp"]).total_seconds() < 60:
+                        descripcion_audio = v_data["text"]
+                        
+                # Si no está en el diccionario, escanear el historial del chat
+                if not descripcion_audio:
+                    try:
+                        mensajes_recientes = await client.get_messages(event.chat_id, limit=5)
+                        for msg in mensajes_recientes:
+                            if msg.id == event.message.id:
+                                continue
+                            diff = abs((event.message.date - msg.date).total_seconds())
+                            if msg.sender_id == remitente_id and diff < 60 and getattr(msg, 'voice', False):
+                                archivo_audio = await msg.download_media(file=DIR_AUDIOS)
+                                texto_audio = transcribir_audio_groq(archivo_audio)
+                                if texto_audio and not texto_audio.startswith("[Error"):
+                                    descripcion_audio = texto_audio.strip()
+                                    logging.info(f"[VIDEO AUDIO HISTORY] Transcripción recuperada: {descripcion_audio}")
+                                try:
+                                    os.remove(archivo_audio)
+                                except:
+                                    pass
+                                break
+                    except Exception as e_hist:
+                        logging.info(f"Error escaneando audio en historial: {e_hist}")
+                
                 archivo = await event.message.download_media(file=dest_path)
                 if not archivo:
                     print("❌ download_media no devolvió archivo", flush=True)
@@ -1037,7 +1571,10 @@ async def handler(event):
                 import requests
                 with open(dest_path, "rb") as f:
                     files = {"file": (file_name, f, "video/mp4")}
-                    res = requests.post("http://localhost:8000/v1/analyze_video", files=files, timeout=180)
+                    data = {}
+                    if descripcion_audio:
+                        data["descripcion_audio"] = descripcion_audio
+                    res = requests.post("http://localhost:8000/v1/analyze_video", files=files, data=data, timeout=180)
                     
                 print(f"🎬 API respondió con código: {res.status_code}", flush=True)
                 if res.status_code == 200:
@@ -1092,22 +1629,73 @@ async def handler(event):
                     file_name = attr.file_name
                     break
                     
-            # Si es un reporte estándar de Mostaza
-            if file_name.upper().startswith("MTZ_") and file_name.upper().endswith(".PDF"):
-                dest_dir = "/home/cristian/Documentos/Supervisor/entrantes"
-                os.makedirs(dest_dir, exist_ok=True)
-                dest_path = os.path.join(dest_dir, file_name)
-                
-                # Descargar y guardar en entrantes/
-                await event.respond(f"📥 Descargando reporte `{file_name}`...")
+            # Si es un archivo PDF (posible reporte)
+            if file_name.lower().endswith(".pdf"):
+                dest_path = os.path.join("/tmp/", file_name)
+                if not event.is_group:
+                    await event.respond(f"📥 Descargando PDF `{file_name}`...")
                 archivo = await event.message.download_media(file=dest_path)
                 if archivo:
-                    await event.respond(f"📥 *Reporte PDF Recibido:* `{file_name}`.\nEntrando en cola de procesamiento...")
+                    if not event.is_group:
+                        await event.respond(f"⚙️ Analizando y procesando reporte de forma automática...")
+                    exito, msg_proc = await procesar_reporte_directo(dest_path)
+                    if exito:
+                        await event.respond(f"✅ {msg_proc}")
+                    else:
+                        if event.is_group:
+                            # En grupo: NUNCA preguntar. Escalar directamente a Cristian por privado
+                            await escalar_a_cristian(dest_path, remitente_nombre)
+                        else:
+                            # En privado: flujo interactivo normal
+                            chat_id_str = str(event.sender_id)
+                            estado_tmp = cargar_estado()
+                            estado_tmp["chat_id"] = chat_id_str
+                            estado_tmp["status"] = "waiting_technician_local"
+                            estado_tmp["pdf_path"] = dest_path
+                            estado_tmp["file_name"] = file_name
+                            estado_tmp["sender_name"] = remitente_nombre
+                            
+                            chat = await event.get_chat()
+                            chat_title = "Grupo"
+                            if chat and hasattr(chat, 'title') and chat.title:
+                                chat_title = chat.title
+                            estado_tmp["chat_title"] = chat_title
+                            
+                            guardar_estado(estado_tmp)
+                            
+                            guessed_local = ""
+                            try:
+                                import motor_supervisor
+                                datos, _, _ = motor_supervisor.procesar_reporte(dest_path)
+                                guessed_local = datos.get("local", "")
+                            except Exception:
+                                pass
+                                
+                            mention_str = f"@{event.sender.username}" if event.sender and getattr(event.sender, 'username', None) else remitente_nombre
+                            
+                            if guessed_local:
+                                pregunta = (
+                                    f"⚠️ Hola {mention_str}, no pude determinar con certeza la sigla del local en tu reporte `{file_name}`.\n"
+                                    f"¿Este reporte pertenece a **{guessed_local}** o a qué local? Responde con la sigla o nombre oficial."
+                                )
+                            else:
+                                pregunta = (
+                                    f"⚠️ Hola {mention_str}, no logramos identificar el local para tu reporte `{file_name}`.\n"
+                                    f"¿A qué local corresponde? Responde con la sigla o nombre oficial."
+                                )
+                                
+                            await event.respond(pregunta)
+                            asyncio.create_task(esperar_respuesta_timeout(chat_id_str, "waiting_technician_local", 600))
                 else:
-                    await event.respond(f"⚠️ Error al descargar el archivo `{file_name}`. Por favor, reintenta.")
+                    if not event.is_group:
+                        await event.respond(f"⚠️ Error al descargar el archivo `{file_name}`. Por favor, reintenta.")
                 return
 
-        # Es un manual potencial (documento no estándar o foto/imagen)
+        # Si estamos en un grupo, NUNCA clasificar imágenes o archivos como manuales interactivos
+        if event.is_group:
+            return
+
+        # Es un manual potencial (documento no estándar o foto/imagen en chat PRIVADO)
         temp_dir = "/tmp/tg_manuals_temp"
         os.makedirs(temp_dir, exist_ok=True)
         dest_path = os.path.join(temp_dir, file_name)
@@ -1258,6 +1846,30 @@ async def handler(event):
             pregunta_falla = (tiene_kw_tecnica and tiene_kw_pregunta_tecnica) or tiene_error_numero
             
             debe_responder = pregunta_direccion or pregunta_direccion_generica or pregunta_falla
+            
+            if debe_responder:
+                # Validar intención usando LLM para evitar falsos positivos
+                try:
+                    import google.generativeai as genai
+                    api_key = os.getenv("GEMINI_API_KEY")
+                    if api_key:
+                        genai.configure(api_key=api_key)
+                        model = genai.GenerativeModel("gemini-2.5-flash")
+                        prompt = (
+                            "Analiza el siguiente mensaje en un grupo de técnicos de mantenimiento gastronómico:\n"
+                            f"Mensaje: \"{mensaje}\"\n\n"
+                            "Determina si el mensaje contiene una duda técnica real o consulta de soporte técnico que requiera asistencia inteligente del supervisor (SOPORTE) "
+                            "o si es un saludo, charla casual, queja informal o reporte simple de llegada a local que no amerita responder (CASUAL).\n"
+                            "Responde únicamente SOPORTE o CASUAL."
+                        )
+                        response = model.generate_content(prompt, request_options={"timeout": 4})
+                        if "CASUAL" in response.text.upper():
+                            print(f"[INTENT-CLASSIFIER] Mensaje clasificado como CASUAL: '{mensaje}'. Omitiendo respuesta.")
+                            debe_responder = False
+                        else:
+                            print(f"[INTENT-CLASSIFIER] Mensaje clasificado como SOPORTE: '{mensaje}'. Procediendo a responder.")
+                except Exception as e_intent:
+                    print(f"[INTENT-CLASSIFIER-ERROR] Falló clasificador: {e_intent}")
 
         if not debe_responder:
             return  # Silencio en el grupo
@@ -1268,12 +1880,18 @@ async def handler(event):
     if not es_grupo or debe_responder:
         from agentic_loop import consultar_agentic_loop
         
-        system_prompt = """Eres Hermes, el "Supervisor" principal del sistema y asistente experto en mantenimiento operativo.
-Tienes acceso a múltiples herramientas para consultar datos de locales, pendientes, manuales técnicos y reportes analizados.
+        system_prompt = """Eres Hermes, el "Supervisor" principal del sistema y asistente experto en mantenimiento operativo de las franquicias de Mostaza, corriendo sobre la infraestructura de 'AntiGravity'.
+Tienes acceso a múltiples herramientas para consultar datos de locales, pendientes, manuales técnicos, tickets activos y reportes analizados.
+
+CONOCIMIENTO DE TUS CAPACIDADES DE INGESTA AUTOMÁTICA:
+- Ingesta de Reportes en Grupos y Privado: El Userbot de Telegram está programado para interceptar y descargar automáticamente cualquier archivo PDF (informe técnico) subido en los grupos y chats habilitados. Cuando un archivo llega al grupo, el sistema realiza la ingesta silenciosa: extrae los datos clave, lo sube a la carpeta de Google Drive del local (a través de la WebApp), actualiza la planilla de control (Sheets/Excel) y lo registra en Obsidian/NotebookLM.
+- Ingesta de WhatsApp: Los reportes técnicos compartidos en los grupos de WhatsApp de mantenimiento son capturados por el puente pasivo de WhatsApp Web ('whatsapp-bridge.service') e ingresados automáticamente al sistema.
+- Por ende, SÍ tienes la capacidad de procesar archivos de forma autónoma. Si el usuario te pregunta por ello, confirma que el sistema realiza este flujo automáticamente en segundo plano.
+
 REGLAS ESTRICTAS:
 1. Siempre sé profesional, resolutivo y analítico.
-2. NUNCA respondas que "no tienes la capacidad" o "no encuentras" algo ANTES de usar las herramientas. Úsalas para buscar siglas, información o reportes.
-3. Si la herramienta de buscar local te dice que no encontró el local, pide amablemente aclaración. Si te devuelve una sigla (ej. FSJU), usa ESA SIGLA para buscar reportes o pendientes.
+2. NUNCA respondas que "no tienes la capacidad" o "no puedes acceder" a los archivos que se suben al grupo. El Userbot los procesa y tú tienes acceso a esos datos a través de tus herramientas (como consultar reportes, buscar pendientes, buscar tickets, etc.).
+3. Si la herramienta de buscar local te dice que no encontró el local, pide amablemente aclaración. Si te devuelve una sigla (ej. FSJU), usa ESA SIGLA para buscar reportes, tickets o pendientes.
 4. Si hay fallas técnicas, usa la herramienta de buscar manuales. Si es algo de código o infraestructura que falla, usa la herramienta de contactar a AntiGravity.
 5. Inicia tu respuesta final con el emoji 🤖 [Hermes] (a menos que el usuario esté pidiendo ayuda de otro agente, pero Hermes siempre coordina).
 """

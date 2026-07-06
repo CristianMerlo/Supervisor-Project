@@ -60,6 +60,24 @@ def obtener_locales_conocidos():
         print(f"Error leyendo CSV de locales: {e}")
     return conocidos
 
+def obtener_nombre_local_por_sigla(sigla):
+    """Resuelve la sigla del local a su nombre comercial completo usando locales.csv"""
+    CSV_PATH = Path("/home/cristian/PROYECTOS/Supervisor-Project/locales.csv")
+    if not CSV_PATH.exists():
+        return ""
+    try:
+        import csv
+        with open(CSV_PATH, newline='', encoding='utf-8') as csvfile:
+            reader = csv.DictReader(csvfile)
+            for row in reader:
+                sigla_tickets = row.get("SIGLA TICKETS", "").strip().upper()
+                sigla_sistema = row.get("SIGLA SISTEMA", "").strip().upper()
+                if sigla.upper() in [sigla_tickets, sigla_sistema]:
+                    return row.get("LOCAL", "").strip()
+    except Exception as e:
+        print(f"Error resolviendo nombre de local: {e}")
+    return ""
+
 def autenticar():
     """Realiza el login contra la API de Mostaza y retorna el token JWT"""
     payload = {
@@ -141,9 +159,12 @@ def procesar_tickets():
             # Formatear el mensaje
             prioridad_icon = "🔴 EMERGENCIA" if t_priority.lower() in ["alta", "urgente", "emergencia"] else "🟡"
             
+            nombre_local = obtener_nombre_local_por_sigla(t_store)
+            store_display = f"{t_store} - {nombre_local}" if nombre_local else t_store
+            
             mensaje = (
                 f"🎫 *NUEVO TICKET DETECTADO*\n"
-                f"🏪 *Local:* {t_store}\n"
+                f"🏪 *Local:* {store_display}\n"
                 f"🕒 *Fecha/Hora:* {fecha_str} a las {t_time}\n"
                 f"⚠️ *Prioridad:* {prioridad_icon} ({t_priority})\n"
                 f"🛠 *Incidencia:* {t_incidence}\n"

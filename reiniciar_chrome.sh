@@ -21,7 +21,7 @@ rm -f /home/cristian/.config/chrome-whatsapp/Singleton*
 
 # 2. Iniciar Chrome en background con el puerto CDP abierto
 echo "[2/2] Lanzando Chrome con remote debugging..."
-setsid google-chrome --remote-debugging-port=9222 --user-data-dir="/home/cristian/.config/chrome-whatsapp" --no-first-run --no-default-browser-check < /dev/null > /dev/null 2>&1 &
+setsid google-chrome --headless=new --remote-debugging-port=9222 --user-data-dir="/home/cristian/.config/chrome-whatsapp" --no-first-run --no-default-browser-check < /dev/null > /dev/null 2>&1 &
 
 sleep 2
 echo "✓ Proceso completado exitosamente."

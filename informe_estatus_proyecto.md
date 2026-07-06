@@ -73,6 +73,15 @@ El ecosistema actual del proyecto se compone de los siguientes archivos:
 *   **Conexión Dinámica con Sheets (Gemini Tools)**: Se integró el soporte nativo de Function Calling en la API local (`server.py`). Al consultar sobre el estado de una sucursal, mantenimientos o alertas, la IA ejecuta automáticamente búsquedas y lecturas dinámicas sobre la base de datos de Sheets (`Locales_Maestro`, `Historial_Mantenimiento`, `Alertas_Activas`).
 *   **Ejecución Transparente y Asíncrona**: Habilitado el modo `enable_automatic_function_calling=True` en las sesiones de chat de la API. El bot resuelve la petición por detrás de escena y responde con los datos duros reales formateados.
 
+### I. Motor de Conocimiento RAG y Bóveda de Obsidian (Completado)
+*   **Integración Local-First:** Se implementó `obsidian_bridge.py`, que actúa como buscador semántico sobre la bóveda local de Obsidian (`brain/`).
+*   **Conversión de PDFs y OCR Automático:** Se desarrolló `convertir_pdfs_a_md.py` para transformar manuales técnicos PDF a formato Markdown. Además, el bot transcribe fotos (ej. diagramas de error) enviadas por Telegram a texto utilizando la API local.
+*   **Contexto Extendido:** El motor RAG fue configurado para extraer hasta 15,000 caracteres preservando el formato de tablas y enviarlo a Gemini 2.5 Flash, logrando cero alucinaciones en diagnósticos complejos como los errores de La Cimbali.
+*   **Automatización de Mantenimiento de la Bóveda:** Tarea programada en cron que corre diariamente a las 02:00 AM para ingestar y convertir nuevos PDFs a la base de conocimientos, así como conversión en tiempo real al subir documentos por Telegram.
+
+### J. Optimización de Infraestructura Local (Completado)
+*   **Perfil de Bajo Consumo para Chrome:** Se configuró el daemon de WhatsApp Web (`reiniciar_chrome.sh`) con banderas estrictas (`--disable-gpu`, `--disable-extensions`, `--mute-audio`, `--disable-sync`) para reducir radicalmente el consumo de RAM en Ubuntu.
+
 ---
 
 ## 4. Estatus de Funciones Pendientes (Planificadas en Arquitectura)
@@ -100,3 +109,32 @@ Analizando los códigos de producción frente al diseño de `hermes_architecture
 1.  **Prioridad 1: Validación de Emisores:** Implementar la validación de Chat ID y correo electrónico contra la lista oficial de técnicos habilitados.
 2.  **Prioridad 2: Auditoría y Viáticos:** Desarrollar los bloques de visión computacional y conciliación de viáticos.
 3.  **Prioridad 3: Orquestación Predictiva:** Programar la proyección por shots y la integración de agendamiento en calendario.
+
+---
+
+## 6. Últimas Actualizaciones de Arquitectura (Integradas)
+*   **Módulo Asistente de Correos**: Desarrollado `asistente_correos.py` con integración IMAP y procesamiento de IA (Gemini Flash) para leer, resumir y almacenar correos informativos en `supervisor_local.db` y Google Drive. Se sumaron las capacidades `tool_consultar_correos` y `tool_redactar_correo_borrador` a Hermes.
+*   **Enrutamiento Inteligente en Telegram**: Se modificó la infraestructura de notificaciones y el userbot para rutear alertas directamente al chat privado del supervisor (evitando fugas de privacidad en el grupo general).
+*   **Motor de Extracción (Self-Healing)**: El `motor_extraccion_errores.py` se actualizó para utilizar el agente local Qwen 2.5 (0.5b), reduciendo drásticamente el consumo de recursos de Ubuntu. Se agregó lógica de recuperación automática (auto-reinicio de Ollama si crashea) y control de estado para evitar reprocesar manuales.
+*   **Estabilización del Cerebro Agentic Loop**: Se implementó un "limitador de contexto" en `agentic_loop.py` para prevenir excesos de cuota en Groq (Error 413 por historiales inmensos). Además, se programó un recuperador de alucinaciones (Error 400) que intercepta errores de sintaxis XML al buscar locales y fuerza la ejecución de las herramientas.
+*   **Unificación de Base de Datos Maestro (Julio 2026)**: Unificadas de forma absoluta todas las conexiones de base de datos relacional de la aplicación hacia el archivo maestro consolidado en `/home/cristian/Documentos/Supervisor/supervisor_local.db`. Se fusionaron las tablas del repositorio de desarrollo y producción y se migraron con éxito los datos de memoria, correos e historial de soluciones.
+*   **Silenciador Anti-Spam y Control de Colisiones (WhatsApp)**: 
+    - Implementamos una lógica de archivo lock (`/tmp/whatsapp_alert.lock`) en `motor_whatsapp_web.py` que silencia alertas repetitivas de conexión por 4 horas tras enviar el primer aviso.
+    - Se resolvió un conflicto de colisión de puertos (`9222` de Chrome) desactivando la ejecución del motor de WhatsApp de la tarea periódica (cron) de `ingestor_automatico.py` y delegando esta responsabilidad exclusivamente al daemon continuo de sistema `whatsapp-bridge.service`.
+    - Ajustamos la frecuencia de revisión del servicio a un periodo más relajado de 2 minutos (`RestartSec=120`) para reducir la carga de CPU en el servidor de producción.
+*   **Estabilización del Levantamiento de Chrome (Wayland/setsid)**: Rediseñamos `reiniciar_chrome.sh` para cerrar de forma agresiva instancias antiguas (`killall -9 chrome`), eliminar bloqueos huérfanos (`SingletonLock`), exportar variables de pantalla (`WAYLAND_DISPLAY`, `XDG_RUNTIME_DIR`) compatibles con cron y usar `setsid` con redirección de entrada `< /dev/null` para evitar cierres prematuros del navegador.
+*   **Procesamiento Silencioso de Videos en Grupos**: Modificamos el manejador de video en `userbot_supervisor.py` para anular las respuestas e interactividad públicas de descarga y diagnóstico dentro del grupo de mantenimiento técnico. Los análisis se realizan de forma invisible y sus reportes/errores técnicos se enrutan de manera estrictamente privada al chat de Cristian para su aprobación.
+*   **Búsqueda Inteligente de Locales y Sugerencias (Criterio Amplio)**: 
+    - Desarrollamos un cargador del archivo de sucursales `/home/cristian/Documentos/Supervisor/locales.csv` que mapea de forma dual la **Sigla Sistema (ej: `FSJU`)** y la **Sigla Tickets (ej: `FCSJ3`)** hacia el local oficial.
+    - Corregimos un error estructural en la detección de palabras clave en el userbot (`any(p in locales_conocidos)`) para permitir el matching correcto de siglas en el chat.
+    - Agregamos un motor de tolerancia a errores tipográficos que sugiere nombres e interactúa con el técnico en caso de que escriba un nombre de local similar o incompleto.
+*   **Watchdog de Inactividad en Flujos Interactivos**: Implementamos un supervisor de estados temporales (`esperar_respuesta_timeout`) que vigila los flujos de confirmación de local en Telegram. Si un técnico sube un archivo y no responde a la pregunta de confirmación en 10 minutos, se cancela la sesión interactiva y se notifica de forma privada a Cristian con los metadatos recopilados para su posterior revisión.
+*   **Fase 3 de Mejora Cognitiva (Completada - Julio 2026)**:
+    - **RAG Semántico Vectorial local (SQLite + Gemini Embeddings)**: Desarrollamos `indexar_manuales_vectorial.py` para vectorizar los manuales de servicio en una base de datos local SQLite (`manuales_vectores.db`), implementando control de cuotas y búsquedas por similitud coseno en el Agentic Loop.
+    - **Sincronización Automática con NotebookLM**: Integramos subidas y actualizaciones asíncronas de locales con NotebookLM en segundo plano tras modificaciones de fichas locales.
+    - **Historial de Decisiones (Few-Shot Dinámico)**: Diseñamos un gestor SQLite (`correcciones.db`) para guardar correcciones de Cristian e inyectarlas dinámicamente en el prompt de Hermes.
+    - **Razonamiento Chain of Thought (CoT)**: Obligamos a Hermes a razonar en voz alta mediante bloques `<razonamiento>` (los cuales se extraen y registran en `razonamientos.log` y son eliminados de la respuesta final del chat de Telegram).
+    - **Clasificador Dual de Intenciones (Filtro Spam)**: Integramos clasificación Gemini 2.5 Flash en grupos para diferenciar consultas técnicas reales (`SOPORTE`) de charlas cotidianas (`CASUAL`), silenciando por completo las respuestas spam en grupos de técnicos.
+    - **Diagnóstico Multimodal Integrado (Audio + Video/Foto)**: Implementamos un vinculador temporal en el userbot que asocia fotos/videos y notas de voz de un mismo usuario enviadas con hasta 60 segundos de diferencia, transcribiendo los audios con Whisper e inyectándolos en la consulta visual y RAG.
+    - **Pipeline de Evaluación de Calidad (LLM-as-a-Judge)**: Desarrollamos `evaluar_supervisor.py` para correr suites de pruebas automáticas autoevaluando el comportamiento de Hermes ante un set de preguntas patrón.
+    - **Mapeo de Locales Completo en Alertas**: Modificamos el motor de tickets para que al alertar un ticket resuelva la sigla y muestre el nombre completo del local (ej: `FMSVP - SAN MARTIN PEATONAL`).

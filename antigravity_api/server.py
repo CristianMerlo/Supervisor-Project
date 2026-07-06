@@ -1,7 +1,7 @@
 import os
 import uvicorn
 import google.generativeai as genai
-from fastapi import FastAPI, HTTPException, Request, UploadFile, File
+from fastapi import FastAPI, HTTPException, Request, UploadFile, File, Form
 from pydantic import BaseModel
 import base64
 from typing import List, Optional, Union, Dict, Any
@@ -419,7 +419,7 @@ def generar_diagnostico_groq(prompt_final):
 
 
 @app.post("/v1/analyze_video")
-async def analyze_video(file: UploadFile = File(...)):
+async def analyze_video(file: UploadFile = File(...), descripcion_audio: Optional[str] = Form(None)):
     global use_backup_until
     
     import tempfile
@@ -533,18 +533,22 @@ async def analyze_video(file: UploadFile = File(...)):
             
         # 6. Consultar base de conocimiento (RAG)
         query_parts = [data.get("marca"), data.get("modelo"), data.get("error_detectado")]
+        if descripcion_audio:
+            query_parts.append(descripcion_audio)
         query_str = " ".join([p for p in query_parts if p])
         print(f"🔍 Buscando manuales para: '{query_str}'...")
         rag_response = consultar_brain_hermes(query=query_str.strip())
         
         # 7. Generar diagnóstico integrado
+        desc_audio_str = f"- Descripción por voz del técnico: {descripcion_audio}\n" if descripcion_audio else ""
         prompt_final = (
             f"Como el Agente Supervisor (con la identidad de 🧠 [Hermes]), responde de manera profesional y resolutiva al técnico. "
             f"Combina el siguiente análisis visual del video:\n"
             f"- Tipo de equipo: {data.get('tipo_equipo')}\n"
             f"- Marca y modelo: {data.get('marca')} {data.get('modelo')}\n"
             f"- Error/Síntoma detectado: {data.get('error_detectado')}\n"
-            f"- Descripción visual de la falla: {data.get('descripcion_falla')}\n\n"
+            f"- Descripción visual de la falla: {data.get('descripcion_falla')}\n"
+            f"{desc_audio_str}\n"
             f"Con la información técnica extraída de nuestra base de conocimiento:\n"
             f"{rag_response}\n\n"
             f"Por favor, genera un diagnóstico integrado en español redactado en un tono técnico, estructurado en Markdown, "

@@ -1,0 +1,91 @@
+{
+  "Francisco Rametta": {
+    "lunes": [
+      "OFF"
+    ],
+    "martes": [
+      "Alto Rosario",
+      "City Center"
+    ],
+    "miercoles": [
+      "Alto Rosario",
+      "City Center"
+    ],
+    "jueves": [
+      "Alto Rosario",
+      "City Center",
+      "Tickets Franquicias"
+    ],
+    "viernes": [
+      "Alto Rosario",
+      "City Center",
+      "Tickets Franquicias"
+    ],
+    "sabado": [
+      "Alto Rosario",
+      "City Center",
+      "Tickets Franquicias"
+    ],
+    "domingo": [
+      "OFF"
+    ]
+  },
+  "Anabella Guerrero": {
+    "lunes": [
+      "Temas en La Plata",
+      "cierre de locales PPM",
+      "Guardia"
+    ],
+    "martes": [],
+    "miercoles": [
+      "OFF"
+    ],
+    "jueves": [],
+    "viernes": [],
+    "sabado": [
+      "FSM2",
+      "Merlo - Cabildo",
+      "FLP2"
+    ],
+    "domingo": []
+  },
+  "Tomas Vera": {
+    "lunes": [
+      "FVDP",
+      "FLUJ"
+    ],
+    "martes": [],
+    "miercoles": [],
+    "jueves": [
+      "OFF"
+    ],
+    "viernes": [
+      "OFF"
+    ],
+    "sabado": [],
+    "domingo": []
+  },
+  "Fernando Soria": {
+    "lunes": [
+      "VACACIONES"
+    ],
+    "martes": [
+      "VACACIONES"
+    ],
+    "miercoles": [
+      "VACACIONES"
+    ],
+    "jueves": [
+      "VACACIONES"
+    ],
+    "viernes": [
+      "VACACIONES"
+    ],
+    "sabado": [
+      "OFF"
+    ],
+    "domingo": [
+      "OFF"
+    ]
+  }
+}

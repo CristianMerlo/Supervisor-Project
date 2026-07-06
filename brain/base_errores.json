@@ -123,6 +123,306 @@
             "codigo": "052",
             "falla": "Pausa calentamiento caldera",
             "solucion": "Reactivar el termostato de seguridad y verificar las conexiones eléctricas"
+        },
+        {
+            "codigo": "415",
+            "falla": "V3N 50Hz    380V3N 60Hz           min. 5x1,5 mm²        220-240V 50Hz       220V 60Hz         min. 3x4mm²     Kg pounds    79 174.2PESO      42 (1.6) ø120(4.7)   120 (4.72)   185 (7.28)    110 (4.33) 4,8-5,7 kW 24A 4,8-5,7 kW 12Aø120 (4.7)",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "240",
+            "falla": "V3 50Hz    220V3 60Hz           min. 4x2,5 mm²  4,8-5,7 kW 19A 4,8 kW ALIMENTAZIONE ELETTRICA POWER SUPPLYPOTENZA INSTALLATAINSTALLED POWERCORRENTE DI LINEALINE POWERSEZIONE CAVO ALIMENTAZIONE SUPPLY CABLE SECTION MACCHINA MACHINE        IIIWarning!  Substances containing aromatic hydrocarbons,  oxidising acids, acetone, hydrofluorocarbons, ether or  ketones must not be used in the machine!  Also prohibited from use are anaerobic adhesives (Loctite",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "3",
+            "falla": "Cámara fuera de posición   Durante la fase de  erogación se ha obscurecidola fotocélula FC2. En presencia de este error el ciclo de la máquina se bloquea y la máquina expulsa la pastilla de café.",
+            "solucion": "• Motor averiado. En suministro: repliegue cámara en fase de suministro hasta el oscurecimiento de FC2  • Residuos de polvo de café sobre las fotocélulas.  -Sustituir el motorreductor grupo café   - Sustituir la tarjeta - comprobar el correcto funcionamiento del sensor FC2."
+        },
+        {
+            "codigo": "8",
+            "falla": "Timeout manipulación grupo.",
+            "solucion": "• Motor averiado  • Final de carrera defectuoso/ oscurecido  • Bloqueo mecánico.1 Abrir la máquina   2 Activar el cuadro manual   3 Accionar el motor grupo   -el motor arranca   -verificar el correcto funcionamiento de los fines de carrera FC1, FC2, FC3 y FC4 con ayuda del cuadro manual   -el motor no arranca   -verificar la presencia de tensión de alimentación en el motor accionando el mando manual   -si hay tensión:   verificar un posible bloqueo mecánico   -no hay tensión:   -verificar la tensión en salida de la tarjeta a los contactos: en la tarjeta CPU slave el J12, pin 1 y 5.   -si no hay tensión en salida de la tarjeta, sustituir la tarjeta."
+        },
+        {
+            "codigo": "9",
+            "falla": "Fotocélulas de los sensores obscurecidas   Cuando 2 FC de 3 están obscurecidas, la máquina realiza un ciclo de manipulación (o de reset) en toda la carrera, para intentar restablecer la normal situación de trabajo. Si al final de dicho ciclo la situación sigue inalterada, se visualiza el código averiado.",
+            "solucion": "• Polvo de café en la proximidad de los finales de carrera• Finales de carrera defectuosos. 1 Limpiar los finales de carrera  2 Verificar el correcto funcionamiento de los fines de carrera FC1, FC2, FC3, FC4 con ayuda del cuadro manual   3 Sustituir los finales de carrera defectuosos.114 ES Español9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
+        },
+        {
+            "codigo": "18",
+            "falla": "Timeout movimiento  boquilla.Finales de carrera no funcionan.   Codificador averiado.   Motor averiado.  Bloqueo mecánico. -Verificar cableados y conjunto mecánico.   Controlar posibles interferencias mecánicas con el movimiento.   Sustituir el conjunto.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "20",
+            "falla": "Avería alimentación USB.Excesivo consumo de corriente de puerto USB.Controlar el estado del puerto USB y sus conexiones para identificar las posibles causas del exceso de consumo (p. ej. cortocircuitos).   Una vez eliminada la causa de la avería el sistema se restablece automáticamente, por lo que el puerto USB debe regresar a la condición de funcionamiento normal. Si la anomalía persiste, cambiar la tarjeta CPU Master .",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "22",
+            "falla": "Anomalía de movimiento  regulación muelas MM1. Anomalía de movimiento regulación muelas MM2.",
+            "solucion": "• Motorreductor bloqueado   • Motorreductor averiado  • Codificador averiado. 1) Abrir la máquina.   2) Activar los motores del regulador de muelas en el cuadro de mandos manuales   3) Si el motorreductor no funciona, verificar la tensión al motor.   4) Si hay tensión verificar posibles bloqueos mecánicos.   5) Si el motorreductor funciona (codificador que no cuenta) verificar los cableados.   6) Sustituir el motorreductor.   7) Verificar o sustituir la tarjeta CPU Slave."
+        },
+        {
+            "codigo": "24",
+            "falla": "Mal funcionamiento del reloj. Información incoherente sobre la fecha y hora. Reconfigurar fecha y hora. Si la anomalía continúa, sustituir el panel maestro.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "25",
+            "falla": "Avería driver motor grupo café.Cortocircuito en el cableado o en el motor.Verificare el cableado, verificar/sustituir el motor, verificar/sustituir la CPU slave.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "26",
+            "falla": "Avería driver motor bomba leche.Cortocircuito en el cableado o en el motor.Verificare el cableado, verificar/sustituir el motor, verificar/sustituir la CPU slave.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "27",
+            "falla": "Avería driver motor regulador muelas.Cortocircuito en el cableado o en el motor.Verificare el cableado, verificar/sustituir el motor, verificar/sustituir la CPU slave.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "32",
+            "falla": "Avería válvula  proporcional de aire.",
+            "solucion": "• Cableado defectuoso/interrumpido.   • Tarjeta válvula proporcional averiada (TVP). • Avería de la válvula proporcional de aire (VPA). • Tarjeta CPU Slave averiada.- Controlar el cableado entre la tarjeta CPU Slave y la tarjeta válvula proporcional (SVP) y la válvula proporcional de aire (VPA). - Sustituir la tarjeta válvula proporcional (SVP).   - Sustituir la válvula proporcional de aire (VPA). - Sustituir la tarjeta CPU Slave."
+        },
+        {
+            "codigo": "33",
+            "falla": "Avería válvula proporcional de vapor.Avería válvula proporcional de vapor.- Cableado defectuoso/interrumpido.   - Tarjeta válvula proporcional averiada (SVP). - Tarjeta CPU Slave averiada.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "34",
+            "falla": "Avería accionamiento válvula proporcional de aire.",
+            "solucion": "• Avería interna en la válvula proporcional de aire (VPA).  -Si la anomalía persiste, sustituir la válvula."
+        },
+        {
+            "codigo": "37",
+            "falla": "Avería sensor conductibilidad leche.",
+            "solucion": "• Sensor desconectado eléctricamente.   •  Sensor averiado. •  Tarjeta CPU Slave averiada.  -Verificar el cableado.  -Sustituir el sensor  -Sustituir la tarjeta.G6."
+        },
+        {
+            "codigo": "38",
+            "falla": "Avería sensor temperatura leche.",
+            "solucion": "• Sensor desconectado eléctricamente.   • Sensor averiado. • Tarjeta CPU Slave averiada.- Verificar el cableado. - Sustituir el sensor. - Sustituir la tarjeta.C7."
+        },
+        {
+            "codigo": "39",
+            "falla": "Ausencia detergente durante lavado leche.",
+            "solucion": "• Lavado leche efectuado sin utilizar el detergente correspondiente. • Líquido detergente no adecuado.   • Sensor conductibilidad leche averiado. • Tarjeta CPU Slave averiada.- Efectuar el lavado con el líquido detergente, siguiendo las indicaciones previstas en el procedimiento que se describe en los manuales de uso.   - Utilizar el líquido detergente aconsejado en los manuales de uso.   - Sustituir el sensor.D8 - Sustituir la tarjeta.D8."
+        },
+        {
+            "codigo": "41",
+            "falla": "Alarma por sobrecorriente durante la activación del motor bomba leche.",
+            "solucion": "• Sobreesfuerzo durante el funcionamiento   • Rotor bloqueado   • Motor bomba averiado. Si el error es esporádico, verificar la limpieza del circuito hidráulico; si el error es más frecuente, sustituir el motor de la bomba de leche.116 ES Español9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
+        },
+        {
+            "codigo": "49",
+            "falla": "Stop suministro por falta  de leche.",
+            "solucion": "• Ausencia de leche en el recipiente.   • Extracción de leche no efectuada.   • Sensor conductibilidad leche averiado.   • Tarjeta CPU Slave averiada.- Llenar el recipiente de leche.   - Comprobar el correcto funcionamiento de la parte de circuito de aspiración de leche.   - Sustituir el sensor. - Sustituir la tarjeta."
+        },
+        {
+            "codigo": "50",
+            "falla": "Suministro a base de leche interrumpido por baja presión.",
+            "solucion": "• Uso simultáneo de servicios vapor/agua junto a calentamiento leche, especialmente con presiones de trabajo bajas o potencia reducida.   • Agua de red en entrada particularmente fría. • Presencia de gases disueltos en el agua que se liberan en la caldera. - Controlar la dureza y el PH del agua de entrada en la máquina y en el sistema de tratamiento del agua.   - Habilitar el ciclo de restablecimiento de la presión en la caldera."
+        },
+        {
+            "codigo": "51",
+            "falla": "Avería sensor de presión caldera de servicios.",
+            "solucion": "• sensor desconectado eléctricamente   • sensor averiado • tarjeta CPU averiada.Abrir la máquina -  comprobar el cableado   -  sustituir el sensor   -  sustituir la tarjeta."
+        },
+        {
+            "codigo": "52",
+            "falla": "Pausa calentamiento caldera.",
+            "solucion": "• intervención  termostato de seguridad rearmable • cableado elementos calentadores y/o mando triac interrumpido   • elemento caldera interrumpido • Tarjeta triac o CPU slave averiada.Abrir la máquina -  comprobar si se ha activado el termostato de seguridad y si fuese así rearmarlo   -  controlar si en el cableado hay una interrupción o cables desconectados -  controlar que la resistencia de la caldera no esté interrumpida y si fuese así sustituirla   -  sustituir la tarjeta triac."
+        },
+        {
+            "codigo": "53",
+            "falla": "Avería en el sensor de temperatura de vapor.",
+            "solucion": "• Termopar desconectado/ interrumpido   • Tarjeta averiada.   -Abrir la máquina   -verificar el cableado  -sustituir el termopar  -sustituir la tarjeta."
+        },
+        {
+            "codigo": "54",
+            "falla": "Anomalía en el sensor de temperatura de grupo café.",
+            "solucion": "• KTY desconectado o averiado   • Tarjeta averiada. Abrir la máquina   -  comprobar el cableado   -  sustituir el KTY   -  sustituir la tarjeta.Español117 ES9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
+        },
+        {
+            "codigo": "55",
+            "falla": "Timeout calentamiento  grupo café.",
+            "solucion": "• Elemento calentador desconectado o averiado  • KTY averiado • Tarjeta averiada.Abrir la máquina   -  comprobar el cableado   -  comprobar elemento calentador   -  sustituir el KTY   -  sustituir la tarjeta CPU slave."
+        },
+        {
+            "codigo": "56",
+            "falla": "Anomalía en el sensor de temperatura de calentador café.",
+            "solucion": "• sensor temperatura desconectado o averiado • cableado del sensor de temperatura interrumpido • tarjeta CPU averiada.• Comprobar/sustituir el sensor • Comprobar el cableado • Sustituir la tarjeta CPU."
+        },
+        {
+            "codigo": "57",
+            "falla": "Timeout calentamiento calentador café.",
+            "solucion": "• intervención del termostato de seguridad rearmable • elemento caldera interrumpido • tarjeta triac averiada   • cableado de element os calentadores y/o mando triac interrumpido- Dejar enfriar la máquina y luego volver a reactivar el termostato de seguridad. - Controlar que la resistencia esté correctamente alimentada. - Controlar  las  conexiones  eléctricas de los TRIAC y que éstos funcionen correctamente. - Sustituir el TRIAC / tarjeta CPU si está averiado."
+        },
+        {
+            "codigo": "58",
+            "falla": "Anomalía sobrepresión en caldera de servicios.",
+            "solucion": "• Sonda del nivel averiada; caldera demasiado llena.  • Resistencia continuamente alimentada.  • tarjeta triac averiada   • Sensor de presión averiado • Verificar la sonda del nivel   • Verificar el cableado  • Sustituir la tarjeta triac  • Sustituir sensor de presión."
+        },
+        {
+            "codigo": "59",
+            "falla": "Timeout de carga de la caldera de servicios.",
+            "solucion": "• Alimentación red hídrica interrumpida   • EV de carga averiada.   • Cableado interrumpido   • Tarjeta averiada.   • Sonda de nivel sucia o averiada. • Controlar la conexión a la red hídrica.   • Controlar/sustituir la electroválvula Evc. • Comprobar el cableado • Controlar/sustituir la sonda de nivel • Cambiar la tarjeta CPU."
+        },
+        {
+            "codigo": "60",
+            "falla": "Anomalía señal de nivel caldera de servicios.",
+            "solucion": "• Perturbación eléctrica en referencia de tierra.  -Controlar la puesta a tierra y los aislamientos de la máquina."
+        },
+        {
+            "codigo": "61",
+            "falla": "Anomalía durante el control del correcto llenado del calentador.",
+            "solucion": "• Falta agua. • Contador volumétrico averiado • Bomba averiada.• Comprobar si hay agua y si la bomba funciona.   • Revise las obras del contador volumétrico.   • Comprobar si hay obstrucciones en el circuito de entrada boiler de café.118 ES Español9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
+        },
+        {
+            "codigo": "62",
+            "falla": "Suministros de café  referidos a MM1 con caudal por debajo del límite (3 suministros consecutivos).",
+            "solucion": "• Filtro de café obstruido   • conducto de café obstruido   • tipo de café cambiado   • calibración cref errónea  • moledura demasiado fina, dosis para moler excesiva.- realizar lavado grupo   -  limpiar/sustituir el filtro de café   - moler el café más grueso  - calibrar correctamente la máquina según el café/receta."
+        },
+        {
+            "codigo": "63",
+            "falla": "Suministros de café referidos a MM1 con caudal por encima del límite (3 suministros consecutivos).",
+            "solucion": "• café terminado (y sensor de café averiado, si está presente)  • puente en el café en tolva   • tipo de café cambiado   • calibración cref errónea  • moledura demasiado gruesa  • moledor-dosificador bloqueado, dosis para moler escasa.- quitar el puente en tolva   - comprobar el funcionamiento del sensor de presencia de café - comprobar la ausencia de elementos externos dentro de las muelas - comprobar el funcionamiento del moledor-dosificador (arranque y fusibles) - moler el café más fino - calibrar correctamente la máquina según el café/receta."
+        },
+        {
+            "codigo": "64",
+            "falla": "Suministros de café referidos a MM2 con caudal por debajo del límite (3 suministros consecutivos).",
+            "solucion": "• Filtro de café obstruido   • conducto de café obstruido   • tipo de café cambiado   • calibración cref errónea  • moledura demasiado fina, dosis para moler excesiva.-realizar lavado grupo   -limpiar/sustituir el filtro de café   -moler el café más grueso  -calibrar correctamente la máquina según el café/receta."
+        },
+        {
+            "codigo": "65",
+            "falla": "Suministros de café referidos a MM2 con caudal por encima del límite (3 suministros consecutivos).",
+            "solucion": "• café terminado (y sensor de café averiado, si está presente) • puente en el café en tolva   • tipo de café cambiado   • calibración cref errónea • moledura demasiado gruesa • moledor-dosificador bloqueado, dosis para moler escasa.- quitar el puente en tolva   - comprobar el funcionamiento del sensor de presencia de café - comprobar la ausencia de elementos externos dentro de las muelas - comprobar el funcionamiento del moledor-dosificador (arranque y fusibles) - moler el café más fino - calibrar correctamente la máquina según el café/receta.Español119 ES9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
+        },
+        {
+            "codigo": "66",
+            "falla": "Dosis irregular durante  el suministro de café.",
+            "solucion": "• Falta agua.   • Bomba rota  • Demasiado café  • Café molido demasiado fino   • Filtros obturados   • Ev de café obturada o defectuosa   • Medidor de caudal roto.  -1 Abrir la máquina   2 Verificar el funcionamiento del contador con el cuadro de test durante el suministro de un café   3 si el contador funciona con solo pocos impulsos:   - verificar la granulometría y la calidad del café molido   - limpiar los filtros   - verificar la obstrucción de la electroválvula de café y del circuito hidráulico de café   4 si el contador NO funciona:   - verificar si falta agua y si funciona la bomba   - sustituir el medidor de caudal   - verificar el cableado."
+        },
+        {
+            "codigo": "67",
+            "falla": "Dosis irregular durante el lavado del grupo café.",
+            "solucion": "• Falta agua.   •  Bomba rota  •  Filtros obturados   • Ev de café obturada o defectuosa   • Medidor de caudal roto. 1 Abrir la máquina   2 Comprobar el funcionamiento del contador con el cuadro de test durante el ciclo de lavado   3 si el contador funciona con solo pocos impulsos:   -limpiar los filtros   -verificar la obstrucción de la electroválvula de café y del circuito hidráulico de café   4 si el contador NO funciona:   -verificar si falta agua y si funciona la bomba   -sustituir el medidor de caudal   -verificar el cableado."
+        },
+        {
+            "codigo": "88",
+            "falla": "Error en la integridad de datos NVM EEPROM.",
+            "solucion": "• Error la integridad de datos contenidos en la memoria permanente de la CPU slave.  -Apagar y volver a encender la máquina. Si la anomalía persiste, sustituir la tarjeta CPU slave."
+        },
+        {
+            "codigo": "89",
+            "falla": "Error en la integridad de datos NVM RAM.",
+            "solucion": "• Error la integridad de datos contenidos en la memoria permanente RAM de la CPU master.  -Apagar y volver a encender la máquina. Si la anomalía continúa, sustituir el panel maestro."
+        },
+        {
+            "codigo": "91",
+            "falla": "Ausencia de cubeta durante ciclo lavados leche.",
+            "solucion": "• Retirada de cubeta durante el lavado. • Sensor presencia cubeta defectuoso.  - Colocar correctamente la cubeta de lavado. - Asegurarse de que funcione correctamente el sensor de presencia de la cubeta en el cuadro de prueba.120 ES Español9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
+        },
+        {
+            "codigo": "92",
+            "falla": "Solicitud regeneración  de resinas ablandador de agua.  -Mantenimiento ablandador.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "93",
+            "falla": "Necesidad de cambiar filtro de agua. -Sustituir filtro agua ablandador.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "94",
+            "falla": "Habilitación test válvula de seguridad de la caldera. Se ha efectuado un acceso con la llave USB específica para habilitar la función del test de la válvula de seguridad de la caldera. Acción deseada por el usuariointroduciendo el códigocorrespondiente.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "95",
+            "falla": "Evento registrado cada vez que se efectúa una autenticación con las credenciales Master.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "96",
+            "falla": "Necesidad de realizar mantenimiento.- Realizar mantenimiento ordinario.",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "98",
+            "falla": "Reset informe histórico averías.",
+            "solucion": "• Proceso de inicio de la estructura del informe histórico de averías."
+        },
+        {
+            "codigo": "100",
+            "falla": "Error de integridad de  la base de datos.",
+            "solucion": "• Error de integridad de los datos contenidos en la base de datos de la CPU master.  -Si la anomalía continúa, sustituir el panel maestro."
+        },
+        {
+            "codigo": "101",
+            "falla": "Avería en el puerto serie en dirección a la CPU Slave.",
+            "solucion": "• Avería de funcionamiento del puerto serie de comunicación con la CPU slave.  -Apagar y volver a encender la máquina. Controlar el cableado de interconexión entre las tarjetas de la CPU. Si la anomalía continúa, sustituir el panel maestro."
+        },
+        {
+            "codigo": "102",
+            "falla": "Avería pantalla táctil, la pantalla no responde a las presiones.",
+            "solucion": "• Perturbaciones eléctricas.Al verificarse el problema la máquina ejecuta un procedimiento de restablecimiento inmediato para regresar a la funcionalidad normal. Controlar la conexión a tierra y los aislamientos de la máquina."
+        },
+        {
+            "codigo": "103",
+            "falla": "Restablecimiento parámetros NVM CPU master.",
+            "solucion": "• Anomalías de alimentación.   • Perturbaciones eléctricas.\"Al verificarse el problema la máquina ejecuta un procedimiento de restablecimiento inmediato para regresar a la funcionalidad normal.   Controlar la conexión a tierra y los aislamientos de la máquina."
+        },
+        {
+            "codigo": "158",
+            "falla": "Anomalía sobretemperatura calentador.",
+            "solucion": "• Nivel de agua bajo o calentador  vacío.   • Resistencia continuamente alimentada.     • Tarjeta cpu/triac averiada.  • Controlar nivel • Controlar el cableado• Sustituir tarjetas."
+        },
+        {
+            "codigo": "106",
+            "falla": "Evento registrado cada vez que se desactiva el control de mantenimiento.122 ES EspañolDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES La máquina no suministra las bebidas        solicitadasa)\t no\tse\talcanza\tla\ttemperatura \tdel\tcalentador \tprogramada \t(1°\tcalentamiento) b)\t temperatura \tmínima\tde\tcalentamiento \tde\tla\tcámara\tgrupo\tcafé\t70\t°C\t(TGR)\tno\talcanzada \t (1.er calentamiento) c) falta café d)\t cajón \tde\tposos\tagotados \tcafé\tlleno\t e) compuertas tolvas de café abiertas f) grupo café averiado  g)\t filtro\tcafé\tbloqueado h)\t orificios \tde\tboquilla\tde\tsuministro \tbloqueados i) bomba volumétrica averiada o desconectada  j)\t falta\talimentación \tde\tla\tred\thídrica k) granulometría incorrecta l) conducto FEP en salida del grupo de suministro bloqueado m) by pass de bomba volumétrica no regulado correctamente n) EvG averiada o desconectada Dificultad de montaje de la cubierta supe - riora) presencia de granos de café en el interior del conducto de alimentación de la cámara de  moledura b) cables eléctricos aplastados entre la cubierta y la carcasa de la máquina Dificultad para posicionar correctamente la tolva en la máquina c)\t verificar \tque\tla\tcompuerta \testé\tabierta d)\t verificar \tla\tpolarización \tde\tla\ttolva El grupo de suministro no se mueve o no se mueve correctamente a) motorreductor averiado b)\t tarjeta \tCPU\tslave\taveriada c) roscas y tuerca no debidamente acopladas d) sensores ópticos averiados/desconectados o oscurecidos por depósito de café  e)\t cajón \tde\tposos\textraído f)\t ausencia \tde\tlubricante \ten\tlos\tejes\tde\tdeslizamiento El motor moledor no arranca a) compuerta de tolva abierta b) conector de alimentación no conectado  c) rotor mecánicamente bloqueado d) microinterruptor de seguridad abierto (válido sólo con la cubierta superior quitada) El grupo de suministro genera ruidos du - rante el movimientoa)\t juegos \ten\tel\tacoplamiento \tde\tlas\troscas\ty\tlas\ttuercas b)\t ausencia \tde\tlubricante \ten\tejes\tde\tdeslizamiento La temperatura final de la bebida no es correcta a) la temperatura programada en el calentador no es correcta b) la temperatura programada en la cámara del grupo café (TGR) no es correcta c) intervención termostatos de seguridad rearmables  d) cantidad de bebida no adecuada10.  Anomalías circuito caféEspañol123 ESDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES El tiempo de suministro de la bebida no es  correctoa) la dosis de café molido no es correcta b) la granulometría de café molido no es correcta c)\t las\tconfiguraciones \tCref.\talgoritmo \tPGS\tno\tson\tcorrectas d) caudal más allá de lo aceptable ± 50 % (PGS no activo) e)\t filtro\tcafé\tbloqueado f)\t guarnición \tOR\tpistón\tinferior\tfuera\tdel\talojamiento \t g) los granos de café forman una obstrucción accidental en la tolva h) portamuelas giratorio bloqueado por un cuerpo extraño Descarte dosis división bebidas >10 % e)\t agujeros \ten\ttapa\tde\tboquilla\tde\tsuministro \ttapados\tpor\tcafé\tseco f)\t agujeros \tØ\t2\tpor\tdivisión\ten\tpresión\ttapados\tpor\tcafé\tseco g)\t agujeros \tØ\t2\tpor\tdivisión\ten\tpresión\tcon\tpresencia \tde\trebaba\tde\telaboración Residuos de café molido seco sobre grupo y/o sobre base de la máquina a) colector de café molido colocado incorrectamente b) dosis de café incorrecta c) resorte batiente de grupo café roto Formación de burbujas y/o bebida de mala calidad a) granulometría incorrecta b) la dosis de café molido no es correcta c) la temperatura programada en la cámara del grupo café (TGR) no es correcta d) fuga de aire en la guarnición de tapa boquilla de suministro  e)\t temperatura \tcalentador \tinsuficiente, \tqueda\tpolvo\tde\tcafé\tsin\tutilizar f) cantidad de bebida no adecuada  g)\t café\ten\tgrano\tviejo Coloración de la bebida no uniforme a)\t residuos \tde\tcafé\ten\tlos\tconductos \tal\tfinal\tdel\tsuministro. \tRealizar\tel\tlavado\tdel\tcircuito\tcafé b) la temperatura programada en la cámara del grupo café (TGR) no es correcta  c) granulometría incorrecta d) dosis de café incorrecta Salida solo de agua de la boquillade suministro (a excepción de en el ciclo de lavado) a) portamuelas giratorio bloqueado mecánicamente  b) motor\tmoledor-dosificador \tno\tfunciona c) los granos de café forman una obstrucción accidental en la tolva  d) programación de las dosis de café incorrecta según receta Dosis café en taza inconstante a) válvula de expansión calentador no regulada correctamente b) Contador volumétrico averiado. c) corriente \tde\tcompensación \tdel\tgrupo\tinsuficiente10.  Anomalías circuito café124 ES EspañolDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES La máquina no suministra las bebidas  solicitadasa)\t no\tse\talcanza\tla\ttemperatura \tprogramada \tde\tla\tcaldera\t(1°\tcalentamiento) b) falta leche c) tubo de aspiración de leche no está inmerso o está pinchado  d) tubo de aspiración de leche obstruido e)\t configuración \tequivocada \tdel\tparámetro \t\"activación\" f)\t bomba \tde\tengranajes \taveriada \to\tdesconectada \t g) electroválvula Ed averiada o desconectada h) apertura excesiva de los reguladores de aire i) fuga de aire accidental de los conductos arriba de la bomba de leche La bomba de engranajes no activa la corri - ente de fluidoa) apertura excesiva de los reguladores de aire b) electroválvula Elf3 averiada o desconectada  c)\t configuración \tequivocada \tdel\tparámetro \t\"activación\" Baja dosis en taza a) conducto del circuito leche parcialmente bloqueado b)\t configuración \tequivocada \tdel\tparámetro \t\"activación\" Baja temperatura en taza a) aire sobrecalentado en la caldera b)\t configuración \tv\tMpl\tde\tbomba\tde\tengranajes \tincorrecta \t c)\t temperatura \tleche\ten\taspiración \tpróxima\ta\t0\t°C Excesiva temperatura en taza con respecto a la configurada a)\t temperatura \tleche\ten\taspiración \t>\t3-5\t°C b) tubo de aspiración de leche obstruido/bloqueado c) abertura excesiva de los reguladores de aire leche caliente/leche fría  d)\t configuración \tv\tMpl\tde\tbomba\tde\tengranajes \tincorrecta División de la dosis poco equitativa a) residuos de leche seca en el interior de la boquilla de suministro  b) abertura excesiva del regulador de aire Baja calidad en taza c) abertura de los reguladores de aire no adecuada d)\t temperatura \tfinal\t>\t72-75\t°C e)\t configuración \tv\tMpl\tde\tbomba\tde\tengranajes \tincorrecta f)\t configuración \tequivocada \tdel\tparámetro \t\"activación\" g) leche precongelada en fase de almacenamiento Salida de vapor de la boquilla de suminis - tro al inicio de la erogaciónh) tubo de aspiración de leche obstruido/bloqueado i) tubo de aspiración de leche no está sumergido en la leche  j)\t configuración \tequivocada \tdel\tparámetro \t\"activación\" k)\t bomba \tde\tengranajes \taveriada \to\tdesconectada \t l) electroválvula Elf3 averiada o desconectada m) apertura excesiva de los reguladores de aire10.  Anomalías circuito lecheEspañol125 ESDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES Montaje ausente o parcial a) electroválvulas Ear1/Ear2 averiadas o desconectadas eléctricamente b)\t abertura \tinsuficiente \tde\tlos\treguladores \tde\taire c)\t temperatura \tleche\t>\t5\t°C\t(válida\tsólo\tpara\tleche\tfría) d) leche precongelada en fase de almacenamiento e) la electroválvula Elf3 no garantiza el no retorno del líquido de lavado en la dirección del  contenedor de leche El circuito de leche queda lleno de residu - os al finalizar el suministroa) alimentación de la red hídrica interrumpida b) electroválvula Elf1 averiada o desconectada  c) bomba volumétrica averiada o desconectada d)\t configuración \tequivocada \tWM4\ten\tNO La boquilla de suministro está bloqueada con residuos de leche a) alimentación de la red hídrica interrumpida b) electroválvula Elf1 averiada o desconectada  c) bomba volumétrica averiada o desconectada  d)\t configuración \tWM4\ten\tNO e) programación equivocada de lavado breve a frío del último suministro El canal de aspiración de leche queda lleno al finalizar el suministro f)\t no\tes\tsuficiente \tel\ttiempo\tde\tvaciado\tconfigurado g) falta de restablecimiento de la presión ambiental causa sifón en el conducto de descarga h) presencia de un sifón en el conducto de aspiración10.  Anomalías circuito leche126 ES EspañolDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES La máquina no suministra la bebida a)\t no\tse\talcanza\tla\ttemperatura \tdel\tcalentador \tprogramada \t(1°\tcalentamiento) b) motor mixer averiado o desconectado c) mixer bloqueado por polvo soluble (demasiado lleno) d)\t conductos \thacia\tabajo\tdel\tmixer\tbloqueados \tpor\tresiduos \tdel\tproductos \tno\tdisueltos e) bomba volumétrica averiada o desconectada f) electroválvula Eds averiada o desconectada g) suministro efectuado sin la mezcla caliente debido al salpicadero abierto Dosis en taza menor a la nominal a) residuos no disueltos del producto en los conductos b) residuos no disueltos del producto en el mixer Baja temperatura en taza a) temperatura programada del calentador de café correspondiente expresamente al café b) programación equivocada del nivel de temperatura según la receta c)\t ritmo \tde\ttrabajo\tmayor\tal\tritmo\tposible\ttérmicamente \t d) regulación termostato de seguridad del calentador Excesiva temperatura en taza a) temperatura programada del calentador de café correspondiente expresamente al café b) programación equivocada del nivel de temperatura según la receta  c) electroválvula Eaf averiada o desconectada La boquilla de suministro está bloqueada  con residuos de chocolatea) programación equivocada de lavado breve del último suministro b) temperatura de solubilización incorrecta Densidad elevada de chocolate Presencia de agua limpia que sale de laboquilla de suministro a)\t formación \taccidental \tde\tuna\tamasijo\tde\tproducto \tdentro\tde\tla\ttolva\t b)\t motorreductor \tdosificador \taveriado \to\tdesconectado c)\t aporte \tlimitado\tde\tpolvo\tsoluble\tcon\trespecto \ta\tla\tdosis\tde\tagua.\tLa\tdosificación \ta\tpasos\tno\t alcanza a compensar d) electroválvula Eds averiada o desconectada e)\t electroválvula \tEds\tcon\tnúcleo\tpegajoso \tpor\tla\tanterior\tsalida\taccidental \tde\tchocolate \tdel\t mixer f) presencia de sifón en el conducto de descarga La bebida no sale por la boquilla de suministro a) electroválvula Eds averiada o desconectada10.  Anomalías circuito solublesEspañol127 ESDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES El lavado dura más de lo normalposibles\tobstrucciones \tde\tlos\tfiltros\tde\tcafé pastilla\tde\tlavado\tempastada \ten\tel\tfiltro\tde\tcafé DESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES El lavado no arranca alojamiento incorrecto del contenedor de recogida Ejecución incorrecta del lavadoa) alimentación de la red hídrica interrumpida b) bomba volumétrica averiada o desconectada  c) bomba de leche averiada o desconectada El líquido de lavado no vuelve a circular o el  contenedor de recogida no se vacíaa) abertura excesiva de los reguladores de aire leche caliente/leche fría b)\t bomba \tde\tengranajes \taveriada \to\tdesconectada \t c) electroválvula Elf3 averiada o desconectada Residuos de detergente en el contenedor de recogida de lavado con recirculacióna) el canal de aspiración no está correctamente colocado sobre el fondo del contenedor de  recogida b) cantidad de detergente excesiva en el depósito de lavado10. Anomalías de lavado largo en el circuito café 10.  Anomalías lavado con recirculación en el circuito de leche DESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES El lavado no arrancaa) motor mixer averiado o desconectado b) mixer bloqueado por polvo soluble c) conductos después del mixer bloqueados por los polvos solubles  d) bomba volumétrica averiada o desconectada10.  Anomalías lavado circuito solubles128 ES EspañolDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES Humedad en la tolva o en la parte interna  del salpicaderoa) funcionamiento anormal del rotor de aspiración de vapores b) panel posterior o puertas anteriores no cerradas correctamente Portamuelas giratorio bloqueado  mecánicamentea) cuerpo extraño interpuesto entre las muelas b)\t interrupción \tdel\tcondensador \tde\tmarcha\tmotor\tmoledor-dosificador c) fuga guarnición pistón del grupo café en fase de compresión Bomba volumétrica no funcionaa) interrupción del condensador de marcha b) motor averiado o desconectado La bomba volumétrica no permite alcanzar la presión de 9-10bar con la válvula cerrada a) bypass balanceado a regular  b) paletas consumadas La máquina no se enciendea) ausencia de red eléctrica d)\t interruptor \ton/off\tapagado \to\taveriado Calentador o caldera no alcanzan la temperatura programadaa) conector de cuatro polos cableado general desconectado c) intervención termostatos de seguridad  c) triac averiada Pantalla táctil apagadaa)\t tarjeta \tde\tpantalla\taveriada b) alimentador switching averiado  c) cableado de máquina interrumpido Iluminación ausente en el plano de trabajo de la máquina a) led RGB averiados b) cableado interrumpido Intervención en la válvula de seguridada)\t sensor \tde\tpresión\taveriado \t-\ttarjeta\ttriac\taveriada b) electroválvula Evc averiada o desconectada - caldera vaciada/demasiado llena  c) interrupción del circuito de autonivel - caldera demasiado llena Goteo de líquidos sobre el plano de apoyo de la máquina a)\t guarnición \tOR\tconexión \tcon\tbandeja\tde\tdescarga \tdesgastada \t b)\t bandeja \tno\tcolocada \thasta\tel\ttope Señalización continua cajón de posos extraídoa)\t reed\tpresencia \tdel\tcajón\tde\tposos\taveriado b) cableado reed interrumpido c)\t falta\tel\timán\tfijado\tal\tcajón10.  Anomalías componentes de la máquinaFase di salita iniziale Initial ascent phase Phase de montée initiale Anfangsanstiegsphase Fase de subida inicial Fase de subida inicialPosizione standby Standby position Position pause Stand-By-Position Posición standby Posição standbyFase di macinatura Grinding phase Phase de mouture Mahlphase Fase de moledura Fase de moagem Fase di salita intermedia 1 Intermediate ascent phase 1 Phase de montée intermédiaire 1 Zwischenanstiegsphase 1 Fase de subida intermedia 1Fase de subida intermédia 111.   Fasi movimentazione gruppo - Group movement phases - Phases de manutention du groupe -     Bewegungsphasen Gruppe - Fases movimientos del grupo -  Fases de movimentação do grupo V1 2 3 44 4Fase di erogazione Dispensing phase Phase de distribution Abgabephase Fase de suministro Fase da distribuiçãoFase di salita intermedia 2 Intermediate ascent phase 2 Phase de montée intermédiaire 2 Zwischenanstiegsphase 2 Fase de subida intermedia 2 Fase de subida intermédia 2Termine fase di salita End ascent phase  Terme de phase de montée  Final fase de subida Ende Anstiegsphase  Conclusão fase de subida  Fase di termine erogazione - Asciugatura End dispensing phase - Drying Phase de fin de distribution - Séchage Endphase Abgabe - Trocknung Fase de final de suministro - Secado Fase de conclusão da distribuição - Secagem11.   Fasi movimentazione gruppo - Group movement phases - Phases de manutention du groupe -     Bewegungsphasen Gruppe - Fases movimientos del grupo -  Fases de movimentação do grupo VI5 6 7 84 4 41 411.   Fasi movimentazione gruppo - Group movement phases - Phases de manutention du groupe -     Bewegungsphasen Gruppe - Fases movimientos del grupo -  Fases de movimentação do grupo Fase di discesa finale - 1 - Final descent phase - 1- Phase de descente finale - 1 - Endabstiegsphase - 1- Fase de descenso final - 1 - Fase de descida final - 1 -Fase iniziale di discesa Initial descent phase Phase initiale de descente Anfangsabstiegsphase Fase inicial de descenso Fase inicial de descidaFase di discesa intermedia Intermediate descent phase Phase de descente intermédiaire Zwischenabstiegsphase Fase de descenso intermedia Fase de descida intermédia Fase di discesa finale - 2 - Final descent phase - 2- Phase de descente finale - 2 - Endabstiegsphase - 2- Fase de descenso final - 2 - Fase de descida final - 2 - VII9 10 11 1244Ritorno posizione standby Return to standby position Retour position pause Rückkehr in Stand-By-Position Retorno a la posición standby Retorno à posição de standbyEspulsione fondo caffè - 1 - Expulsion of coffee grounds 1- Expulsion du marc de café - 1 - Ausstoß Kaffeesatz - 1- Expulsión posos de café - 1 - Expulsão borra café - 1 -Espulsione fondo caffè - 2 - Expulsion of coffee grounds - 2- Expulsion du marc de café - 2 - Ausstoß Kaffeesatz - 2- Expulsión posos de café - 2 - Expulsão borra café - 2 - Posizione standby Standby position Position pause Stand-By-Position Posición standby Posição standby11.   Fasi movimentazione gruppo - Group movement phases - Phases de manutention du groupe -     Bewegungsphasen Gruppe - Fases movimientos del grupo -  Fases de movimentação do grupo VIII13 14 15 16",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "16",
+            "falla": "A3Title Size D esign File Name Rev Date: Sheet: ofRev. Date D escription FromRev. History Dc + - Tc1 2 FC2 FC3 FC1 Rc WB 1 1 -t °NTCg -t °NTCbDV SL Sml1 2EFC SP+ - -t °OPTOSWITCH REED FLUSSIMETRO TERMOCOPPIA NTC SENSORE PRESSIONE LIVELLOIRSmc1 IRSmc2",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "",
+            "falla": "DUAL_MILK535924040538119000Enc535960000 ENCODER966442000     Schema elettrico - Wiring diagram - Schéma électrique -                  Elektrischer Schaltplan - Esquema eléctrico -  Esquema elétrico XIII11 22 33 44 55 66 77 88 D DC CB BA A S30 - FUNZ IONALE POTENZA STE LLA S30_pot enza_STELL A.Sch Doc 1 1 24/05/2016A3Title Size D esign File N ame Rev Date: Sheet: ofRev. Date D escription FromRev. Hi storyTSR N TELERUTTOREMORSETTIERA GENERALE   MORSETTIERA 3 51 2 4 6P3 P5 P4 P2P1",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "16",
+            "falla": "FILTRO DELTA EL 16MBFG5POMPA MACININO 1 MACININO 2TERMOSTATO BOILER TERMOSTATO CALDAIA INTERRUTTORE MM1 INTERRUTTORE MM2R S T N N2 (CALDAIA) N1 (BOILER)N3_N4 (POMPA/MM1/MM2)R1-R2 (BOILER - MM3) R1-R2 (BOILER - MM3) S1 (CALDAIA) T1-T2-T3 (POMPA/MM1/MM2)Tl MoMoGStTB1RBTB2 TC1 RC TC2 MM1 MM2MP IMM1 IMM2Asw Fi2Fi1IG T1 IMM3 INTERRUTTORE MM3R2MMMM3MACININO 3N1_M3 (MM3) N1_M3R1R2     Schema elettrico - Wiring diagram - Schéma électrique -                  Elektrischer Schaltplan - Esquema eléctrico -  Esquema elétrico XIV11 22 33 44 55 66 77 88 D DC CB BA A S30 - FUNZ IONALE POTENZ A TRIANGOLO S30_pot enza_TRIANGOLO.Sch Doc 1 1 24/05/2016A3Title Size D esign File N ame Rev Date: Sheet: ofRev. Date D escription FromRev. Hi storyTSR TELERUTTOREMORSETTIERA GENERALEMORSETTIERA 3 51 2 4 6P3 P5 P4 P2P1",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "16",
+            "falla": "FILTRO DELTA EL 16MBFG5POMPA MACININO 1 MACININO 2TERMOSTATO BOILER TERMOSTATO CALDAIA INTERRUTTORE MM1 INTERRUTTORE MM2R_OUT S_OUT T_OUT N_OUTR_IN S_IN T_IN N_IN01 2 3 R S T NR1-R2  (BOILER-MM3) N3_N4 (POMPA/MM1/MM2) N1-N1_M3 (BOILER - MM3) N2 (CALDAIA)1234Tl Mo MoGStTB1RBTB2 TC1RCTC2 MM1 MM2MP IMM1 IMM2Asw Fi2Fi1IGR2 R1 IMM3 INTERRUTTORE MM3R2MMMM3N1 N1_M3 MACININO 3 INSERIRE  UN PONTIC ELLO  TRA LA POSIZIONE  1 E LA POSIZIONE 2 DELLA  MORSETTIERA  GENERALEBOILER RESISTANCE BOILER  RESISTANCE INSERT  A BRIDGE  BETWEEN THE  POSIT ION 1 AND THE  POSIT ION 2  OF THE  GENE RAL TERMINAL  BOARD     Schema elettrico - Wiring diagram - Schéma électrique -                  Elektrischer Schaltplan - Esquema eléctrico -  Esquema elétrico XV11 22 33 44 55 66 77 88 D DC CB BA A S30 - FUNZ IONALE POTENZA  MONOF ASE S30_pot enza_MONOF ASE.Sch Doc 1 1 24/05/2016A3Title Size D esign File N ame Rev Date: Sheet: ofRev. Date D escription FromRev. Hi storyL N TELERUTTOREMORSETTIERA GENERALE MORSETTIERA 3 51 2 4 6P3 P5 P4 P2P1",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "16",
+            "falla": "FILTRO DELTA EL 16MBFG5POMPA MACININO 1 MACININO 2TERMOSTATO BOILER TERMOSTATO CALDAIA INTERRUTTORE MM1 INTERRUTTORE MM2R S T N N2 (CALDAIA)N1 N3_N4 (POMPA/MM1/MM2)R1  (BOILER) S1(CALDAIA) T1 (POMPA)T2-T3 (MM1/MM2)Tl MoMoGStTB1RBTB2 TC1RCTC2 MM1 MM2MP IMM1 IMM2Asw Fi2Fi1IG IMM3 INTERRUTTORE MM3R2MMMM3N1-N1_M3 (BOILER - MM3) N1_M3R2  (MM3) N1_M3MACININO 3BOILER RESISTANCE BOILER  RESISTANCER2  (MM3)     Schema elettrico - Wiring diagram - Schéma électrique -                  Elektrischer Schaltplan - Esquema eléctrico -  Esquema elétrico XVI11 22 33 44 55 66 77 88 D DC CB BA A S30 - FUNZIONALE POTENZA MONOFASE UL S30_pot enza _MON OFASE_UL_T .SchDoc 1 1 7/7/2016A3Title v e R e m a N  e l i F  n g i s e D e z i S f o : t e e h S : e t a DRev. Date Description FromRev. HistoryL N TELERUTTOREMORSETTIERA GENERALEMORSETTIERA 3 51 2 4 6P3 P5 P4 P2P1 3 51 2 4",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "132",
+            "falla": "Elf2 Capp/CaffèElf1 HtEsm231MMx Eaf Gv MPFiGEva Gsol BoIn  0,6 mmIn  0,8 mm EvcEm1 3 2Ets*ts* CsEv Eac S30_Full",
+            "solucion": "Revisar manual para más detalles."
+        },
+        {
+            "codigo": "925",
+            "falla": "ACQUA FREDDA ACQUA CALDA ACQUA MISCELATA VAPORE ARIA SOLUBILE LATTE ACQUA LAVAGGIO LATTEEd ACQUA LAVAGGIO RICIRCOLODvIn  0.6 mm1 21 21",
+            "solucion": "Revisar manual para más detalles."
         }
     ],
     "Hielera__Clase_Manitowoc": [
@@ -264,7 +564,13 @@
             "solucion": "{\"Revisar contacto eléctrico del presostato, si está sulfatado limpiar y si el tubo de cobre está obstruido con sarro desarmar y purgar, reemplazar la pieza si la membrana interna está perforada.\""
         }
     ],
-    "ups__MOSTAZA__UPS_10_KVA__001_002095": [],
+    "ups__MOSTAZA__UPS_10_KVA__001_002095": [
+        {
+            "codigo": "E01",
+            "falla": "Error al conectar la pantalla con el sistema de control del UPS (Control desde el display)",
+            "solucion": "La pantalla se conectará directamente en el panel frontal de los controles. Asegúrate de que la pantalla esté configurada correctamente para este propósito."
+        }
+    ],
     "Melitta__CT8_SM_V5.0_ES": [
         {
             "codigo": "E01",
@@ -311,6 +617,25 @@
             "codigo": "E01",
             "falla": "El cambio de configuración de los transistores debe ser previamente realizado por un profesional en el área de seguridad energética y electrónica.",
             "solucion": "Realizar cambios de configuraciones de transistores aprobadas por ingenieros autorizados y certificados. En este caso, se recomienda la colaboración con un ingeniero técnico en el sector de la automatización y la seguridad electricidad para que los cambios se hagan correctamente."
+        }
+    ],
+    "Cimbali__S30_Despiece_": [
+        {
+            "codigo": "E01",
+            "falla": "No se proporcionaron datos de código de error en el archivo de texto.",
+            "solucion": "El archivo no contiene información sobre un error o fallo. Se recomienda analizar el contenido del archivo de texto para obtener más detalles."
+        }
+    ],
+    "Liniers_Fallas_Recurrentes": [
+        {
+            "codigo": "Obstruccion Chicler Circuito Leche",
+            "falla": "Obstruccion total del chicler debido a la acumulacion de grasa de leche seca y sedimentos calcificados, lo que impide la dosificacion de aire, provoca que la bomba succione exclusivamente liquido sin capacidad de generar espuma y entrega el producto a temperatura inferior a la estandar.",
+            "solucion": "Desobstruccion fisica del chicler, limpieza profunda del conjunto de emulsion y restablecimiento del ciclo de lavado diario de descarte utilizando el agente quimico azul Rinsa por manguera de succion y picos de infusion."
+        },
+        {
+            "codigo": "Error Operativo Molino",
+            "falla": "La presencia de granos sueltos y restos de cafe sobre la superficie de la base del molino impide el asentamiento plano y completo de la tolva, lo que desactiva el switch electromagnetico de seguridad del motor e interrumpe el ciclo de molienda.",
+            "solucion": "Remocion completa de los residuos y granos de cafe sueltos en la base de encastre de la tolva previo a su montaje, asegurando el contacto pleno de los tres puntos de control y la activacion del switch de seguridad."
         }
     ]
 }

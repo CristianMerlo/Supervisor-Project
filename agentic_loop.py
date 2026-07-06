@@ -201,20 +201,69 @@ Redacta el cuerpo del correo listo para copiar y pegar:
         return f"Error redactando borrador: {e}"
 
 def tool_buscar_manuales(sintoma_falla):
-    """Busca en los manuales técnicos (Obsidian/NotebookLM) soluciones a problemas técnicos de equipos."""
+    """Busca en los manuales técnicos (Obsidian/NotebookLM) soluciones a problemas técnicos de equipos usando Búsqueda Semántica Vectorial (RAG)."""
     try:
-        from obsidian_bridge import ObsidianVault
-        vault = ObsidianVault()
-        hallazgos = vault.buscar_manual(sintoma_falla)
-        if hallazgos:
-            resp = "Información encontrada en manuales locales:\n"
-            for h in hallazgos[:2]:
-                resp += f"- {h['contexto']}\n"
+        import sqlite3
+        import json
+        import numpy as np
+        import google.generativeai as genai
+        
+        GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
+        if not GEMINI_KEY:
+            return "No se pudo realizar la búsqueda vectorial (Falta GEMINI_API_KEY)."
+            
+        genai.configure(api_key=GEMINI_KEY)
+        
+        # Generar embedding de la consulta
+        response = genai.embed_content(
+            model="models/gemini-embedding-001",
+            content=sintoma_falla
+        )
+        query_vector = np.array(response['embedding'])
+        
+        # Conectar a la base de datos de vectores
+        DB_PATH = "/home/cristian/PROYECTOS/Supervisor-Project/brain/manuales_vectores.db"
+        if not os.path.exists(DB_PATH):
+            return "La base de datos de vectores no existe aún."
+            
+        conn = sqlite3.connect(DB_PATH)
+        cursor = conn.cursor()
+        cursor.execute("SELECT archivo_nombre, texto_fragmento, vector FROM manuales_vectores")
+        rows = cursor.fetchall()
+        
+        resultados = []
+        for nombre, fragmento, vector_str in rows:
+            vector = np.array(json.loads(vector_str))
+            
+            # Calcular similitud coseno
+            dot = np.dot(query_vector, vector)
+            norm_q = np.linalg.norm(query_vector)
+            norm_v = np.linalg.norm(vector)
+            score = dot / (norm_q * norm_v) if (norm_q * norm_v) > 0 else 0
+            
+            resultados.append({
+                "archivo": nombre,
+                "fragmento": fragmento,
+                "score": score
+            })
+            
+        conn.close()
+        
+        # Ordenar por similitud descendente
+        resultados.sort(key=lambda x: x["score"], reverse=True)
+        
+        # Tomar los top 2 que superen un umbral razonable
+        top_hallazgos = [r for r in resultados[:2] if r["score"] > 0.4]
+        
+        if top_hallazgos:
+            resp = "💡 *Resultados Semánticos Encontrados en Manuales locales:*\n\n"
+            for idx, h in enumerate(top_hallazgos, 1):
+                resp += f"{idx}. *Documento:* {h['archivo']} (Similitud: {h['score']:.2f})\n"
+                resp += f"   *Detalle:* {h['fragmento'][:800]}...\n\n"
             return resp
     except Exception as e:
-        pass
-    
-    # Fallback to NotebookLM local (via Gemini File API)
+        print(f"Error en búsqueda semántica local: {e}")
+        
     return tool_consultar_manuales_profundo(sintoma_falla)
 
 def tool_consultar_manuales_profundo(consulta):
@@ -287,9 +336,129 @@ def tool_contar_reportes(sigla):
         resp += f" Algunos archivos recientes son: {', '.join(nombres)}"
     return resp
 
-def tool_consultar_antigravity(consulta_tecnica):
-    """Usa esta herramienta cuando el usuario pregunte por algo de código, scripts, infraestructura o logs que tú no puedas responder."""
-    return f"He notificado a AntiGravity sobre esto: '{consulta_tecnica}'. Él revisará los logs."
+def tool_buscar_tickets(termino_busqueda):
+    """Busca en el listado de tickets activos del Linkup ERP (de Mostaza) por sigla de local, nombre, ID de ticket, prioridad o descripción."""
+    import json
+    from pathlib import Path
+    
+    ruta_tickets = Path("/home/cristian/PROYECTOS/Supervisor-Project/brain/tickets_activos.json")
+    if not ruta_tickets.exists():
+        return "No hay datos de tickets activos disponibles en este momento."
+        
+    try:
+        with open(ruta_tickets, "r", encoding="utf-8") as f:
+            tickets = json.load(f)
+            
+        term = termino_busqueda.strip().lower()
+        if not term:
+            return f"Actualmente hay {len(tickets)} tickets activos en total."
+            
+        coincidencias = []
+        for t in tickets:
+            if (term in str(t.get("id", "")).lower() or
+                term in t.get("store", "").lower() or
+                term in t.get("title", "").lower() or
+                term in t.get("description", "").lower() or
+                term in t.get("category", "").lower() or
+                term in t.get("incidence", "").lower()):
+                coincidencias.append(t)
+                
+        if not coincidencias:
+            siglas_candidatas = set()
+            csv_path = "/home/cristian/Documentos/Supervisor/locales.csv"
+            if not os.path.exists(csv_path):
+                csv_path = "/home/cristian/PROYECTOS/Supervisor-Project/locales.csv"
+            if os.path.exists(csv_path):
+                import csv
+                try:
+                    with open(csv_path, newline='', encoding='utf-8') as csvfile:
+                        reader = csv.DictReader(csvfile)
+                        for row in reader:
+                            nombre_local = row.get("LOCAL", "").strip().lower()
+                            if term in nombre_local:
+                                sigla_sis = row.get("SIGLA SISTEMA", "").strip().upper()
+                                sigla_tic = row.get("SIGLA TICKETS", "").strip().upper()
+                                if sigla_sis and sigla_sis != "-":
+                                    siglas_candidatas.add(sigla_sis)
+                                if sigla_tic and sigla_tic != "-":
+                                    siglas_candidatas.add(sigla_tic)
+                except Exception:
+                    pass
+            
+            # Mapeo manual para Rosario
+            if "rosario" in term:
+                siglas_candidatas.update(["FPROS", "FMROS", "FRSM", "FORO", "FMPUM"])
+                
+            for t in tickets:
+                if t.get("store", "").upper() in siglas_candidatas:
+                    coincidencias.append(t)
+                    
+        if not coincidencias:
+            return f"No encontré ningún ticket activo que coincida con el término '{termino_busqueda}'."
+            
+        resp = f"Encontré {len(coincidencias)} tickets activos relacionados:\n\n"
+        for t in coincidencias[:10]:
+            resp += f"--- TICKET {t.get('id')} ({t.get('statusName', 'open').upper()}) ---\n"
+            resp += f"Local: {t.get('store')} | Prioridad: {t.get('priority')}\n"
+            resp += f"Categoría/Incidencia: {t.get('category')} / {t.get('incidence')}\n"
+            resp += f"Detalle: {t.get('title')}\n"
+            desc = t.get('description', '')
+            snippet = desc[:150].replace('\n', ' ') + "..." if len(desc) > 150 else desc.replace('\n', ' ')
+            resp += f"Descripción: {snippet}\n\n"
+            
+        if len(coincidencias) > 10:
+            resp += f"... y otros {len(coincidencias) - 10} tickets más."
+            
+        return resp
+    except Exception as e:
+        return f"Error consultando tickets activos: {e}"
+
+def tool_guardar_memoria_diagnostico(sigla, resumen_falla, solucion=None, repuestos=None):
+    """Guarda un registro de falla, diagnóstico, repuestos recomendados y resolución en la base de datos de memoria histórica del local."""
+    import sqlite3
+    import datetime
+    db_path = "/home/cristian/Documentos/Supervisor/supervisor_local.db"
+    try:
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        fecha = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        c.execute(
+            "INSERT INTO memoria_diagnostico (sigla, fecha, resumen_falla, solucion, repuestos) VALUES (?, ?, ?, ?, ?)",
+            (sigla.upper().strip(), fecha, resumen_falla.strip(), solucion, repuestos)
+        )
+        conn.commit()
+        conn.close()
+        return f"Éxito: Se guardó el registro de memoria de diagnóstico histórico para el local {sigla}."
+    except Exception as e:
+        return f"Error guardando memoria de diagnóstico: {e}"
+
+def tool_consultar_memoria_diagnostico(sigla):
+    """Consulta todo el historial de diagnósticos y fallas pasadas registradas para un local en base a su sigla."""
+    import sqlite3
+    db_path = "/home/cristian/Documentos/Supervisor/supervisor_local.db"
+    try:
+        conn = sqlite3.connect(db_path)
+        c = conn.cursor()
+        c.execute(
+            "SELECT fecha, resumen_falla, solucion, repuestos FROM memoria_diagnostico WHERE sigla = ? ORDER BY fecha DESC",
+            (sigla.upper().strip(),)
+        )
+        rows = c.fetchall()
+        conn.close()
+        if not rows:
+            return f"No hay registros de memoria diagnóstica histórica para el local {sigla}."
+        
+        resultado = f"Historial de Memoria Diagnóstica para {sigla}:\n"
+        for i, row in enumerate(rows, 1):
+            resultado += f"\n[{i}] Fecha: {row[0]}\n"
+            resultado += f"• Falla: {row[1]}\n"
+            if row[2]:
+                resultado += f"• Solución: {row[2]}\n"
+            if row[3]:
+                resultado += f"• Repuestos sugeridos: {row[3]}\n"
+        return resultado
+    except Exception as e:
+        return f"Error consultando memoria de diagnóstico: {e}"
 
 TOOLS_SCHEMA = [
     {
@@ -434,6 +603,51 @@ TOOLS_SCHEMA = [
                 "required": ["instrucciones_respuesta"]
             }
         }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_buscar_tickets",
+            "description": "Busca en el listado de tickets activos del Linkup ERP (Mostaza) por sigla de local, nombre del local, ID de ticket o descripción.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "termino_busqueda": {"type": "string", "description": "Término a buscar (ej: 'rosario', 'FPROS', 'display', '128459')"}
+                },
+                "required": ["termino_busqueda"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_guardar_memoria_diagnostico",
+            "description": "Guarda un registro de diagnóstico histórico de falla, solución y repuestos recomendados para un local específico.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "sigla": {"type": "string", "description": "Sigla del local (ej: FLIN, FSJU)"},
+                    "resumen_falla": {"type": "string", "description": "Descripción resumida de la falla y diagnóstico técnico"},
+                    "solucion": {"type": "string", "description": "Detalle de la resolución o reparación ejecutada"},
+                    "repuestos": {"type": "string", "description": "Repuestos e insumos recomendados o utilizados"}
+                },
+                "required": ["sigla", "resumen_falla"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_consultar_memoria_diagnostico",
+            "description": "Consulta el historial de fallas y diagnósticos anteriores registrados para un local.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "sigla": {"type": "string", "description": "Sigla del local a consultar"}
+                },
+                "required": ["sigla"]
+            }
+        }
     }
 ]
 
@@ -462,33 +676,72 @@ def execute_tool(tool_name, arguments_str):
             return tool_redactar_correo_borrador(args.get("instrucciones_respuesta", ""))
         elif tool_name == "tool_consultar_manuales_profundo":
             return tool_consultar_manuales_profundo(args.get("consulta", ""))
+        elif tool_name == "tool_buscar_tickets":
+            return tool_buscar_tickets(args.get("termino_busqueda", ""))
+        elif tool_name == "tool_guardar_memoria_diagnostico":
+            return tool_guardar_memoria_diagnostico(
+                args.get("sigla", ""), 
+                args.get("resumen_falla", ""), 
+                args.get("solucion", ""), 
+                args.get("repuestos", "")
+            )
+        elif tool_name == "tool_consultar_memoria_diagnostico":
+            return tool_consultar_memoria_diagnostico(args.get("sigla", ""))
         else:
             return f"Herramienta desconocida: {tool_name}"
     except Exception as e:
         return f"Error ejecutando herramienta {tool_name}: {e}"
 
 def consultar_agentic_loop(mensaje_usuario, historial, system_prompt):
-    """Ejecuta el bucle de razonamiento usando Groq con Tool Calling."""
-    url = "https://api.groq.com/openai/v1/chat/completions"
-    headers = {
-        "Authorization": f"Bearer {GROQ_API_KEY}",
-        "Content-Type": "application/json"
-    }
+    """Ejecuta el bucle de razonamiento usando Gemini (vía API compatible con OpenAI) o Groq como resguardo."""
+    import config_manager
+    model_gemini = config_manager.get_env_var("MODEL_GEMINI_TEXT", "gemini-2.5-flash")
+    model_groq = config_manager.get_env_var("MODEL_GROQ_TEXT", "llama-3.3-70b-versatile")
+    
+    api_provider = "gemini"
+    gemini_key = os.getenv("GEMINI_API_KEY")
+    if not gemini_key:
+        api_provider = "groq"
+        
+    # Cargar Perfil de Respuestas (Tono y Estilo de Cristian)
+    perfil_path = "/home/cristian/Documentos/Supervisor/perfil_respuestas_cristian.md"
+    if os.path.exists(perfil_path):
+        try:
+            with open(perfil_path, "r", encoding="utf-8") as f:
+                perfil_texto = f.read()
+            system_prompt += f"\n\nTONO Y ESTILO DE REDACCIÓN COMPROMETIDO (Sigue estrictamente estas directrices y ejemplos):\n{perfil_texto}\n"
+        except Exception:
+            pass
+            
+    # Cargar Correcciones Semánticas Few-Shot Dinámicas
+    try:
+        import sys
+        ruta_dir = "/home/cristian/Documentos/Supervisor"
+        if ruta_dir not in sys.path:
+            sys.path.append(ruta_dir)
+        import gestion_correcciones
+        correcciones = gestion_correcciones.obtener_correcciones_relevantes(mensaje_usuario, limit=2)
+        if correcciones:
+            corr_prompt = "\n⚠️ CORRECCIONES DE HISTORIAL DE DECISIONES DEL SUPERVISOR (Úsalas como Few-Shot dinámico):\n"
+            for q, r_inc, corr in correcciones:
+                corr_prompt += f"- Ante la pregunta/situación: '{q}'\n  Evita responder como: '{r_inc}'\n  Respuesta correcta aprobada por el Supervisor: '{corr}'\n"
+            system_prompt += corr_prompt
+    except Exception as e_corr:
+        print(f"Error cargando Few-Shot dinámico: {e_corr}")
     
     # Inyección vital para evitar loops y alucinaciones
     system_prompt += """
-REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS:
+REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS Y RAZONAMIENTO:
 1. Utiliza estrictamente el esquema JSON provisto para invocar herramientas. NUNCA escribas etiquetas XML o pseudo-código como <function=...>. Si necesitas datos, invoca la herramienta por la API oficial.
-2. Si buscas en un manual (o cualquier base de datos) y no encuentras la respuesta esperada, NO repitas la misma búsqueda con los mismos argumentos. Informa al usuario que no tienes ese dato específico.
+2. Si buscas en un manual o base de datos y no encuentras la respuesta esperada, NO repitas la misma búsqueda con los mismos argumentos. Informa al usuario que no tienes ese dato específico.
 3. NO alucines datos. Si no encuentras la información, admite que no la tienes y finaliza tu respuesta.
+4. RAZONAMIENTO ESTRUCTURADO (Chain of Thought - CoT): De forma obligatoria, antes de llamar a cualquier herramienta o emitir tu respuesta final, debes escribir tu análisis técnico paso a paso encerrado entre etiquetas <razonamiento> y </razonamiento>. Analiza allí qué datos te faltan, qué herramientas invocarás y qué hipótesis técnicas manejas sobre la falla.
 """
     
-    # Convertir el historial en texto para inyectarlo en el system_prompt y evitar errores de parseo de Tool Calling en Groq
     if historial:
         historial_texto = "Historial reciente de la conversación (para tu memoria):\n"
-        for msg in historial[-5:]: # Limitar a los últimos 5 mensajes
+        for msg in historial[-5:]:
             rol = "Usuario" if msg["role"] == "user" else "Hermes"
-            # Limitar la longitud del contenido para no explotar la cuota de Groq
             contenido_seguro = str(msg['content'])[:1000] + ("..." if len(str(msg['content'])) > 1000 else "")
             historial_texto += f"{rol}: {contenido_seguro}\n"
         system_prompt += f"\n\n{historial_texto}"
@@ -498,29 +751,70 @@ REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS:
     
     max_iterations = 4
     for _ in range(max_iterations):
+        if api_provider == "gemini":
+            active_url = "https://generativelanguage.googleapis.com/v1beta/openai/chat/completions"
+            active_headers = {
+                "Authorization": f"Bearer {gemini_key}",
+                "Content-Type": "application/json"
+            }
+            active_model = model_gemini
+        else:
+            active_url = "https://api.groq.com/openai/v1/chat/completions"
+            active_headers = {
+                "Authorization": f"Bearer {GROQ_API_KEY}",
+                "Content-Type": "application/json"
+            }
+            active_model = model_groq
+
         payload = {
-            "model": "llama-3.3-70b-versatile",
+            "model": active_model,
             "messages": messages,
             "tools": TOOLS_SCHEMA,
             "tool_choice": "auto"
         }
         
         try:
-            res = requests.post(url, headers=headers, json=payload, timeout=60)
+            res = requests.post(active_url, headers=active_headers, json=payload, timeout=60)
+            
+            # 1. Fallback: Si Gemini falla, rotar a Groq de inmediato
+            if res.status_code != 200 and api_provider == "gemini":
+                with open("groq_error.log", "a") as f:
+                    f.write(f"Gemini API falló con {res.status_code}. Rotando a Groq...\n")
+                api_provider = "groq"
+                active_url = "https://api.groq.com/openai/v1/chat/completions"
+                active_headers = {
+                    "Authorization": f"Bearer {GROQ_API_KEY}",
+                    "Content-Type": "application/json"
+                }
+                payload["model"] = model_groq
+                res = requests.post(active_url, headers=active_headers, json=payload, timeout=60)
+                
+            # 2. Fallback: Si Groq da 429 (Rate limit), rotar a llama-3.1-8b-instant
+            if res.status_code == 429 and api_provider == "groq":
+                with open("groq_error.log", "a") as f:
+                    f.write(f"Groq API falló con 429. Rotando a llama-3.1-8b-instant...\n")
+                payload["model"] = "llama-3.1-8b-instant"
+                res = requests.post(active_url, headers=active_headers, json=payload, timeout=60)
+
             if res.status_code != 200:
                 with open("groq_error.log", "a") as f:
-                    f.write(f"Error de API: {res.status_code} - {res.text}\n")
+                    f.write(f"Error de API final: {res.status_code} - {res.text}\n")
                 
-                # Intentar auto-recuperar si Groq falló al parsear la herramienta (400 tool_use_failed)
                 try:
                     error_data = res.json()
                     if error_data.get("error", {}).get("code") == "tool_use_failed":
                         failed_gen = error_data["error"].get("failed_generation", "")
                         import re
-                        match = re.search(r'<function=(\w+)\((.*?)\)</function>', failed_gen)
-                        if match:
-                            tool_name = match.group(1)
-                            args_str = match.group(2)
+                        name_match = re.search(r'<function=(\w+)', failed_gen)
+                        if name_match:
+                            tool_name = name_match.group(1)
+                            json_match = re.search(r'(\{.*?\})', failed_gen, re.DOTALL)
+                            if json_match:
+                                args_str = json_match.group(1)
+                            else:
+                                args_match = re.search(r'<function=\w+\((.*?)\)', failed_gen)
+                                args_str = args_match.group(1) if args_match else "{}"
+                                
                             tool_result = execute_tool(tool_name, args_str)
                             messages.append({
                                 "role": "tool",
@@ -528,16 +822,16 @@ REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS:
                                 "name": tool_name,
                                 "content": str(tool_result)
                             })
-                            continue # Reintentar el loop con el resultado
-                except Exception:
-                    pass
+                            continue
+                except Exception as e_recovery:
+                    with open("groq_error.log", "a") as f:
+                        f.write(f"Auto-recovery falló: {e_recovery}\n")
                 
                 return f"Ocurrió un error al contactar al modelo de razonamiento. {res.status_code}"
             
             data = res.json()
             response_message = data["choices"][0]["message"]
             
-            # Si el modelo decidió llamar a una o más herramientas
             if response_message.get("tool_calls"):
                 messages.append(response_message)
                 for tool_call in response_message["tool_calls"]:
@@ -552,11 +846,33 @@ REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS:
                         "name": tool_name,
                         "content": str(tool_result)
                     })
-                # Volver al inicio del loop con los resultados de la herramienta
                 continue
             
-            # Si no llamó herramientas, devolvemos el contenido de texto final
-            return response_message.get("content", "Sin respuesta.")
+            content = response_message.get("content", "Sin respuesta.")
+            
+            # Extraer y limpiar razonamiento CoT
+            if "<razonamiento>" in content and "</razonamiento>" in content:
+                import re
+                try:
+                    razonamiento_match = re.search(r'<razonamiento>(.*?)</razonamiento>', content, re.DOTALL)
+                    if razonamiento_match:
+                        razonamiento = razonamiento_match.group(1).strip()
+                        # Registrar razonamiento para auditoría
+                        log_path = "/home/cristian/Documentos/Supervisor/brain/razonamientos.log"
+                        os.makedirs(os.path.dirname(log_path), exist_ok=True)
+                        from datetime import datetime
+                        with open(log_path, "a", encoding="utf-8") as f_log:
+                            f_log.write(f"=== RAZONAMIENTO [{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] ===\n")
+                            f_log.write(f"Pregunta: {mensaje_usuario}\n")
+                            f_log.write(f"Análisis CoT:\n{razonamiento}\n")
+                            f_log.write("=" * 60 + "\n\n")
+                    
+                    # Limpiar el contenido final
+                    content = re.sub(r'<razonamiento>.*?</razonamiento>', '', content, flags=re.DOTALL).strip()
+                except Exception as e_cot:
+                    print(f"Error procesando CoT: {e_cot}")
+                    
+            return content
             
         except Exception as e:
             return f"Error en el bucle agentic: {e}"

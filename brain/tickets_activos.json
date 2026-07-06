@@ -1761,7 +1761,7 @@
     "date": 1781888805,
     "time": "14:06",
     "updated": null,
-    "percentageTime": 335
+    "percentageTime": 336
   },
   {
     "id": 128002,
@@ -1803,7 +1803,7 @@
     "date": 1782417427,
     "time": "16:57",
     "updated": null,
-    "percentageTime": 213
+    "percentageTime": 214
   },
   {
     "id": 128347,
@@ -1824,7 +1824,7 @@
     "date": 1782493892,
     "time": "14:11",
     "updated": null,
-    "percentageTime": 195
+    "percentageTime": 196
   },
   {
     "id": 128750,
@@ -1908,7 +1908,7 @@
     "date": 1783081273,
     "time": "09:21",
     "updated": null,
-    "percentageTime": 59
+    "percentageTime": 60
   },
   {
     "id": 129454,
@@ -1950,7 +1950,7 @@
     "date": 1779760642,
     "time": "22:57",
     "updated": null,
-    "percentageTime": 7866
+    "percentageTime": 7874
   },
   {
     "id": 126313,
@@ -1971,7 +1971,7 @@
     "date": 1781036963,
     "time": "17:29",
     "updated": null,
-    "percentageTime": 5059
+    "percentageTime": 5067
   },
   {
     "id": 127454,
@@ -1992,7 +1992,7 @@
     "date": 1781800363,
     "time": "13:32",
     "updated": null,
-    "percentageTime": 3380
+    "percentageTime": 3388
   },
   {
     "id": 128753,
@@ -2055,7 +2055,7 @@
     "date": 1783101692,
     "time": "15:01",
     "updated": null,
-    "percentageTime": 518
+    "percentageTime": 526
   },
   {
     "id": 129414,
@@ -2118,7 +2118,7 @@
     "date": 1783203185,
     "time": "19:13",
     "updated": null,
-    "percentageTime": 295
+    "percentageTime": 303
   },
   {
     "id": 129609,
@@ -2133,12 +2133,12 @@
     "incidence": "ER 021  y 022 - Anomal\u00eda en movimiento de las muelas",
     "incidence_breadcrumb": "EQUIPOS;CAFETERAS CIMBALI",
     "priority": "Urgente",
-    "status": 7,
-    "statusName": "new",
+    "status": 1,
+    "statusName": "open",
     "priorityColor": "#FD0000",
     "date": 1783333205,
     "time": "07:20",
     "updated": null,
-    "percentageTime": 20
+    "percentageTime": 30
   }
 ]

@@ -170,6 +170,148 @@ def tool_consultar_correos(asunto_o_contenido):
     except Exception as e:
         return f"Error consultando correos: {e}"
 
+def tool_analizar_adjuntos_correo(asunto_o_contenido):
+    """Busca un correo en la bandeja de entrada, descarga TODOS sus archivos adjuntos y analiza sus contenidos."""
+    import os
+    import imaplib
+    import email
+    from email.header import decode_header
+    import tempfile
+    import google.generativeai as genai
+    from pathlib import Path
+    
+    user = os.environ.get("GMAIL_USER")
+    pas = os.environ.get("GMAIL_APP_PASSWORD")
+    if not user or not pas:
+        return "Error: Credenciales de GMail (GMAIL_USER o GMAIL_APP_PASSWORD) no configuradas."
+        
+    try:
+        mail = imaplib.IMAP4_SSL("imap.gmail.com", timeout=30)
+        mail.login(user, pas)
+        mail.select("inbox")
+        
+        status, mensajes = mail.search(None, 'ALL')
+        if status != "OK" or not mensajes[0]:
+            mail.logout()
+            return "No se encontraron correos en la bandeja de entrada."
+            
+        target_msg = None
+        msg_ids = mensajes[0].split()
+        msg_ids.reverse()
+        
+        for num in msg_ids[:30]:
+            status, data = mail.fetch(num, '(RFC822)')
+            if status != "OK": continue
+            raw_email = data[0][1]
+            msg = email.message_from_bytes(raw_email)
+            
+            subject_header = msg.get("Subject")
+            subject = ""
+            if subject_header:
+                decoded = decode_header(subject_header)
+                for frag, enc in decoded:
+                    if isinstance(frag, bytes):
+                        subject += frag.decode(enc or 'utf-8', errors='ignore')
+                    else:
+                        subject += str(frag)
+                        
+            if asunto_o_contenido.lower() in subject.lower():
+                target_msg = msg
+                break
+                
+        if not target_msg:
+            mail.logout()
+            return f"No encontré ningún correo reciente con el asunto o término '{asunto_o_contenido}'."
+            
+        adjuntos_guardados = []
+        temp_dir = tempfile.mkdtemp()
+        
+        for part in target_msg.walk():
+            if part.get_content_maintype() == 'multipart':
+                continue
+            if part.get('Content-Disposition') is None:
+                continue
+                
+            filename = part.get_filename()
+            if filename:
+                decoded = decode_header(filename)
+                decoded_filename = ""
+                for frag, enc in decoded:
+                    if isinstance(frag, bytes):
+                        decoded_filename += frag.decode(enc or 'utf-8', errors='ignore')
+                    else:
+                        decoded_filename += str(frag)
+                
+                if decoded_filename:
+                    filepath = os.path.join(temp_dir, decoded_filename)
+                    with open(filepath, "wb") as f:
+                        f.write(part.get_payload(decode=True))
+                    adjuntos_guardados.append(filepath)
+                    
+        mail.logout()
+        
+        if not adjuntos_guardados:
+            return f"El correo '{subject}' fue encontrado, pero no contiene ningún archivo adjunto."
+            
+        resumen_adjuntos = f"Encontré {len(adjuntos_guardados)} archivos adjuntos en el correo '{subject}':\n\n"
+        
+        # Configurar Gemini
+        GEMINI_KEY = os.environ.get("GEMINI_API_KEY")
+        if GEMINI_KEY:
+            genai.configure(api_key=GEMINI_KEY)
+            
+        for path in adjuntos_guardados:
+            name = os.path.basename(path)
+            resumen_adjuntos += f"📄 *Archivo:* {name}\n"
+            
+            if name.lower().endswith(".pdf"):
+                try:
+                    import PyPDF2
+                    reader = PyPDF2.PdfReader(path)
+                    text = ""
+                    for page in reader.pages[:10]:
+                        text += page.extract_text() or ""
+                    
+                    if len(text.strip()) > 50 and GEMINI_KEY:
+                        model = genai.GenerativeModel("gemini-2.5-flash")
+                        prompt = (
+                            "Analiza el siguiente texto extraído de un remito o reporte de trabajos técnicos de un proveedor de mantenimiento:\n\n"
+                            f"{text[:8000]}\n\n"
+                            "Determina detalladamente:\n"
+                            "1. Qué locales (sucursales de Mostaza) son mencionados en los trabajos.\n"
+                            "2. Qué tareas específicas (reparación de cafeteras, aires acondicionados, cloacas, etc.) se realizaron en cada local.\n"
+                            "Responde de forma clara, técnica y estructurada."
+                        )
+                        response = model.generate_content(prompt)
+                        resumen_adjuntos += f"{response.text}\n\n"
+                    else:
+                        resumen_adjuntos += f"El PDF no contiene texto extraíble suficiente. (Longitud del texto: {len(text)})\n\n"
+                except Exception as e_pdf:
+                    resumen_adjuntos += f"Error analizando el contenido del PDF: {e_pdf}\n\n"
+            elif name.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.bmp')) and GEMINI_KEY:
+                try:
+                    model = genai.GenerativeModel("gemini-2.5-flash")
+                    with open(path, "rb") as img_f:
+                        img_data = img_f.read()
+                    
+                    contents = [
+                        {
+                            "mime_type": "image/jpeg" if name.lower().endswith(('.jpg', '.jpeg')) else "image/png",
+                            "data": img_data
+                        },
+                        "Analiza esta imagen de un remito o reporte de trabajos técnicos. Identifica el local de Mostaza y detalla los trabajos realizados y firmas correspondientes."
+                    ]
+                    response = model.generate_content(contents)
+                    resumen_adjuntos += f"{response.text}\n\n"
+                except Exception as e_img:
+                    resumen_adjuntos += f"Error analizando la imagen con IA: {e_img}\n\n"
+            else:
+                resumen_adjuntos += f"Formato no soportado para análisis automatizado de contenido.\n\n"
+                
+        return resumen_adjuntos
+    except Exception as e:
+        return f"Error procesando correo y adjuntos: {e}"
+
 def tool_redactar_correo_borrador(instrucciones_respuesta):
     """Redacta un borrador de correo profesional basado en instrucciones."""
     try:
@@ -607,6 +749,20 @@ TOOLS_SCHEMA = [
     {
         "type": "function",
         "function": {
+            "name": "tool_analizar_adjuntos_correo",
+            "description": "Busca un correo electrónico por término en el asunto, descarga todos sus archivos adjuntos (PDFs, imágenes) y analiza su contenido técnico para reportar trabajos realizados por local.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "asunto_o_contenido": {"type": "string", "description": "Término de búsqueda del asunto del correo (ej: 'EVETEC')"}
+                },
+                "required": ["asunto_o_contenido"]
+            }
+        }
+    ,
+    {
+        "type": "function",
+        "function": {
             "name": "tool_buscar_tickets",
             "description": "Busca en el listado de tickets activos del Linkup ERP (Mostaza) por sigla de local, nombre del local, ID de ticket o descripción.",
             "parameters": {
@@ -672,6 +828,8 @@ def execute_tool(tool_name, arguments_str):
             return tool_generar_excel_kpi()
         elif tool_name == "tool_consultar_correos":
             return tool_consultar_correos(args.get("asunto_o_contenido", ""))
+        elif tool_name == "tool_analizar_adjuntos_correo":
+            return tool_analizar_adjuntos_correo(args.get("asunto_o_contenido", ""))
         elif tool_name == "tool_redactar_correo_borrador":
             return tool_redactar_correo_borrador(args.get("instrucciones_respuesta", ""))
         elif tool_name == "tool_consultar_manuales_profundo":

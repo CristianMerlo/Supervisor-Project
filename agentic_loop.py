@@ -759,7 +759,7 @@ TOOLS_SCHEMA = [
                 "required": ["asunto_o_contenido"]
             }
         }
-    ,
+    },
     {
         "type": "function",
         "function": {

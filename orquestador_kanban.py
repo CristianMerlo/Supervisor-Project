@@ -1,5 +1,7 @@
 import os
 import sqlite3
+import glob
+import pandas as pd
 from datetime import datetime, timedelta
 import gspread
 from google.oauth2.service_account import Credentials
@@ -14,6 +16,40 @@ SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive"
 ]
+
+def cargar_mapa_categorias():
+    cat_map = {}
+    
+    # 1. Cargar de Historial_Tickets.xlsx
+    web_path = "/home/cristian/Documentos/Supervisor/base_tickets/Historial_Tickets.xlsx"
+    if os.path.exists(web_path):
+        try:
+            df_web = pd.read_excel(web_path)
+            for _, r in df_web.iterrows():
+                tid = str(r.get("Código", "")).strip()
+                cat = str(r.get("Categoría", "")).strip()
+                if tid:
+                    cat_map[tid] = cat
+        except Exception as e:
+            print(f"Error cargando Historial_Tickets.xlsx: {e}")
+            
+    # 2. Cargar de Base_Tickets_Mostaza_*.xlsx
+    api_files = glob.glob("/home/cristian/PROYECTOS/Supervisor-Project/Base_Tickets_Mostaza_*.xlsx")
+    if api_files:
+        try:
+            latest_api = max(api_files, key=os.path.getmtime)
+            xls = pd.ExcelFile(latest_api)
+            for sh in xls.sheet_names:
+                df_api = pd.read_excel(xls, sheet_name=sh)
+                for _, r in df_api.iterrows():
+                    tid = str(r.get("id", "")).strip()
+                    cat = str(r.get("category", "")).strip()
+                    if tid:
+                        cat_map[tid] = cat
+        except Exception as e:
+            print(f"Error cargando Base_Tickets_Mostaza: {e}")
+            
+    return cat_map
 
 def orquestar_kanban():
     if not SHEET_URL:
@@ -39,10 +75,13 @@ def orquestar_kanban():
         try:
             hoja_historial = sabana.worksheet("Historial_Mantenimiento")
             registros_historial = hoja_historial.get_all_records()
+            cat_map = cargar_mapa_categorias()
+            
             for r in registros_historial:
                 if str(r.get("ESTADO", "")).strip().lower() == "pendiente":
-                    # Evitar tickets de "Lista de Mantenimiento"
-                    categoria = str(r.get("CATEGORIA", r.get("CATEGORÍA", r.get("Categoria", r.get("Categoría", ""))))).strip().upper()
+                    # Evitar tickets de "Lista de Mantenimiento" mapeando ID
+                    ticket_id = str(r.get("TICKET", "")).strip()
+                    categoria = cat_map.get(ticket_id, "").upper()
                     if "LISTA DE MANTENIMIENTO" in categoria:
                         continue
                     try:

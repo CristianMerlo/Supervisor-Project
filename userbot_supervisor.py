@@ -122,9 +122,9 @@ def cargar_mapa_locales():
             with open(csv_path, newline='', encoding='utf-8') as csvfile:
                 reader = csv.DictReader(csvfile)
                 for row in reader:
-                    sigla_sistema = row.get("SIGLA SISTEMA", "").strip().upper()
-                    sigla_tickets = row.get("SIGLA TICKETS", "").strip().upper()
-                    nombre_local = row.get("LOCAL", "").strip()
+                    sigla_sistema = str(row.get("SIGLA SISTEMA") or "").strip().upper()
+                    sigla_tickets = str(row.get("SIGLA TICKETS") or "").strip().upper()
+                    nombre_local = str(row.get("LOCAL") or "").strip()
                     
                     # Sigla oficial será sigla_sistema, o sigla_tickets si la de sistema es '-'
                     sigla_oficial = sigla_sistema
@@ -137,8 +137,8 @@ def cargar_mapa_locales():
                     datos = {
                         "sigla": sigla_oficial,
                         "nombre": nombre_local,
-                        "direccion": row.get("DIRECCION", "").strip(),
-                        "supervisor": row.get("SUPERVISOR (GTE ZONA)", "").strip()
+                        "direccion": str(row.get("DIRECCION") or "").strip(),
+                        "supervisor": str(row.get("SUPERVISOR (GTE ZONA)") or "").strip()
                     }
                     
                     # Registrar bajo sigla de sistema
@@ -739,6 +739,7 @@ async def handler(event):
     import os
     import shutil
     import asyncio
+    import datetime
     if event.is_private and event.sender_id != MI_TELEGRAM_ID:
         return
 
@@ -1384,7 +1385,6 @@ async def handler(event):
             os.makedirs(dest_dir, exist_ok=True)
             
             import shutil
-            import datetime
             fecha_str = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
             exitosos = []
             

@@ -1188,7 +1188,8 @@ async def handler(event):
     estado = cargar_estado()
 
     # Interceptar respuesta de texto si hay un flujo interactivo activo para este chat
-    mensaje = event.text.strip() if event.text else ""
+    if event.text:
+        mensaje = event.text.strip()
     
     if estado.get("chat_id") == chat_id_str and mensaje:
         status = estado.get("status")

@@ -602,7 +602,91 @@ def tool_consultar_memoria_diagnostico(sigla):
     except Exception as e:
         return f"Error consultando memoria de diagnóstico: {e}"
 
+def tool_crear_recordatorio(tarea):
+    """Crea una nueva tarea o recordatorio en el sistema de tareas personales."""
+    import sys
+    sys.path.insert(0, "/home/cristian/PROYECTOS/Supervisor-Project/brain")
+    import gestion_recordatorios
+    return gestion_recordatorios.crear_recordatorio(tarea)
+
+def tool_listar_recordatorios(estado="pendiente"):
+    """Lista las tareas y recordatorios de Cristian filtrando por estado: 'pendiente', 'completado' o 'todos'."""
+    import sys
+    sys.path.insert(0, "/home/cristian/PROYECTOS/Supervisor-Project/brain")
+    import gestion_recordatorios
+    return gestion_recordatorios.listar_recordatorios(estado)
+
+def tool_completar_recordatorio(id_recordatorio):
+    """Marca un recordatorio o tarea pendiente como completado."""
+    import sys
+    sys.path.insert(0, "/home/cristian/PROYECTOS/Supervisor-Project/brain")
+    import gestion_recordatorios
+    return gestion_recordatorios.marcar_completado(id_recordatorio)
+
+def tool_eliminar_recordatorio(id_recordatorio):
+    """Elimina definitivamente un recordatorio o tarea por su ID."""
+    import sys
+    sys.path.insert(0, "/home/cristian/PROYECTOS/Supervisor-Project/brain")
+    import gestion_recordatorios
+    return gestion_recordatorios.eliminar_recordatorio(id_recordatorio)
+
 TOOLS_SCHEMA = [
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_crear_recordatorio",
+            "description": "Crea una nueva tarea o recordatorio para Cristian (ej: responder un correo, enviar un informe, etc.)",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "tarea": {"type": "string", "description": "El texto detallado del recordatorio o tarea a realizar"}
+                },
+                "required": ["tarea"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_listar_recordatorios",
+            "description": "Lista los recordatorios o tareas de Cristian filtrados por estado",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "estado": {"type": "string", "description": "Filtrar por 'pendiente', 'completado' o 'todos'", "enum": ["pendiente", "completado", "todos"]}
+                },
+                "required": ["estado"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_completar_recordatorio",
+            "description": "Marca una tarea o recordatorio pendiente como resuelto o completado por su ID",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "id_recordatorio": {"type": "integer", "description": "El ID numérico del recordatorio a completar"}
+                },
+                "required": ["id_recordatorio"]
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
+            "name": "tool_eliminar_recordatorio",
+            "description": "Elimina físicamente una tarea o recordatorio por su ID numérico",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "id_recordatorio": {"type": "integer", "description": "El ID numérico del recordatorio a eliminar"}
+                },
+                "required": ["id_recordatorio"]
+            }
+        }
+    },
     {
         "type": "function",
         "function": {
@@ -845,6 +929,14 @@ def execute_tool(tool_name, arguments_str):
             )
         elif tool_name == "tool_consultar_memoria_diagnostico":
             return tool_consultar_memoria_diagnostico(args.get("sigla", ""))
+        elif tool_name == "tool_crear_recordatorio":
+            return tool_crear_recordatorio(args.get("tarea", ""))
+        elif tool_name == "tool_listar_recordatorios":
+            return tool_listar_recordatorios(args.get("estado", "todos"))
+        elif tool_name == "tool_completar_recordatorio":
+            return tool_completar_recordatorio(args.get("id_recordatorio", 0))
+        elif tool_name == "tool_eliminar_recordatorio":
+            return tool_eliminar_recordatorio(args.get("id_recordatorio", 0))
         else:
             return f"Herramienta desconocida: {tool_name}"
     except Exception as e:

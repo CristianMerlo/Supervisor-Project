@@ -942,6 +942,27 @@ def execute_tool(tool_name, arguments_str):
     except Exception as e:
         return f"Error ejecutando herramienta {tool_name}: {e}"
 
+def post_with_retry(url, headers, json_payload, api_name):
+    import time
+    import requests
+    max_retries = 3
+    delay = 2
+    for attempt in range(max_retries):
+        try:
+            res = requests.post(url, headers=headers, json=json_payload, timeout=60)
+            if res.status_code != 429:
+                return res
+            with open("groq_error.log", "a") as f:
+                f.write(f"[{api_name}] 429 Detectado. Intento {attempt+1}/{max_retries}. Esperando {delay}s...\n")
+            time.sleep(delay)
+            delay *= 2
+        except Exception as e:
+            if attempt == max_retries - 1:
+                raise e
+            time.sleep(delay)
+            delay *= 2
+    return res
+
 def consultar_agentic_loop(mensaje_usuario, historial, system_prompt):
     """Ejecuta el bucle de razonamiento usando Gemini (vía API compatible con OpenAI) o Groq como resguardo."""
     import config_manager
@@ -1024,7 +1045,7 @@ REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS Y RAZONAMIENTO:
         }
         
         try:
-            res = requests.post(active_url, headers=active_headers, json=payload, timeout=60)
+            res = post_with_retry(active_url, active_headers, payload, api_provider)
             
             # 1. Fallback: Si Gemini falla, rotar a Groq de inmediato
             if res.status_code != 200 and api_provider == "gemini":
@@ -1037,14 +1058,14 @@ REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS Y RAZONAMIENTO:
                     "Content-Type": "application/json"
                 }
                 payload["model"] = model_groq
-                res = requests.post(active_url, headers=active_headers, json=payload, timeout=60)
+                res = post_with_retry(active_url, active_headers, payload, "groq")
                 
             # 2. Fallback: Si Groq da 429 (Rate limit), rotar a llama-3.1-8b-instant
             if res.status_code == 429 and api_provider == "groq":
                 with open("groq_error.log", "a") as f:
                     f.write(f"Groq API falló con 429. Rotando a llama-3.1-8b-instant...\n")
                 payload["model"] = "llama-3.1-8b-instant"
-                res = requests.post(active_url, headers=active_headers, json=payload, timeout=60)
+                res = post_with_retry(active_url, active_headers, payload, "groq-fallback")
 
             if res.status_code != 200:
                 with open("groq_error.log", "a") as f:

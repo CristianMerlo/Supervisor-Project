@@ -1910,20 +1910,42 @@ REGLAS ESTRICTAS:
             # Guardar en memoria local del userbot
             guardar_mensaje_memoria(remitente_id, "user", mensaje)
             guardar_mensaje_memoria(remitente_id, "assistant", respuesta_ia)
+        # Verificar si la respuesta es un error técnico
+        es_error_tecnico = False
+        if respuesta_ia and ("Ocurrió un error al contactar al modelo" in respuesta_ia or "Error en el bucle agentic" in respuesta_ia or respuesta_ia.startswith("Error: ")):
+            es_error_tecnico = True
+
         if respuesta_ia:
-            if "[ARCHIVO_ADJUNTO]" in respuesta_ia:
-                partes = respuesta_ia.split("[ARCHIVO_ADJUNTO]")
-                mensaje_texto = partes[0].strip()
-                ruta_archivo = partes[1].strip()
-                
-                if mensaje_texto:
-                    await event.respond(mensaje_texto)
-                if os.path.exists(ruta_archivo):
-                    await client.send_file(event.chat_id, ruta_archivo)
-                else:
-                    await event.respond(f"❌ Error: El archivo generado no se encontró en {ruta_archivo}")
+            if es_error_tecnico and es_grupo:
+                # Error técnico en grupo: no spamear el grupo, notificar a Cristian
+                chat_title = "Grupo"
+                try:
+                    chat = await event.get_chat()
+                    if chat and hasattr(chat, "title") and chat.title:
+                        chat_title = chat.title
+                except Exception:
+                    pass
+                msg_alerta = (
+                    f"⚠️ *[Hermes Alerta de Error]*\n"
+                    f"Se produjo un error al procesar una consulta de *{remitente_nombre}* en el grupo *{chat_title}*.\n\n"
+                    f"💬 *Mensaje original:* {mensaje}\n"
+                    f"❌ *Detalle del error:* {respuesta_ia}"
+                )
+                await client.send_message(MI_TELEGRAM_ID, msg_alerta)
             else:
-                await event.respond(respuesta_ia)
+                if "[ARCHIVO_ADJUNTO]" in respuesta_ia:
+                    partes = respuesta_ia.split("[ARCHIVO_ADJUNTO]")
+                    mensaje_texto = partes[0].strip()
+                    ruta_archivo = partes[1].strip()
+                    
+                    if mensaje_texto:
+                        await event.respond(mensaje_texto)
+                    if os.path.exists(ruta_archivo):
+                        await client.send_file(event.chat_id, ruta_archivo)
+                    else:
+                        await event.respond(f"❌ Error: El archivo generado no se encontró en {ruta_archivo}")
+                else:
+                    await event.respond(respuesta_ia)
         return
 async def watchdog_loop():
     logging.info("--- [WATCHDOG] Iniciando perro guardián de conexión Telegram ---")

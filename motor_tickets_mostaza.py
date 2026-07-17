@@ -163,7 +163,7 @@ def procesar_tickets():
             store_display = f"{t_store} - {nombre_local}" if nombre_local else t_store
             
             mensaje = (
-                f"🎫 *NUEVO TICKET DETECTADO*\n"
+                f"🎫 *NUEVO TICKET DETECTADO (# {t_id})*\n"
                 f"🏪 *Local:* {store_display}\n"
                 f"🕒 *Fecha/Hora:* {fecha_str} a las {t_time}\n"
                 f"⚠️ *Prioridad:* {prioridad_icon} ({t_priority})\n"

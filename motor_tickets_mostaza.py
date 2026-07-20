@@ -41,41 +41,66 @@ def guardar_vistos(vistos):
         print(f"Error guardando estado de tickets: {e}")
 
 def obtener_locales_conocidos():
-    """Lee el CSV de locales y retorna un set con las siglas (ej: 'FSAL4') de los locales conocidos."""
+    """Lee el CSV de locales y la base de datos SQLite para retornar las siglas de los locales conocidos."""
     conocidos = set()
     CSV_PATH = BASE_DIR / "locales.csv"
-    if not CSV_PATH.exists():
-        print(f"[!] CSV no encontrado en {CSV_PATH}")
-        return conocidos
-        
-    try:
-        import csv
-        with open(CSV_PATH, newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                sigla = row.get("SIGLA TICKETS", "").strip().upper()
-                if sigla:
-                    conocidos.add(sigla)
-    except Exception as e:
-        print(f"Error leyendo CSV de locales: {e}")
+    if CSV_PATH.exists():
+        try:
+            import csv
+            with open(CSV_PATH, newline='', encoding='utf-8') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    sigla = row.get("SIGLA TICKETS", "").strip().upper()
+                    if sigla:
+                        conocidos.add(sigla)
+        except Exception as e:
+            print(f"Error leyendo CSV de locales: {e}")
+            
+    DB_PATH = Path("/home/cristian/Documentos/Supervisor/supervisor_local.db")
+    if DB_PATH.exists():
+        try:
+            import sqlite3
+            with sqlite3.connect(DB_PATH) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT sigla FROM locales")
+                for row in cursor.fetchall():
+                    sigla = row[0].strip().upper()
+                    if sigla:
+                        conocidos.add(sigla)
+        except Exception as e:
+            print(f"Error leyendo DB de locales: {e}")
+            
     return conocidos
 
 def obtener_nombre_local_por_sigla(sigla):
-    """Resuelve la sigla del local a su nombre comercial completo usando locales.csv"""
+    """Resuelve la sigla del local a su nombre comercial completo usando locales.csv y SQLite."""
     CSV_PATH = Path("/home/cristian/PROYECTOS/Supervisor-Project/locales.csv")
-    if not CSV_PATH.exists():
-        return ""
-    try:
-        import csv
-        with open(CSV_PATH, newline='', encoding='utf-8') as csvfile:
-            reader = csv.DictReader(csvfile)
-            for row in reader:
-                sigla_tickets = row.get("SIGLA TICKETS", "").strip().upper()
-                sigla_sistema = row.get("SIGLA SISTEMA", "").strip().upper()
-                if sigla.upper() in [sigla_tickets, sigla_sistema]:
-                    return row.get("LOCAL", "").strip()
-    except Exception as e:
-        print(f"Error resolviendo nombre de local: {e}")
+    if CSV_PATH.exists():
+        try:
+            import csv
+            with open(CSV_PATH, newline='', encoding='utf-8') as csvfile:
+                reader = csv.DictReader(csvfile)
+                for row in reader:
+                    sigla_tickets = row.get("SIGLA TICKETS", "").strip().upper()
+                    sigla_sistema = row.get("SIGLA SISTEMA", "").strip().upper()
+                    if sigla.upper() in [sigla_tickets, sigla_sistema]:
+                        return row.get("LOCAL", "").strip()
+        except Exception as e:
+            print(f"Error resolviendo nombre de local: {e}")
+            
+    DB_PATH = Path("/home/cristian/Documentos/Supervisor/supervisor_local.db")
+    if DB_PATH.exists():
+        try:
+            import sqlite3
+            with sqlite3.connect(DB_PATH) as conn:
+                cursor = conn.cursor()
+                cursor.execute("SELECT nombre FROM locales WHERE sigla=?", (sigla.upper(),))
+                row = cursor.fetchone()
+                if row:
+                    return row[0].strip()
+        except Exception as e:
+            print(f"Error resolviendo nombre de local en DB: {e}")
+            
     return ""
 
 def autenticar():

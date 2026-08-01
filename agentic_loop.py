@@ -634,62 +634,6 @@ TOOLS_SCHEMA = [
     {
         "type": "function",
         "function": {
-            "name": "tool_crear_recordatorio",
-            "description": "Crea una nueva tarea o recordatorio para Cristian (ej: responder un correo, enviar un informe, etc.)",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "tarea": {"type": "string", "description": "El texto detallado del recordatorio o tarea a realizar"}
-                },
-                "required": ["tarea"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "tool_listar_recordatorios",
-            "description": "Lista los recordatorios o tareas de Cristian filtrados por estado",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "estado": {"type": "string", "description": "Filtrar por 'pendiente', 'completado' o 'todos'", "enum": ["pendiente", "completado", "todos"]}
-                },
-                "required": ["estado"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "tool_completar_recordatorio",
-            "description": "Marca una tarea o recordatorio pendiente como resuelto o completado por su ID",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "id_recordatorio": {"type": "integer", "description": "El ID numérico del recordatorio a completar"}
-                },
-                "required": ["id_recordatorio"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "tool_eliminar_recordatorio",
-            "description": "Elimina físicamente una tarea o recordatorio por su ID numérico",
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "id_recordatorio": {"type": "integer", "description": "El ID numérico del recordatorio a eliminar"}
-                },
-                "required": ["id_recordatorio"]
-            }
-        }
-    },
-    {
-        "type": "function",
-        "function": {
             "name": "tool_buscar_local",
             "description": "Busca la dirección y datos maestros de un local usando su nombre o sigla",
             "parameters": {
@@ -1009,20 +953,7 @@ REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS Y RAZONAMIENTO:
 4. RAZONAMIENTO ESTRUCTURADO (Chain of Thought - CoT): De forma obligatoria, antes de llamar a cualquier herramienta o emitir tu respuesta final, debes escribir tu análisis técnico paso a paso encerrado entre etiquetas <razonamiento> y </razonamiento>. Analiza allí qué datos te faltan, qué herramientas invocarás y qué hipótesis técnicas manejas sobre la falla.
 """
 
-    # Filtrar herramientas de recordatorios en chats grupales por privacidad de Cristian
     current_tools = TOOLS_SCHEMA
-    if es_grupo:
-        recordatorios_tools = {
-            "tool_crear_recordatorio", 
-            "tool_listar_recordatorios", 
-            "tool_completar_recordatorio", 
-            "tool_eliminar_recordatorio"
-        }
-        current_tools = [t for t in TOOLS_SCHEMA if t["function"]["name"] not in recordatorios_tools]
-        system_prompt += """
-⚠️ ADVERTENCIA DE PRIVACIDAD:
-Estás interactuando en un CHAT GRUPAL. Las herramientas de recordatorios y pendientes personales de Cristian están completamente DESHABILITADAS. NO tienes permitido listar, crear, completar o eliminar recordatorios en este chat de grupo. Si algún usuario te pregunta por recordatorios, pendientes o tareas resueltas, indícale de forma cortés que esa información es confidencial y privada y que no tienes permitido acceder a ella ni mostrarla en este chat grupal.
-"""
     
     if historial:
         historial_texto = "Historial reciente de la conversación (para tu memoria):\n"

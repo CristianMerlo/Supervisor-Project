@@ -907,7 +907,7 @@ async def handler(event):
         if file_name_img.lower().endswith(('.jpg', '.jpeg', '.png', '.webp', '.bmp', '.gif')):
             is_image_doc = True
 
-    if is_photo or is_image_doc:
+    if False:  # Desactivado procesamiento de fotos/imágenes por optimización
         try:
             # Si es doc, usamos su nombre, si no, uno por id
             if is_photo:
@@ -1487,7 +1487,7 @@ async def handler(event):
 
     # Soporte de Videos (Análisis de fallas en video)
     is_video = (event.message.video is not None) or (event.message.media and hasattr(event.message.media, 'document') and (event.message.media.document.mime_type or "").startswith("video/"))
-    if is_video:
+    if False:  # Desactivado procesamiento de videos por optimización
         file_name = f"video_{event.message.id}.mp4"
         for attr in event.message.media.document.attributes:
             if hasattr(attr, 'file_name'):
@@ -1877,8 +1877,8 @@ async def handler(event):
             
     # Filtrar palabras significativas para buscar local (ya definido arriba)
     # 3. Agentic Loop para Consultas Inteligentes (Reemplaza Niveles 1-4)
-    # Solo procesa si debe responder en grupo, o si es privado
-    if not es_grupo or debe_responder:
+    # Desactivadas respuestas conversacionales de IA en grupos (Solo responde en privado con Cristian)
+    if not es_grupo:
         from agentic_loop import consultar_agentic_loop
         
         system_prompt = """Eres Hermes, el "Supervisor" principal del sistema y asistente experto en mantenimiento operativo de las franquicias de Mostaza, corriendo sobre la infraestructura de 'AntiGravity'.

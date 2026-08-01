@@ -1931,7 +1931,13 @@ REGLAS ESTRICTAS:
                     f"💬 *Mensaje original:* {mensaje}\n"
                     f"❌ *Detalle del error:* {respuesta_ia}"
                 )
-                await client.send_message(MI_TELEGRAM_ID, msg_alerta)
+                # Registrar el error técnico localmente de forma silenciosa para no spamear a Cristian
+                try:
+                    with open("/home/cristian/Documentos/Supervisor/supervisor_errores.log", "a", encoding="utf-8") as f_err:
+                        from datetime import datetime
+                        f_err.write(f"[{datetime.now().isoformat()}] {msg_alerta.replace('*', '')}\n\n")
+                except Exception as e_log:
+                    print(f"Error escribiendo en supervisor_errores.log: {e_log}")
             else:
                 if "[ARCHIVO_ADJUNTO]" in respuesta_ia:
                     partes = respuesta_ia.split("[ARCHIVO_ADJUNTO]")

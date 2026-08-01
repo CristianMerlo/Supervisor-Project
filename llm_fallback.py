@@ -16,39 +16,17 @@ logging.basicConfig(level=logging.INFO)
 
 def notificar_error_modelo(provider, model_name, error_msg):
     """
-    Intenta notificar a Cristian por Telegram sobre una falla de modelo 
-    e incluye alternativas para sanar el sistema en caliente.
+    Registra de forma silenciosa las fallas de modelo en un archivo de log local,
+    evitando molestar a Cristian por Telegram con mensajes de depuración técnica.
     """
+    log_path = "/home/cristian/Documentos/Supervisor/fallas_modelos.log"
     try:
-        import notificador_telegram
-        alternativas = []
-        if provider.lower() == "groq":
-            alternativas = obtener_modelos_disponibles_groq()
-        elif provider.lower() == "gemini":
-            alternativas = ["gemini-2.5-flash", "gemini-2.5-pro", "gemini-1.5-flash"]
-            
-        mensaje = (
-            f"⚠️ *[Falla Crítica de Modelo]*\n"
-            f"El modelo *{model_name}* ({provider.upper()}) falló en producción.\n"
-            f"❌ *Error:* `{error_msg}`\n\n"
-        )
-        
-        if alternativas:
-            mensaje += f"👉 *Selecciona un modelo alternativo para solucionar el problema:*\n"
-            for alt in alternativas:
-                es_vision = "vision" in alt.lower() or "scout" in alt.lower() or "pixtral" in alt.lower()
-                var_key = "MODEL_GROQ_VISION" if es_vision else "MODEL_GROQ_TEXT"
-                if provider.lower() == "gemini":
-                    var_key = "MODEL_GEMINI_TEXT"
-                
-                # Comando para cambiar modelo
-                mensaje += f"• `/switch_model_{provider.lower()}_{var_key}_{alt.replace('/', '_')}`\n"
-        else:
-            mensaje += "No se pudieron recuperar modelos alternativos automáticamente."
-            
-        notificador_telegram.enviar_alerta(mensaje, agente="Antigravity", destinatario_id=215173956)
-    except Exception as e_notif:
-        logger.error(f"No se pudo enviar notificación de falla de modelo: {e_notif}")
+        with open(log_path, "a", encoding="utf-8") as f:
+            from datetime import datetime
+            f.write(f"[{datetime.now().isoformat()}] [{provider.upper()}] Modelo: {model_name} | Error: {error_msg}\n")
+        logger.error(f"[LOGGED] Falló modelo {model_name} ({provider}). Registrado en fallas_modelos.log")
+    except Exception as e_log:
+        logger.error(f"No se pudo escribir en log de fallas de modelos: {e_log}")
 
 def obtener_modelos_disponibles_groq():
     """Consulta la API de Groq para obtener el listado de todos los modelos activos."""

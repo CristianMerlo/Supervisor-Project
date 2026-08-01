@@ -15,7 +15,7 @@ if not GEMINI_KEY:
     exit(1)
 
 genai.configure(api_key=GEMINI_KEY)
-model = genai.GenerativeModel('gemini-2.5-flash')
+model = genai.GenerativeModel('gemini-flash-latest')
 
 BASE_JSON_PATH = "/home/cristian/PROYECTOS/Supervisor-Project/brain/base_errores.json"
 REPORTE_PATH = f"/home/cristian/Documentos/Supervisor/Reporte_QA_{datetime.now().strftime('%Y%m%d')}.md"

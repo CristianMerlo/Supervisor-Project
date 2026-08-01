@@ -2,640 +2,1078 @@
     "Melitta_Cafina": [
         {
             "codigo": "E01",
-            "falla": "Error de Group Erogador, la pantalla muestra 'Limpiar Grupo' o 'Grupo atascado'. No permite sacar café.",
-            "solucion": "Extraer el grupo erogador por el panel frontal, lavarlo con agua tibia para quitar restos de café compactado, engrasar las guías de movimiento (con grasa de grado alimenticio) y volver a insertar."
+            "falla": "Grupo erogador atascado",
+            "solucion": "Extraer el grupo erogador, lavarlo con agua tibia, engrasar las guías de movimiento con grasa de grado alimenticio y volver a insertar"
+        },
+        {
+            "codigo": "Y51",
+            "falla": "Sistema de leche no espuma o escupe vapor sin leche",
+            "solucion": "Desarmar la cabeza dispensadora, limpiar los orificios con un cepillo y remojar en líquido limpiador de leche durante 10 minutos"
         }
     ],
     "phu__Cambio_de_configuracion_PHU": [
         {
-            "codigo": "E01",
-            "falla": "La configuración de PHU no se puede cambiar debido a errores de sintaxis.",
-            "solucion": "No se proporcionó información sobre cómo hacer este cambio. Asegúrate de que los archivos de configuración son correctos y en formato válido."
+            "codigo": "No se carga la configuración",
+            "falla": "El archivo de configuración no se carga correctamente",
+            "solucion": "Asegurarse de que el archivo sea el original y no una copia, y que el pendrive esté vacío y formateado"
+        },
+        {
+            "codigo": "Error de autenticación",
+            "falla": "No se puede acceder al sistema de configuración",
+            "solucion": "Verificar que el usuario y la contraseña sean correctos (USUARIO: most, CONTRASEÑA: Burger para el nuevo sistema, o USUARIO: manager, CONTRASEÑA: password para el viejo sistema)"
+        },
+        {
+            "codigo": "No se puede descargar la configuración",
+            "falla": "No se puede descargar la configuración después de completar los slots",
+            "solucion": "Verificar que todos los slots estén completos y seleccionar la opción de descargar"
         }
     ],
     "taylor__Mantenimiento_de_Taylor_C713": [
         {
-            "codigo": "FALLA_PRODUCT_DOOR_OFF",
-            "falla": "Sensor del freezer dor Dañado: Cambiar el Sensor"
+            "codigo": "PAUSA SEGURID",
+            "falla": "La pantalla de PAUSA SEGURID se presenta con la alarma activada",
+            "solucion": "Oprimir cualquier símbolo de control para solucionar el problema"
         },
         {
-            "codigo": "CORTE_ALT_PRES_COMP",
-            "falla": "Condensador (Obstruido por un Objeto o pared – Sucio el condensador – Sucio el filtro) – No funciona la turbina."
+            "codigo": "SOBRECARG BATIDOR",
+            "falla": "Sobrecarga de batidora",
+            "solucion": "Verificar y solucionar problemas de falso contacto en la ficha, tomas, borneras de alimentación o conectores blancos, o reemplazar el motor si es necesario"
         },
         {
-            "codigo": "CONGELADOR_BLOQUEADO",
-            "falla": "Las causantes de esta falla pueden ser: 1_ El priming está mal echo – 2_ Los carburitos esta puestos al revés – 3_ El nivel de mezcla de la tolva no es el adecuado."
+            "codigo": "CORTE ALT PRES COMP",
+            "falla": "Corte por alta presión de compresora",
+            "solucion": "Verificar y limpiar el condensador, reemplazar el filtro si es necesario, o verificar el funcionamiento de la turbina"
         },
         {
-            "codigo": "FALLA_TOLVA",
-            "falla": "La maquina se tilda y no se puede utilizar – Se debe cambiar el sensor y hacer el Priming para dejarla operativa."
+            "codigo": "FALLA TERM TOLVA",
+            "falla": "Termistor de tolva dañado",
+            "solucion": "Reemplazar el sensor y realizar el procedimiento de priming"
+        },
+        {
+            "codigo": "FALLA TERM BARRIL",
+            "falla": "Termistor de barril dañado",
+            "solucion": "Reemplazar el sensor y realizar el procedimiento de priming"
+        },
+        {
+            "codigo": "FALLA PRODUCT DOOR OFF",
+            "falla": "Sensor del freezer door dañado",
+            "solucion": "Reemplazar el sensor"
+        },
+        {
+            "codigo": "CONGELADOR BLOQUEADO",
+            "falla": "Congelador bloqueado",
+            "solucion": "Verificar y solucionar problemas de priming, carburitos mal colocados o nivel de mezcla incorrecto"
+        },
+        {
+            "codigo": "TOLVA>41F (5C) TRAS 4 HR",
+            "falla": "Temperatura de la mezcla en la tolva superior a 41°F (5°C) durante más de 4 horas",
+            "solucion": "Verificar y ajustar la temperatura de la tolva"
+        },
+        {
+            "codigo": "BARRIL>41F (5C) TRAS 4 HR",
+            "falla": "Temperatura de la mezcla en el cilindro refrigerante superior a 41°F (5°C) durante más de 4 horas",
+            "solucion": "Verificar y ajustar la temperatura del cilindro refrigerante"
+        },
+        {
+            "codigo": "TOLVA>41F (5C) TRAS FE",
+            "falla": "Temperatura de la mezcla en la tolva superior a 41°F (5°C) después de una interrupción en el suministro eléctrico",
+            "solucion": "Verificar y ajustar la temperatura de la tolva"
+        },
+        {
+            "codigo": "BARRIL>41F (5C) TRAS FE",
+            "falla": "Temperatura de la mezcla en el cilindro refrigerante superior a 41°F (5°C) después de una interrupción en el suministro eléctrico",
+            "solucion": "Verificar y ajustar la temperatura del cilindro refrigerante"
+        },
+        {
+            "codigo": "TOLVA>59F (15C)",
+            "falla": "Temperatura de la mezcla en la tolva superior a 59°F (15°C)",
+            "solucion": "Verificar y ajustar la temperatura de la tolva"
+        },
+        {
+            "codigo": "BARRIL>59F (15C)",
+            "falla": "Temperatura de la mezcla en el cilindro refrigerante superior a 59°F (15°C)",
+            "solucion": "Verificar y ajustar la temperatura del cilindro refrigerante"
         },
         {
             "codigo": "E01",
-            "falla": "Se debe verificar la cámara de enfriamiento para asegurarse de que esté correctamente instalada y configurada.",
-            "solucion": "Verificar el estado de la cámara de enfriamiento y asegurarse de que esté correctamente conectada al sistema de refrigeración."
+            "falla": "Falla en el compresor",
+            "solucion": "Reemplazar el compresor TL3G -R134A (047701)"
         },
         {
             "codigo": "E02",
-            "falla": "El filtro dryer no está en su lugar correcto.",
-            "solucion": "Asegurar que el filtro dryer esté en su posición correcta e instalado en el circuito de moisterización."
+            "falla": "Fuga en la válvula de acceso",
+            "solucion": "Reemplazar la válvula de acceso -1/4 MFLX1/4 (044404)"
+        },
+        {
+            "codigo": "E03",
+            "falla": "Falla en el control",
+            "solucion": "Reemplazar el control A. (X59496 -27)"
+        },
+        {
+            "codigo": "E04",
+            "falla": "Falla en el relé",
+            "solucion": "Reemplazar el relé -DPDT 100UA - 7A 1/8HP (052111 -03)"
+        },
+        {
+            "codigo": "E05",
+            "falla": "Falla en el condensador",
+            "solucion": "Reemplazar el condensador (A. X59919)"
+        }
+    ],
+    "Liniers_Fallas_Recurrentes": [
+        {
+            "codigo": "E01",
+            "falla": "Obstrucción total del chicler debido a la acumulación de grasa de leche seca y sedimentos calcificados",
+            "solucion": "Desobstrucción física del chicler y limpieza profunda del conjunto de emulsión"
+        },
+        {
+            "codigo": "Y51",
+            "falla": "Presencia de granos sueltos y restos de café sobre la superficie de la base del molino",
+            "solucion": "Remoción completa de los residuos y granos de café sueltos en la base de encastre de la tolva"
         }
     ],
     "tostadora__VCT_2000Español_FINAL_2": [
         {
+            "codigo": "Sin display de control",
+            "falla": "La unidad no muestra nada en la pantalla de control",
+            "solucion": "Conectar la unidad a una toma de corriente adecuada, verificar si el protector de límite alto se ha disparado y reiniciar si es necesario"
+        },
+        {
+            "codigo": "Transportador no se enciende",
+            "falla": "El transportador no funciona",
+            "solucion": "Reposicionar el escudo térmico correctamente, reemplazar el escudo térmico si está dañado, ajustar o reemplazar el tensor de rodillo, medir y ajustar las cadenas según el manual de mantenimiento"
+        },
+        {
+            "codigo": "Cadena se ha estirado",
+            "falla": "La cadena transportadora se ha estirado",
+            "solucion": "Medir y ajustar las cadenas según el manual de mantenimiento"
+        },
+        {
+            "codigo": "Motor de accionamiento de la cadena se ha sobrecalentado",
+            "falla": "El motor de accionamiento de la cadena se ha sobrecalentado",
+            "solucion": "Dejar enfriar la unidad, verificar la cadena de transmisión para obstrucciones o uniones en las ruedas dentadas, medir y ajustar la cinta transportadora según la sección de mantenimiento"
+        },
+        {
+            "codigo": "Panes no se tuestan adecuadamente",
+            "falla": "Los panes no se tuestan correctamente",
+            "solucion": "Verificar que los ajustes son correctos, utilizar los ajustes recomendados, ajustar la temperatura a 600 °F (320 °C) y el auxiliar a 400 °F (204 °C), limpiar o reemplazar la hoja de liberación y la correa wrap según sea necesario"
+        },
+        {
             "codigo": "E01",
-            "falla": "El cinturón Wrap no es adecuado para las ruedas dentadas del abrigo.",
-            "solucion": "Realice los pasos 3 y 4, pero asegúrate de que la cadena Transportadora se ajuste con el espacio entre el rodillo y la parte inferior de la rueda."
+            "falla": "Cables mal colocados o sueltos en la toma",
+            "solucion": "Desarmar y verificar que los cables estén colocados correctamente y bien sujetos"
+        },
+        {
+            "codigo": "E02",
+            "falla": "Toma suelta",
+            "solucion": "Verificar que la toma no esté suelta y ajustar si es necesario"
+        },
+        {
+            "codigo": "E03",
+            "falla": "Fichas con cables mal colocados o sueltos",
+            "solucion": "Desarmar y verificar que los cables estén colocados correctamente y sujetos"
+        },
+        {
+            "codigo": "E04",
+            "falla": "Cable de alimentación en mal estado",
+            "solucion": "Verificar que el cable se encuentre en buen estado y reemplazar si es necesario"
+        },
+        {
+            "codigo": "E05",
+            "falla": "Prensacable no colocado correctamente",
+            "solucion": "Verificar que el prensacable esté colocado correctamente en el cable de alimentación"
+        },
+        {
+            "codigo": "E06",
+            "falla": "Cables mal colocados en la bornera de alimentación",
+            "solucion": "Verificar que los cables estén bien colocados en la bornera de alimentación"
+        },
+        {
+            "codigo": "E07",
+            "falla": "Gabinete eléctrico sucio o con humedad",
+            "solucion": "Limpiar con alcohol el gabinete eléctrico y verificar que los componentes eléctricos no estén húmedos"
+        },
+        {
+            "codigo": "E08",
+            "falla": "Cableado en mal estado o no sujetos en las borneras",
+            "solucion": "Verificar que el cableado se encuentre en buen estado y prolijo y sujetos en las borneras"
+        },
+        {
+            "codigo": "E09",
+            "falla": "Motor no lubricado",
+            "solucion": "Lubricar el motor"
+        },
+        {
+            "codigo": "E10",
+            "falla": "Tornillos faltantes o mal colocados",
+            "solucion": "Verificar que tenga todos los tornillos perfectamente colocados y colocar los faltantes"
         }
     ],
     "Cimbali__cimbali_s30": [
         {
             "codigo": "E01",
-            "falla": "La pantalla tátil aparece un mensaje de error.",
-            "solucion": "Para solucionar este problema, debes verificar si la unidad USB está conectada correctamente y asegurarte de que el dispositivo USB esté activado en la máquina."
+            "falla": "Falta de café en la tolva",
+            "solucion": "Reponer el café en la tolva"
         },
         {
             "codigo": "E02",
-            "falla": "El archivo de software no se puede encontrar en el disco duro.",
-            "solucion": "Verifica que el disco duro esté cargado correctamente y que el archivo de software sea visible en el explorador de archivos."
+            "falla": "Falta de leche en el recipiente",
+            "solucion": "Reponer la leche en el recipiente"
         },
         {
             "codigo": "E03",
-            "falla": "La configuración del dispositivo USB no está correctamente establecida.",
-            "solucion": "Reinstala la configuración del dispositivo USB y asegúrate de que esté activada correctamente."
+            "falla": "Cajón de posos lleno",
+            "solucion": "Vaciar el cajón de posos"
+        },
+        {
+            "codigo": "E04",
+            "falla": "Avería de comunicación del sistema de caja",
+            "solucion": "Verificar la conexión del sistema de caja y reiniciar si es necesario"
+        },
+        {
+            "codigo": "E05",
+            "falla": "Sistema de pago no habilitado",
+            "solucion": "Habilitar el sistema de pago"
         },
         {
             "codigo": "E01",
-            "falla": "El icono seleccionado no se puede visualizar debido a la configuración del dispositivo.",
-            "solucion": "{\"error_code\": \"E01\", \"description\": \"El icono seleccionado no se puede visualizar\"}"
+            "falla": "Falla en el recuento del tiempo de lavado automático",
+            "solucion": "Verificar la configuración del menú de lavados y asegurarse de que el lavado automático esté habilitado"
         },
         {
             "codigo": "E02",
-            "falla": "La memoria de las modificaciones no se ha conservado correctamente.",
-            "solucion": "{\"error_code\": \"E02\", \"description\": \"Las modificaciones no se han conservado correctamente\"}"
+            "falla": "No se activa el ciclo de lavado automático después de transcurridos los 210 minutos",
+            "solucion": "Verificar la configuración del menú de lavados y asegurarse de que el lavado automático esté habilitado y configurado correctamente"
         },
         {
-            "codigo": "E01",
-            "falla": "Se puede cargar messages en un idioma personalizado mediante llave USB.",
-            "solucion": "{\"error\": \"Error de carga de mensajes de texto\"}"
+            "codigo": "E03",
+            "falla": "La máquina no se enciende o no responde a los controles",
+            "solucion": "Verificar la conexión a la red eléctrica y asegurarse de que la máquina esté configurada correctamente"
         },
         {
-            "codigo": "C2",
-            "falla": "No hay archivos personales cargados en la memoria externa cuando el soporte USB no contiene ningún archivo admitido.",
-            "solucion": "{\"error\": \"Problema de cargabilidad de archivos de memoria personalizada\"}"
+            "codigo": "E04",
+            "falla": "El display muestra un mensaje de error o no muestra nada",
+            "solucion": "Verificar la configuración del display y asegurarse de que esté funcionando correctamente"
         },
         {
-            "codigo": "U20",
-            "falla": "Cargar iconos de bebidas personalizadas mediante llave USB puede tener problemas si hay un fondo personalizado activado.",
-            "solucion": "{\"error\": \"Problema de carga de fondos personalizados\"}"
+            "codigo": "E05",
+            "falla": "No se puede acceder al menú de programación",
+            "solucion": "Verificar la contraseña de acceso y asegurarse de que se haya introducido correctamente"
         },
         {
-            "codigo": "E01",
-            "falla": "La máquina no permite copiar imágenes de alta resolución a través de la llave USB cuando el soporte USB contiene archivos con dimensión mayor que 50 Mb.",
-            "solucion": "{\"error\": \"Rango de archivo permitido en la función de carga de imágenes\"}"
+            "codigo": "F01",
+            "falla": "No se puede conectar a la red WiFi",
+            "solucion": "Verifique que la redes este activa y el nombre y la contraseña sean correctos, luego intente conectar de nuevo"
         },
         {
-            "codigo": "U20",
-            "falla": "No se puede cargar vídeos personalizados mediante llave USB si no hay fondos personalizados activados.",
-            "solucion": "{\"error\": \"Problema de carga de fondos personalizados\"}"
+            "codigo": "F02",
+            "falla": "Problemas con la carga de archivos multimedia",
+            "solucion": "Verifique que los archivos estén en el formato correcto (JPG, PNG, BMP, MP4) y no superen el tamaño máximo permitido (50MB para imágenes y 200MB para videos)"
         },
         {
-            "codigo": "E01",
-            "falla": "La máquina no tiene configuración para el molinillo MM1.",
-            "solucion": "Debes configurar la selección de referencia para el cálculo de la media para el molinillo MM1."
+            "codigo": "F03",
+            "falla": "No se pueden guardar cambios en el menú de personalización",
+            "solucion": "Verifique que la máquina tenga espacio de almacenamiento disponible y que se hayan presionado los botones correctamente para guardar los cambios"
         },
         {
-            "codigo": "E02",
-            "falla": "El dato estándar de 0,5% es adecuado para bebidas expresas.",
-            "solucion": "La variación de molido no afectará la configuración de esta opción."
+            "codigo": "F04",
+            "falla": "La función de autoaprendizaje de la boquilla no funciona correctamente",
+            "solucion": "Verifique que la boquilla esté correctamente instalada y que se haya seleccionado la función de autoaprendizaje en el menú de personalización"
         },
         {
-            "codigo": "A05",
-            "falla": "Sistema de control de nivel de leche",
-            "solucion": "Reactivar el sensor de presión caldera"
+            "codigo": "F05",
+            "falla": "La pantalla táctil no responde correctamente",
+            "solucion": "Verifique que la pantalla esté limpia y libre de obstáculos, y que se estén utilizando los dedos para interactuar con la pantalla"
         },
         {
-            "codigo": "051",
-            "falla": "Sensor de presión caldera de servicios",
-            "solucion": "Ajustar la resistencia y rearmar el termostato de seguridad"
+            "codigo": "F01",
+            "falla": "Temperatura del grupo incorrecta",
+            "solucion": "Verificar la temperatura programada y ajustar según sea necesario"
         },
         {
-            "codigo": "052",
-            "falla": "Pausa calentamiento caldera",
-            "solucion": "Reactivar el termostato de seguridad y verificar las conexiones eléctricas"
+            "codigo": "F02",
+            "falla": "Temperatura del calentador incorrecta",
+            "solucion": "Verificar la temperatura del calentador y ajustar según sea necesario"
         },
         {
-            "codigo": "415",
-            "falla": "V3N 50Hz    380V3N 60Hz           min. 5x1,5 mm²        220-240V 50Hz       220V 60Hz         min. 3x4mm²     Kg pounds    79 174.2PESO      42 (1.6) ø120(4.7)   120 (4.72)   185 (7.28)    110 (4.33) 4,8-5,7 kW 24A 4,8-5,7 kW 12Aø120 (4.7)",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "F03",
+            "falla": "Pistón no se mueve correctamente",
+            "solucion": "Verificar la configuración del pistón y ajustar según sea necesario"
         },
         {
-            "codigo": "240",
-            "falla": "V3 50Hz    220V3 60Hz           min. 4x2,5 mm²  4,8-5,7 kW 19A 4,8 kW ALIMENTAZIONE ELETTRICA POWER SUPPLYPOTENZA INSTALLATAINSTALLED POWERCORRENTE DI LINEALINE POWERSEZIONE CAVO ALIMENTAZIONE SUPPLY CABLE SECTION MACCHINA MACHINE        IIIWarning!  Substances containing aromatic hydrocarbons,  oxidising acids, acetone, hydrofluorocarbons, ether or  ketones must not be used in the machine!  Also prohibited from use are anaerobic adhesives (Loctite",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "F04",
+            "falla": "Número de posos incorrecto",
+            "solucion": "Verificar la configuración del número de posos y ajustar según sea necesario"
         },
         {
-            "codigo": "3",
-            "falla": "Cámara fuera de posición   Durante la fase de  erogación se ha obscurecidola fotocélula FC2. En presencia de este error el ciclo de la máquina se bloquea y la máquina expulsa la pastilla de café.",
-            "solucion": "• Motor averiado. En suministro: repliegue cámara en fase de suministro hasta el oscurecimiento de FC2  • Residuos de polvo de café sobre las fotocélulas.  -Sustituir el motorreductor grupo café   - Sustituir la tarjeta - comprobar el correcto funcionamiento del sensor FC2."
+            "codigo": "F05",
+            "falla": "Tiempo de suministro de café no visible",
+            "solucion": "Verificar la configuración del tiempo de suministro y ajustar según sea necesario"
         },
         {
-            "codigo": "8",
-            "falla": "Timeout manipulación grupo.",
-            "solucion": "• Motor averiado  • Final de carrera defectuoso/ oscurecido  • Bloqueo mecánico.1 Abrir la máquina   2 Activar el cuadro manual   3 Accionar el motor grupo   -el motor arranca   -verificar el correcto funcionamiento de los fines de carrera FC1, FC2, FC3 y FC4 con ayuda del cuadro manual   -el motor no arranca   -verificar la presencia de tensión de alimentación en el motor accionando el mando manual   -si hay tensión:   verificar un posible bloqueo mecánico   -no hay tensión:   -verificar la tensión en salida de la tarjeta a los contactos: en la tarjeta CPU slave el J12, pin 1 y 5.   -si no hay tensión en salida de la tarjeta, sustituir la tarjeta."
+            "codigo": "F06",
+            "falla": "Retraso en la indicación de café no fresco",
+            "solucion": "Verificar la configuración del retraso y ajustar según sea necesario"
         },
         {
-            "codigo": "9",
-            "falla": "Fotocélulas de los sensores obscurecidas   Cuando 2 FC de 3 están obscurecidas, la máquina realiza un ciclo de manipulación (o de reset) en toda la carrera, para intentar restablecer la normal situación de trabajo. Si al final de dicho ciclo la situación sigue inalterada, se visualiza el código averiado.",
-            "solucion": "• Polvo de café en la proximidad de los finales de carrera• Finales de carrera defectuosos. 1 Limpiar los finales de carrera  2 Verificar el correcto funcionamiento de los fines de carrera FC1, FC2, FC3, FC4 con ayuda del cuadro manual   3 Sustituir los finales de carrera defectuosos.114 ES Español9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
+            "codigo": "F07",
+            "falla": "Umbral de mantenimiento del calentador incorrecto",
+            "solucion": "Verificar la configuración del umbral y ajustar según sea necesario"
         },
         {
-            "codigo": "18",
-            "falla": "Timeout movimiento  boquilla.Finales de carrera no funcionan.   Codificador averiado.   Motor averiado.  Bloqueo mecánico. -Verificar cableados y conjunto mecánico.   Controlar posibles interferencias mecánicas con el movimiento.   Sustituir el conjunto.",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "F08",
+            "falla": "Sensibilidad del nivel de agua incorrecta",
+            "solucion": "Verificar la configuración de la sensibilidad y ajustar según sea necesario"
         },
         {
-            "codigo": "20",
-            "falla": "Avería alimentación USB.Excesivo consumo de corriente de puerto USB.Controlar el estado del puerto USB y sus conexiones para identificar las posibles causas del exceso de consumo (p. ej. cortocircuitos).   Una vez eliminada la causa de la avería el sistema se restablece automáticamente, por lo que el puerto USB debe regresar a la condición de funcionamiento normal. Si la anomalía persiste, cambiar la tarjeta CPU Master .",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "F09",
+            "falla": "Presión de la caldera incorrecta",
+            "solucion": "Verificar la configuración de la presión y ajustar según sea necesario"
         },
         {
-            "codigo": "22",
-            "falla": "Anomalía de movimiento  regulación muelas MM1. Anomalía de movimiento regulación muelas MM2.",
-            "solucion": "• Motorreductor bloqueado   • Motorreductor averiado  • Codificador averiado. 1) Abrir la máquina.   2) Activar los motores del regulador de muelas en el cuadro de mandos manuales   3) Si el motorreductor no funciona, verificar la tensión al motor.   4) Si hay tensión verificar posibles bloqueos mecánicos.   5) Si el motorreductor funciona (codificador que no cuenta) verificar los cableados.   6) Sustituir el motorreductor.   7) Verificar o sustituir la tarjeta CPU Slave."
+            "codigo": "F10",
+            "falla": "Ciclo de restablecimiento de presión no funciona",
+            "solucion": "Verificar la configuración del ciclo y ajustar según sea necesario"
         },
         {
-            "codigo": "24",
-            "falla": "Mal funcionamiento del reloj. Información incoherente sobre la fecha y hora. Reconfigurar fecha y hora. Si la anomalía continúa, sustituir el panel maestro.",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "059",
+            "falla": "Timeout de carga de la caldera de servicios",
+            "solucion": "Controlar la conexión a la red hídrica, controlar/sustituir la electroválvula Evc, comprobar el cableado, controlar/sustituir la sonda de nivel, cambiar la tarjeta CPU"
         },
         {
-            "codigo": "25",
-            "falla": "Avería driver motor grupo café.Cortocircuito en el cableado o en el motor.Verificare el cableado, verificar/sustituir el motor, verificar/sustituir la CPU slave.",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "060",
+            "falla": "Anomalía señal de nivel caldera de servicios",
+            "solucion": "Controlar la puesta a tierra y los aislamientos de la máquina"
         },
         {
-            "codigo": "26",
-            "falla": "Avería driver motor bomba leche.Cortocircuito en el cableado o en el motor.Verificare el cableado, verificar/sustituir el motor, verificar/sustituir la CPU slave.",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "061",
+            "falla": "Anomalía durante el control del correcto llenado del calentador",
+            "solucion": "Comprobar si hay agua y si la bomba funciona, revise las obras del contador volumétrico, comprobar si hay obstrucciones en el circuito de entrada boiler de café"
         },
         {
-            "codigo": "27",
-            "falla": "Avería driver motor regulador muelas.Cortocircuito en el cableado o en el motor.Verificare el cableado, verificar/sustituir el motor, verificar/sustituir la CPU slave.",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "062",
+            "falla": "Suministros de café con caudal por debajo del límite",
+            "solucion": "Realizar lavado grupo, limpiar/sustituir el filtro de café, moler el café más grueso, calibrar correctamente la máquina según el café/receta"
         },
         {
-            "codigo": "32",
-            "falla": "Avería válvula  proporcional de aire.",
-            "solucion": "• Cableado defectuoso/interrumpido.   • Tarjeta válvula proporcional averiada (TVP). • Avería de la válvula proporcional de aire (VPA). • Tarjeta CPU Slave averiada.- Controlar el cableado entre la tarjeta CPU Slave y la tarjeta válvula proporcional (SVP) y la válvula proporcional de aire (VPA). - Sustituir la tarjeta válvula proporcional (SVP).   - Sustituir la válvula proporcional de aire (VPA). - Sustituir la tarjeta CPU Slave."
+            "codigo": "063",
+            "falla": "Suministros de café con caudal por encima del límite",
+            "solucion": "Quitar el puente en tolva, comprobar el funcionamiento del sensor de presencia de café, comprobar la ausencia de elementos externos dentro de las muelas, comprobar el funcionamiento del moledor-dosificador, moler el café más fino, calibrar correctamente la máquina según el café/receta"
         },
         {
-            "codigo": "33",
-            "falla": "Avería válvula proporcional de vapor.Avería válvula proporcional de vapor.- Cableado defectuoso/interrumpido.   - Tarjeta válvula proporcional averiada (SVP). - Tarjeta CPU Slave averiada.",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "064",
+            "falla": "Suministros de café referidos a MM2 con caudal por debajo del límite",
+            "solucion": "Realizar lavado grupo, limpiar/sustituir el filtro de café, moler el café más grueso, calibrar correctamente la máquina según el café/receta"
         },
         {
-            "codigo": "34",
-            "falla": "Avería accionamiento válvula proporcional de aire.",
-            "solucion": "• Avería interna en la válvula proporcional de aire (VPA).  -Si la anomalía persiste, sustituir la válvula."
+            "codigo": "065",
+            "falla": "Suministros de café referidos a MM2 con caudal por encima del límite",
+            "solucion": "Quitar el puente en tolva, comprobar el funcionamiento del sensor de presencia de café, comprobar la ausencia de elementos externos dentro de las muelas, comprobar el funcionamiento del moledor-dosificador, moler el café más fino, calibrar correctamente la máquina según el café/receta"
         },
         {
-            "codigo": "37",
-            "falla": "Avería sensor conductibilidad leche.",
-            "solucion": "• Sensor desconectado eléctricamente.   •  Sensor averiado. •  Tarjeta CPU Slave averiada.  -Verificar el cableado.  -Sustituir el sensor  -Sustituir la tarjeta.G6."
+            "codigo": "066",
+            "falla": "Dosis irregular durante el suministro de café",
+            "solucion": "Abrir la máquina, verificar el funcionamiento del contador con el cuadro de test durante el suministro de un café, verificar la granulometría y la calidad del café molido, limpiar los filtros, verificar la obstrucción de la electroválvula de café y del circuito hidráulico de café, verificar si falta agua y si funciona la bomba, sustituir el medidor de caudal, verificar el cableado"
         },
         {
-            "codigo": "38",
-            "falla": "Avería sensor temperatura leche.",
-            "solucion": "• Sensor desconectado eléctricamente.   • Sensor averiado. • Tarjeta CPU Slave averiada.- Verificar el cableado. - Sustituir el sensor. - Sustituir la tarjeta.C7."
+            "codigo": "067",
+            "falla": "Dosis irregular durante el lavado del grupo café",
+            "solucion": "Abrir la máquina, comprobar el funcionamiento del contador con el cuadro de test durante el ciclo de lavado, limpiar los filtros, verificar la obstrucción de la electroválvula de café y del circuito hidráulico de café, verificar si falta agua y si funciona la bomba, sustituir el medidor de caudal, verificar el cableado"
         },
         {
-            "codigo": "39",
-            "falla": "Ausencia detergente durante lavado leche.",
-            "solucion": "• Lavado leche efectuado sin utilizar el detergente correspondiente. • Líquido detergente no adecuado.   • Sensor conductibilidad leche averiado. • Tarjeta CPU Slave averiada.- Efectuar el lavado con el líquido detergente, siguiendo las indicaciones previstas en el procedimiento que se describe en los manuales de uso.   - Utilizar el líquido detergente aconsejado en los manuales de uso.   - Sustituir el sensor.D8 - Sustituir la tarjeta.D8."
+            "codigo": "088",
+            "falla": "Error en la integridad de datos NVM EEPROM",
+            "solucion": "Apagar y volver a encender la máquina, si la anomalía persiste, sustituir la tarjeta CPU slave"
         },
         {
-            "codigo": "41",
-            "falla": "Alarma por sobrecorriente durante la activación del motor bomba leche.",
-            "solucion": "• Sobreesfuerzo durante el funcionamiento   • Rotor bloqueado   • Motor bomba averiado. Si el error es esporádico, verificar la limpieza del circuito hidráulico; si el error es más frecuente, sustituir el motor de la bomba de leche.116 ES Español9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
+            "codigo": "089",
+            "falla": "Error en la integridad de datos NVM RAM",
+            "solucion": "Apagar y volver a encender la máquina, si la anomalía continúa, sustituir el panel maestro"
         },
         {
-            "codigo": "49",
-            "falla": "Stop suministro por falta  de leche.",
-            "solucion": "• Ausencia de leche en el recipiente.   • Extracción de leche no efectuada.   • Sensor conductibilidad leche averiado.   • Tarjeta CPU Slave averiada.- Llenar el recipiente de leche.   - Comprobar el correcto funcionamiento de la parte de circuito de aspiración de leche.   - Sustituir el sensor. - Sustituir la tarjeta."
+            "codigo": "091",
+            "falla": "Ausencia de cubeta durante ciclo lavados leche",
+            "solucion": "Colocar correctamente la cubeta de lavado, asegurarse de que funcione correctamente el sensor de presencia de la cubeta en el cuadro de prueba"
         },
         {
-            "codigo": "50",
-            "falla": "Suministro a base de leche interrumpido por baja presión.",
-            "solucion": "• Uso simultáneo de servicios vapor/agua junto a calentamiento leche, especialmente con presiones de trabajo bajas o potencia reducida.   • Agua de red en entrada particularmente fría. • Presencia de gases disueltos en el agua que se liberan en la caldera. - Controlar la dureza y el PH del agua de entrada en la máquina y en el sistema de tratamiento del agua.   - Habilitar el ciclo de restablecimiento de la presión en la caldera."
+            "codigo": "092",
+            "falla": "Solicitud regeneración de resinas ablandador de agua",
+            "solucion": "Mantenimiento ablandador"
         },
         {
-            "codigo": "51",
-            "falla": "Avería sensor de presión caldera de servicios.",
-            "solucion": "• sensor desconectado eléctricamente   • sensor averiado • tarjeta CPU averiada.Abrir la máquina -  comprobar el cableado   -  sustituir el sensor   -  sustituir la tarjeta."
+            "codigo": "093",
+            "falla": "Necesidad de cambiar filtro de agua",
+            "solucion": "Sustituir filtro agua ablandador"
         },
         {
-            "codigo": "52",
-            "falla": "Pausa calentamiento caldera.",
-            "solucion": "• intervención  termostato de seguridad rearmable • cableado elementos calentadores y/o mando triac interrumpido   • elemento caldera interrumpido • Tarjeta triac o CPU slave averiada.Abrir la máquina -  comprobar si se ha activado el termostato de seguridad y si fuese así rearmarlo   -  controlar si en el cableado hay una interrupción o cables desconectados -  controlar que la resistencia de la caldera no esté interrumpida y si fuese así sustituirla   -  sustituir la tarjeta triac."
+            "codigo": "095",
+            "falla": "Evento registrado cada vez que se efectúa una autenticación con las credenciales Master",
+            "solucion": ""
         },
         {
-            "codigo": "53",
-            "falla": "Avería en el sensor de temperatura de vapor.",
-            "solucion": "• Termopar desconectado/ interrumpido   • Tarjeta averiada.   -Abrir la máquina   -verificar el cableado  -sustituir el termopar  -sustituir la tarjeta."
+            "codigo": "096",
+            "falla": "Necesidad de realizar mantenimiento",
+            "solucion": "Realizar mantenimiento ordinario"
         },
         {
-            "codigo": "54",
-            "falla": "Anomalía en el sensor de temperatura de grupo café.",
-            "solucion": "• KTY desconectado o averiado   • Tarjeta averiada. Abrir la máquina   -  comprobar el cableado   -  sustituir el KTY   -  sustituir la tarjeta.Español117 ES9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
+            "codigo": "097",
+            "falla": "Reset contraseña",
+            "solucion": ""
         },
         {
-            "codigo": "55",
-            "falla": "Timeout calentamiento  grupo café.",
-            "solucion": "• Elemento calentador desconectado o averiado  • KTY averiado • Tarjeta averiada.Abrir la máquina   -  comprobar el cableado   -  comprobar elemento calentador   -  sustituir el KTY   -  sustituir la tarjeta CPU slave."
+            "codigo": "098",
+            "falla": "Reset informe histórico averías",
+            "solucion": "Proceso de inicio de la estructura del informe histórico de averías"
         },
         {
-            "codigo": "56",
-            "falla": "Anomalía en el sensor de temperatura de calentador café.",
-            "solucion": "• sensor temperatura desconectado o averiado • cableado del sensor de temperatura interrumpido • tarjeta CPU averiada.• Comprobar/sustituir el sensor • Comprobar el cableado • Sustituir la tarjeta CPU."
-        },
-        {
-            "codigo": "57",
-            "falla": "Timeout calentamiento calentador café.",
-            "solucion": "• intervención del termostato de seguridad rearmable • elemento caldera interrumpido • tarjeta triac averiada   • cableado de element os calentadores y/o mando triac interrumpido- Dejar enfriar la máquina y luego volver a reactivar el termostato de seguridad. - Controlar que la resistencia esté correctamente alimentada. - Controlar  las  conexiones  eléctricas de los TRIAC y que éstos funcionen correctamente. - Sustituir el TRIAC / tarjeta CPU si está averiado."
-        },
-        {
-            "codigo": "58",
-            "falla": "Anomalía sobrepresión en caldera de servicios.",
-            "solucion": "• Sonda del nivel averiada; caldera demasiado llena.  • Resistencia continuamente alimentada.  • tarjeta triac averiada   • Sensor de presión averiado • Verificar la sonda del nivel   • Verificar el cableado  • Sustituir la tarjeta triac  • Sustituir sensor de presión."
-        },
-        {
-            "codigo": "59",
-            "falla": "Timeout de carga de la caldera de servicios.",
-            "solucion": "• Alimentación red hídrica interrumpida   • EV de carga averiada.   • Cableado interrumpido   • Tarjeta averiada.   • Sonda de nivel sucia o averiada. • Controlar la conexión a la red hídrica.   • Controlar/sustituir la electroválvula Evc. • Comprobar el cableado • Controlar/sustituir la sonda de nivel • Cambiar la tarjeta CPU."
-        },
-        {
-            "codigo": "60",
-            "falla": "Anomalía señal de nivel caldera de servicios.",
-            "solucion": "• Perturbación eléctrica en referencia de tierra.  -Controlar la puesta a tierra y los aislamientos de la máquina."
-        },
-        {
-            "codigo": "61",
-            "falla": "Anomalía durante el control del correcto llenado del calentador.",
-            "solucion": "• Falta agua. • Contador volumétrico averiado • Bomba averiada.• Comprobar si hay agua y si la bomba funciona.   • Revise las obras del contador volumétrico.   • Comprobar si hay obstrucciones en el circuito de entrada boiler de café.118 ES Español9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
-        },
-        {
-            "codigo": "62",
-            "falla": "Suministros de café  referidos a MM1 con caudal por debajo del límite (3 suministros consecutivos).",
-            "solucion": "• Filtro de café obstruido   • conducto de café obstruido   • tipo de café cambiado   • calibración cref errónea  • moledura demasiado fina, dosis para moler excesiva.- realizar lavado grupo   -  limpiar/sustituir el filtro de café   - moler el café más grueso  - calibrar correctamente la máquina según el café/receta."
-        },
-        {
-            "codigo": "63",
-            "falla": "Suministros de café referidos a MM1 con caudal por encima del límite (3 suministros consecutivos).",
-            "solucion": "• café terminado (y sensor de café averiado, si está presente)  • puente en el café en tolva   • tipo de café cambiado   • calibración cref errónea  • moledura demasiado gruesa  • moledor-dosificador bloqueado, dosis para moler escasa.- quitar el puente en tolva   - comprobar el funcionamiento del sensor de presencia de café - comprobar la ausencia de elementos externos dentro de las muelas - comprobar el funcionamiento del moledor-dosificador (arranque y fusibles) - moler el café más fino - calibrar correctamente la máquina según el café/receta."
-        },
-        {
-            "codigo": "64",
-            "falla": "Suministros de café referidos a MM2 con caudal por debajo del límite (3 suministros consecutivos).",
-            "solucion": "• Filtro de café obstruido   • conducto de café obstruido   • tipo de café cambiado   • calibración cref errónea  • moledura demasiado fina, dosis para moler excesiva.-realizar lavado grupo   -limpiar/sustituir el filtro de café   -moler el café más grueso  -calibrar correctamente la máquina según el café/receta."
-        },
-        {
-            "codigo": "65",
-            "falla": "Suministros de café referidos a MM2 con caudal por encima del límite (3 suministros consecutivos).",
-            "solucion": "• café terminado (y sensor de café averiado, si está presente) • puente en el café en tolva   • tipo de café cambiado   • calibración cref errónea • moledura demasiado gruesa • moledor-dosificador bloqueado, dosis para moler escasa.- quitar el puente en tolva   - comprobar el funcionamiento del sensor de presencia de café - comprobar la ausencia de elementos externos dentro de las muelas - comprobar el funcionamiento del moledor-dosificador (arranque y fusibles) - moler el café más fino - calibrar correctamente la máquina según el café/receta.Español119 ES9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
-        },
-        {
-            "codigo": "66",
-            "falla": "Dosis irregular durante  el suministro de café.",
-            "solucion": "• Falta agua.   • Bomba rota  • Demasiado café  • Café molido demasiado fino   • Filtros obturados   • Ev de café obturada o defectuosa   • Medidor de caudal roto.  -1 Abrir la máquina   2 Verificar el funcionamiento del contador con el cuadro de test durante el suministro de un café   3 si el contador funciona con solo pocos impulsos:   - verificar la granulometría y la calidad del café molido   - limpiar los filtros   - verificar la obstrucción de la electroválvula de café y del circuito hidráulico de café   4 si el contador NO funciona:   - verificar si falta agua y si funciona la bomba   - sustituir el medidor de caudal   - verificar el cableado."
-        },
-        {
-            "codigo": "67",
-            "falla": "Dosis irregular durante el lavado del grupo café.",
-            "solucion": "• Falta agua.   •  Bomba rota  •  Filtros obturados   • Ev de café obturada o defectuosa   • Medidor de caudal roto. 1 Abrir la máquina   2 Comprobar el funcionamiento del contador con el cuadro de test durante el ciclo de lavado   3 si el contador funciona con solo pocos impulsos:   -limpiar los filtros   -verificar la obstrucción de la electroválvula de café y del circuito hidráulico de café   4 si el contador NO funciona:   -verificar si falta agua y si funciona la bomba   -sustituir el medidor de caudal   -verificar el cableado."
-        },
-        {
-            "codigo": "88",
-            "falla": "Error en la integridad de datos NVM EEPROM.",
-            "solucion": "• Error la integridad de datos contenidos en la memoria permanente de la CPU slave.  -Apagar y volver a encender la máquina. Si la anomalía persiste, sustituir la tarjeta CPU slave."
-        },
-        {
-            "codigo": "89",
-            "falla": "Error en la integridad de datos NVM RAM.",
-            "solucion": "• Error la integridad de datos contenidos en la memoria permanente RAM de la CPU master.  -Apagar y volver a encender la máquina. Si la anomalía continúa, sustituir el panel maestro."
-        },
-        {
-            "codigo": "91",
-            "falla": "Ausencia de cubeta durante ciclo lavados leche.",
-            "solucion": "• Retirada de cubeta durante el lavado. • Sensor presencia cubeta defectuoso.  - Colocar correctamente la cubeta de lavado. - Asegurarse de que funcione correctamente el sensor de presencia de la cubeta en el cuadro de prueba.120 ES Español9.  Mensajes de diagnóstico CÓDIGO AVERÍADESCRIPCIÓN CAUSAS POSIBLES INTERVENCIONES"
-        },
-        {
-            "codigo": "92",
-            "falla": "Solicitud regeneración  de resinas ablandador de agua.  -Mantenimiento ablandador.",
-            "solucion": "Revisar manual para más detalles."
-        },
-        {
-            "codigo": "93",
-            "falla": "Necesidad de cambiar filtro de agua. -Sustituir filtro agua ablandador.",
-            "solucion": "Revisar manual para más detalles."
-        },
-        {
-            "codigo": "94",
-            "falla": "Habilitación test válvula de seguridad de la caldera. Se ha efectuado un acceso con la llave USB específica para habilitar la función del test de la válvula de seguridad de la caldera. Acción deseada por el usuariointroduciendo el códigocorrespondiente.",
-            "solucion": "Revisar manual para más detalles."
-        },
-        {
-            "codigo": "95",
-            "falla": "Evento registrado cada vez que se efectúa una autenticación con las credenciales Master.",
-            "solucion": "Revisar manual para más detalles."
-        },
-        {
-            "codigo": "96",
-            "falla": "Necesidad de realizar mantenimiento.- Realizar mantenimiento ordinario.",
-            "solucion": "Revisar manual para más detalles."
-        },
-        {
-            "codigo": "98",
-            "falla": "Reset informe histórico averías.",
-            "solucion": "• Proceso de inicio de la estructura del informe histórico de averías."
+            "codigo": "099",
+            "falla": "Carga datos estándar",
+            "solucion": "Se ha solicitado la carga de los parámetros de fábrica"
         },
         {
             "codigo": "100",
-            "falla": "Error de integridad de  la base de datos.",
-            "solucion": "• Error de integridad de los datos contenidos en la base de datos de la CPU master.  -Si la anomalía continúa, sustituir el panel maestro."
+            "falla": "Error de integridad de la base de datos",
+            "solucion": "Si la anomalía continúa, sustituir el panel maestro"
         },
         {
             "codigo": "101",
-            "falla": "Avería en el puerto serie en dirección a la CPU Slave.",
-            "solucion": "• Avería de funcionamiento del puerto serie de comunicación con la CPU slave.  -Apagar y volver a encender la máquina. Controlar el cableado de interconexión entre las tarjetas de la CPU. Si la anomalía continúa, sustituir el panel maestro."
+            "falla": "Avería en el puerto serie en dirección a la CPU Slave",
+            "solucion": "Apagar y volver a encender la máquina, controlar el cableado de interconexión entre las tarjetas de la CPU, si la anomalía continúa, sustituir el panel maestro"
         },
         {
             "codigo": "102",
-            "falla": "Avería pantalla táctil, la pantalla no responde a las presiones.",
-            "solucion": "• Perturbaciones eléctricas.Al verificarse el problema la máquina ejecuta un procedimiento de restablecimiento inmediato para regresar a la funcionalidad normal. Controlar la conexión a tierra y los aislamientos de la máquina."
+            "falla": "Avería pantalla táctil, la pantalla no responde a las presiones",
+            "solucion": "Controlar la conexión a tierra y los aislamientos de la máquina"
         },
         {
             "codigo": "103",
-            "falla": "Restablecimiento parámetros NVM CPU master.",
-            "solucion": "• Anomalías de alimentación.   • Perturbaciones eléctricas.\"Al verificarse el problema la máquina ejecuta un procedimiento de restablecimiento inmediato para regresar a la funcionalidad normal.   Controlar la conexión a tierra y los aislamientos de la máquina."
+            "falla": "Restablecimiento parámetros NVM CPU master",
+            "solucion": "Controlar la conexión a tierra y los aislamientos de la máquina"
         },
         {
             "codigo": "158",
-            "falla": "Anomalía sobretemperatura calentador.",
-            "solucion": "• Nivel de agua bajo o calentador  vacío.   • Resistencia continuamente alimentada.     • Tarjeta cpu/triac averiada.  • Controlar nivel • Controlar el cableado• Sustituir tarjetas."
+            "falla": "Anomalía sobretemperatura calentador",
+            "solucion": "Controlar nivel, controlar el cableado, sustituir tarjetas"
         },
         {
-            "codigo": "106",
-            "falla": "Evento registrado cada vez que se desactiva el control de mantenimiento.122 ES EspañolDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES La máquina no suministra las bebidas        solicitadasa)\t no\tse\talcanza\tla\ttemperatura \tdel\tcalentador \tprogramada \t(1°\tcalentamiento) b)\t temperatura \tmínima\tde\tcalentamiento \tde\tla\tcámara\tgrupo\tcafé\t70\t°C\t(TGR)\tno\talcanzada \t (1.er calentamiento) c) falta café d)\t cajón \tde\tposos\tagotados \tcafé\tlleno\t e) compuertas tolvas de café abiertas f) grupo café averiado  g)\t filtro\tcafé\tbloqueado h)\t orificios \tde\tboquilla\tde\tsuministro \tbloqueados i) bomba volumétrica averiada o desconectada  j)\t falta\talimentación \tde\tla\tred\thídrica k) granulometría incorrecta l) conducto FEP en salida del grupo de suministro bloqueado m) by pass de bomba volumétrica no regulado correctamente n) EvG averiada o desconectada Dificultad de montaje de la cubierta supe - riora) presencia de granos de café en el interior del conducto de alimentación de la cámara de  moledura b) cables eléctricos aplastados entre la cubierta y la carcasa de la máquina Dificultad para posicionar correctamente la tolva en la máquina c)\t verificar \tque\tla\tcompuerta \testé\tabierta d)\t verificar \tla\tpolarización \tde\tla\ttolva El grupo de suministro no se mueve o no se mueve correctamente a) motorreductor averiado b)\t tarjeta \tCPU\tslave\taveriada c) roscas y tuerca no debidamente acopladas d) sensores ópticos averiados/desconectados o oscurecidos por depósito de café  e)\t cajón \tde\tposos\textraído f)\t ausencia \tde\tlubricante \ten\tlos\tejes\tde\tdeslizamiento El motor moledor no arranca a) compuerta de tolva abierta b) conector de alimentación no conectado  c) rotor mecánicamente bloqueado d) microinterruptor de seguridad abierto (válido sólo con la cubierta superior quitada) El grupo de suministro genera ruidos du - rante el movimientoa)\t juegos \ten\tel\tacoplamiento \tde\tlas\troscas\ty\tlas\ttuercas b)\t ausencia \tde\tlubricante \ten\tejes\tde\tdeslizamiento La temperatura final de la bebida no es correcta a) la temperatura programada en el calentador no es correcta b) la temperatura programada en la cámara del grupo café (TGR) no es correcta c) intervención termostatos de seguridad rearmables  d) cantidad de bebida no adecuada10.  Anomalías circuito caféEspañol123 ESDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES El tiempo de suministro de la bebida no es  correctoa) la dosis de café molido no es correcta b) la granulometría de café molido no es correcta c)\t las\tconfiguraciones \tCref.\talgoritmo \tPGS\tno\tson\tcorrectas d) caudal más allá de lo aceptable ± 50 % (PGS no activo) e)\t filtro\tcafé\tbloqueado f)\t guarnición \tOR\tpistón\tinferior\tfuera\tdel\talojamiento \t g) los granos de café forman una obstrucción accidental en la tolva h) portamuelas giratorio bloqueado por un cuerpo extraño Descarte dosis división bebidas >10 % e)\t agujeros \ten\ttapa\tde\tboquilla\tde\tsuministro \ttapados\tpor\tcafé\tseco f)\t agujeros \tØ\t2\tpor\tdivisión\ten\tpresión\ttapados\tpor\tcafé\tseco g)\t agujeros \tØ\t2\tpor\tdivisión\ten\tpresión\tcon\tpresencia \tde\trebaba\tde\telaboración Residuos de café molido seco sobre grupo y/o sobre base de la máquina a) colector de café molido colocado incorrectamente b) dosis de café incorrecta c) resorte batiente de grupo café roto Formación de burbujas y/o bebida de mala calidad a) granulometría incorrecta b) la dosis de café molido no es correcta c) la temperatura programada en la cámara del grupo café (TGR) no es correcta d) fuga de aire en la guarnición de tapa boquilla de suministro  e)\t temperatura \tcalentador \tinsuficiente, \tqueda\tpolvo\tde\tcafé\tsin\tutilizar f) cantidad de bebida no adecuada  g)\t café\ten\tgrano\tviejo Coloración de la bebida no uniforme a)\t residuos \tde\tcafé\ten\tlos\tconductos \tal\tfinal\tdel\tsuministro. \tRealizar\tel\tlavado\tdel\tcircuito\tcafé b) la temperatura programada en la cámara del grupo café (TGR) no es correcta  c) granulometría incorrecta d) dosis de café incorrecta Salida solo de agua de la boquillade suministro (a excepción de en el ciclo de lavado) a) portamuelas giratorio bloqueado mecánicamente  b) motor\tmoledor-dosificador \tno\tfunciona c) los granos de café forman una obstrucción accidental en la tolva  d) programación de las dosis de café incorrecta según receta Dosis café en taza inconstante a) válvula de expansión calentador no regulada correctamente b) Contador volumétrico averiado. c) corriente \tde\tcompensación \tdel\tgrupo\tinsuficiente10.  Anomalías circuito café124 ES EspañolDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES La máquina no suministra las bebidas  solicitadasa)\t no\tse\talcanza\tla\ttemperatura \tprogramada \tde\tla\tcaldera\t(1°\tcalentamiento) b) falta leche c) tubo de aspiración de leche no está inmerso o está pinchado  d) tubo de aspiración de leche obstruido e)\t configuración \tequivocada \tdel\tparámetro \t\"activación\" f)\t bomba \tde\tengranajes \taveriada \to\tdesconectada \t g) electroválvula Ed averiada o desconectada h) apertura excesiva de los reguladores de aire i) fuga de aire accidental de los conductos arriba de la bomba de leche La bomba de engranajes no activa la corri - ente de fluidoa) apertura excesiva de los reguladores de aire b) electroválvula Elf3 averiada o desconectada  c)\t configuración \tequivocada \tdel\tparámetro \t\"activación\" Baja dosis en taza a) conducto del circuito leche parcialmente bloqueado b)\t configuración \tequivocada \tdel\tparámetro \t\"activación\" Baja temperatura en taza a) aire sobrecalentado en la caldera b)\t configuración \tv\tMpl\tde\tbomba\tde\tengranajes \tincorrecta \t c)\t temperatura \tleche\ten\taspiración \tpróxima\ta\t0\t°C Excesiva temperatura en taza con respecto a la configurada a)\t temperatura \tleche\ten\taspiración \t>\t3-5\t°C b) tubo de aspiración de leche obstruido/bloqueado c) abertura excesiva de los reguladores de aire leche caliente/leche fría  d)\t configuración \tv\tMpl\tde\tbomba\tde\tengranajes \tincorrecta División de la dosis poco equitativa a) residuos de leche seca en el interior de la boquilla de suministro  b) abertura excesiva del regulador de aire Baja calidad en taza c) abertura de los reguladores de aire no adecuada d)\t temperatura \tfinal\t>\t72-75\t°C e)\t configuración \tv\tMpl\tde\tbomba\tde\tengranajes \tincorrecta f)\t configuración \tequivocada \tdel\tparámetro \t\"activación\" g) leche precongelada en fase de almacenamiento Salida de vapor de la boquilla de suminis - tro al inicio de la erogaciónh) tubo de aspiración de leche obstruido/bloqueado i) tubo de aspiración de leche no está sumergido en la leche  j)\t configuración \tequivocada \tdel\tparámetro \t\"activación\" k)\t bomba \tde\tengranajes \taveriada \to\tdesconectada \t l) electroválvula Elf3 averiada o desconectada m) apertura excesiva de los reguladores de aire10.  Anomalías circuito lecheEspañol125 ESDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES Montaje ausente o parcial a) electroválvulas Ear1/Ear2 averiadas o desconectadas eléctricamente b)\t abertura \tinsuficiente \tde\tlos\treguladores \tde\taire c)\t temperatura \tleche\t>\t5\t°C\t(válida\tsólo\tpara\tleche\tfría) d) leche precongelada en fase de almacenamiento e) la electroválvula Elf3 no garantiza el no retorno del líquido de lavado en la dirección del  contenedor de leche El circuito de leche queda lleno de residu - os al finalizar el suministroa) alimentación de la red hídrica interrumpida b) electroválvula Elf1 averiada o desconectada  c) bomba volumétrica averiada o desconectada d)\t configuración \tequivocada \tWM4\ten\tNO La boquilla de suministro está bloqueada con residuos de leche a) alimentación de la red hídrica interrumpida b) electroválvula Elf1 averiada o desconectada  c) bomba volumétrica averiada o desconectada  d)\t configuración \tWM4\ten\tNO e) programación equivocada de lavado breve a frío del último suministro El canal de aspiración de leche queda lleno al finalizar el suministro f)\t no\tes\tsuficiente \tel\ttiempo\tde\tvaciado\tconfigurado g) falta de restablecimiento de la presión ambiental causa sifón en el conducto de descarga h) presencia de un sifón en el conducto de aspiración10.  Anomalías circuito leche126 ES EspañolDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES La máquina no suministra la bebida a)\t no\tse\talcanza\tla\ttemperatura \tdel\tcalentador \tprogramada \t(1°\tcalentamiento) b) motor mixer averiado o desconectado c) mixer bloqueado por polvo soluble (demasiado lleno) d)\t conductos \thacia\tabajo\tdel\tmixer\tbloqueados \tpor\tresiduos \tdel\tproductos \tno\tdisueltos e) bomba volumétrica averiada o desconectada f) electroválvula Eds averiada o desconectada g) suministro efectuado sin la mezcla caliente debido al salpicadero abierto Dosis en taza menor a la nominal a) residuos no disueltos del producto en los conductos b) residuos no disueltos del producto en el mixer Baja temperatura en taza a) temperatura programada del calentador de café correspondiente expresamente al café b) programación equivocada del nivel de temperatura según la receta c)\t ritmo \tde\ttrabajo\tmayor\tal\tritmo\tposible\ttérmicamente \t d) regulación termostato de seguridad del calentador Excesiva temperatura en taza a) temperatura programada del calentador de café correspondiente expresamente al café b) programación equivocada del nivel de temperatura según la receta  c) electroválvula Eaf averiada o desconectada La boquilla de suministro está bloqueada  con residuos de chocolatea) programación equivocada de lavado breve del último suministro b) temperatura de solubilización incorrecta Densidad elevada de chocolate Presencia de agua limpia que sale de laboquilla de suministro a)\t formación \taccidental \tde\tuna\tamasijo\tde\tproducto \tdentro\tde\tla\ttolva\t b)\t motorreductor \tdosificador \taveriado \to\tdesconectado c)\t aporte \tlimitado\tde\tpolvo\tsoluble\tcon\trespecto \ta\tla\tdosis\tde\tagua.\tLa\tdosificación \ta\tpasos\tno\t alcanza a compensar d) electroválvula Eds averiada o desconectada e)\t electroválvula \tEds\tcon\tnúcleo\tpegajoso \tpor\tla\tanterior\tsalida\taccidental \tde\tchocolate \tdel\t mixer f) presencia de sifón en el conducto de descarga La bebida no sale por la boquilla de suministro a) electroválvula Eds averiada o desconectada10.  Anomalías circuito solublesEspañol127 ESDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES El lavado dura más de lo normalposibles\tobstrucciones \tde\tlos\tfiltros\tde\tcafé pastilla\tde\tlavado\tempastada \ten\tel\tfiltro\tde\tcafé DESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES El lavado no arranca alojamiento incorrecto del contenedor de recogida Ejecución incorrecta del lavadoa) alimentación de la red hídrica interrumpida b) bomba volumétrica averiada o desconectada  c) bomba de leche averiada o desconectada El líquido de lavado no vuelve a circular o el  contenedor de recogida no se vacíaa) abertura excesiva de los reguladores de aire leche caliente/leche fría b)\t bomba \tde\tengranajes \taveriada \to\tdesconectada \t c) electroválvula Elf3 averiada o desconectada Residuos de detergente en el contenedor de recogida de lavado con recirculacióna) el canal de aspiración no está correctamente colocado sobre el fondo del contenedor de  recogida b) cantidad de detergente excesiva en el depósito de lavado10. Anomalías de lavado largo en el circuito café 10.  Anomalías lavado con recirculación en el circuito de leche DESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES El lavado no arrancaa) motor mixer averiado o desconectado b) mixer bloqueado por polvo soluble c) conductos después del mixer bloqueados por los polvos solubles  d) bomba volumétrica averiada o desconectada10.  Anomalías lavado circuito solubles128 ES EspañolDESCRIPCIÓN ANOMALÍAS CAUSAS POSIBLES Humedad en la tolva o en la parte interna  del salpicaderoa) funcionamiento anormal del rotor de aspiración de vapores b) panel posterior o puertas anteriores no cerradas correctamente Portamuelas giratorio bloqueado  mecánicamentea) cuerpo extraño interpuesto entre las muelas b)\t interrupción \tdel\tcondensador \tde\tmarcha\tmotor\tmoledor-dosificador c) fuga guarnición pistón del grupo café en fase de compresión Bomba volumétrica no funcionaa) interrupción del condensador de marcha b) motor averiado o desconectado La bomba volumétrica no permite alcanzar la presión de 9-10bar con la válvula cerrada a) bypass balanceado a regular  b) paletas consumadas La máquina no se enciendea) ausencia de red eléctrica d)\t interruptor \ton/off\tapagado \to\taveriado Calentador o caldera no alcanzan la temperatura programadaa) conector de cuatro polos cableado general desconectado c) intervención termostatos de seguridad  c) triac averiada Pantalla táctil apagadaa)\t tarjeta \tde\tpantalla\taveriada b) alimentador switching averiado  c) cableado de máquina interrumpido Iluminación ausente en el plano de trabajo de la máquina a) led RGB averiados b) cableado interrumpido Intervención en la válvula de seguridada)\t sensor \tde\tpresión\taveriado \t-\ttarjeta\ttriac\taveriada b) electroválvula Evc averiada o desconectada - caldera vaciada/demasiado llena  c) interrupción del circuito de autonivel - caldera demasiado llena Goteo de líquidos sobre el plano de apoyo de la máquina a)\t guarnición \tOR\tconexión \tcon\tbandeja\tde\tdescarga \tdesgastada \t b)\t bandeja \tno\tcolocada \thasta\tel\ttope Señalización continua cajón de posos extraídoa)\t reed\tpresencia \tdel\tcajón\tde\tposos\taveriado b) cableado reed interrumpido c)\t falta\tel\timán\tfijado\tal\tcajón10.  Anomalías componentes de la máquinaFase di salita iniziale Initial ascent phase Phase de montée initiale Anfangsanstiegsphase Fase de subida inicial Fase de subida inicialPosizione standby Standby position Position pause Stand-By-Position Posición standby Posição standbyFase di macinatura Grinding phase Phase de mouture Mahlphase Fase de moledura Fase de moagem Fase di salita intermedia 1 Intermediate ascent phase 1 Phase de montée intermédiaire 1 Zwischenanstiegsphase 1 Fase de subida intermedia 1Fase de subida intermédia 111.   Fasi movimentazione gruppo - Group movement phases - Phases de manutention du groupe -     Bewegungsphasen Gruppe - Fases movimientos del grupo -  Fases de movimentação do grupo V1 2 3 44 4Fase di erogazione Dispensing phase Phase de distribution Abgabephase Fase de suministro Fase da distribuiçãoFase di salita intermedia 2 Intermediate ascent phase 2 Phase de montée intermédiaire 2 Zwischenanstiegsphase 2 Fase de subida intermedia 2 Fase de subida intermédia 2Termine fase di salita End ascent phase  Terme de phase de montée  Final fase de subida Ende Anstiegsphase  Conclusão fase de subida  Fase di termine erogazione - Asciugatura End dispensing phase - Drying Phase de fin de distribution - Séchage Endphase Abgabe - Trocknung Fase de final de suministro - Secado Fase de conclusão da distribuição - Secagem11.   Fasi movimentazione gruppo - Group movement phases - Phases de manutention du groupe -     Bewegungsphasen Gruppe - Fases movimientos del grupo -  Fases de movimentação do grupo VI5 6 7 84 4 41 411.   Fasi movimentazione gruppo - Group movement phases - Phases de manutention du groupe -     Bewegungsphasen Gruppe - Fases movimientos del grupo -  Fases de movimentação do grupo Fase di discesa finale - 1 - Final descent phase - 1- Phase de descente finale - 1 - Endabstiegsphase - 1- Fase de descenso final - 1 - Fase de descida final - 1 -Fase iniziale di discesa Initial descent phase Phase initiale de descente Anfangsabstiegsphase Fase inicial de descenso Fase inicial de descidaFase di discesa intermedia Intermediate descent phase Phase de descente intermédiaire Zwischenabstiegsphase Fase de descenso intermedia Fase de descida intermédia Fase di discesa finale - 2 - Final descent phase - 2- Phase de descente finale - 2 - Endabstiegsphase - 2- Fase de descenso final - 2 - Fase de descida final - 2 - VII9 10 11 1244Ritorno posizione standby Return to standby position Retour position pause Rückkehr in Stand-By-Position Retorno a la posición standby Retorno à posição de standbyEspulsione fondo caffè - 1 - Expulsion of coffee grounds 1- Expulsion du marc de café - 1 - Ausstoß Kaffeesatz - 1- Expulsión posos de café - 1 - Expulsão borra café - 1 -Espulsione fondo caffè - 2 - Expulsion of coffee grounds - 2- Expulsion du marc de café - 2 - Ausstoß Kaffeesatz - 2- Expulsión posos de café - 2 - Expulsão borra café - 2 - Posizione standby Standby position Position pause Stand-By-Position Posición standby Posição standby11.   Fasi movimentazione gruppo - Group movement phases - Phases de manutention du groupe -     Bewegungsphasen Gruppe - Fases movimientos del grupo -  Fases de movimentação do grupo VIII13 14 15 16",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "Falta de suministro de agua",
+            "falla": "La máquina no tiene suministro de agua",
+            "solucion": "Verificar si la electroválvula de agua fría (Eaf) y la electroválvula de agua caliente (Eac) están funcionando correctamente"
         },
         {
-            "codigo": "16",
-            "falla": "A3Title Size D esign File Name Rev Date: Sheet: ofRev. Date D escription FromRev. History Dc + - Tc1 2 FC2 FC3 FC1 Rc WB 1 1 -t °NTCg -t °NTCbDV SL Sml1 2EFC SP+ - -t °OPTOSWITCH REED FLUSSIMETRO TERMOCOPPIA NTC SENSORE PRESSIONE LIVELLOIRSmc1 IRSmc2",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "Falla en el calentador",
+            "falla": "El calentador no está funcionando",
+            "solucion": "Verificar si el termostato y el elemento calefactor están funcionando correctamente"
         },
         {
-            "codigo": "",
-            "falla": "DUAL_MILK535924040538119000Enc535960000 ENCODER966442000     Schema elettrico - Wiring diagram - Schéma électrique -                  Elektrischer Schaltplan - Esquema eléctrico -  Esquema elétrico XIII11 22 33 44 55 66 77 88 D DC CB BA A S30 - FUNZ IONALE POTENZA STE LLA S30_pot enza_STELL A.Sch Doc 1 1 24/05/2016A3Title Size D esign File N ame Rev Date: Sheet: ofRev. Date D escription FromRev. Hi storyTSR N TELERUTTOREMORSETTIERA GENERALE   MORSETTIERA 3 51 2 4 6P3 P5 P4 P2P1",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "Falla en la bomba de leche",
+            "falla": "La bomba de leche no está funcionando",
+            "solucion": "Verificar si el motor de la bomba de leche (Mpl) y la electroválvula de leche (Em) están funcionando correctamente"
         },
         {
-            "codigo": "16",
-            "falla": "FILTRO DELTA EL 16MBFG5POMPA MACININO 1 MACININO 2TERMOSTATO BOILER TERMOSTATO CALDAIA INTERRUTTORE MM1 INTERRUTTORE MM2R S T N N2 (CALDAIA) N1 (BOILER)N3_N4 (POMPA/MM1/MM2)R1-R2 (BOILER - MM3) R1-R2 (BOILER - MM3) S1 (CALDAIA) T1-T2-T3 (POMPA/MM1/MM2)Tl MoMoGStTB1RBTB2 TC1 RC TC2 MM1 MM2MP IMM1 IMM2Asw Fi2Fi1IG T1 IMM3 INTERRUTTORE MM3R2MMMM3MACININO 3N1_M3 (MM3) N1_M3R1R2     Schema elettrico - Wiring diagram - Schéma électrique -                  Elektrischer Schaltplan - Esquema eléctrico -  Esquema elétrico XIV11 22 33 44 55 66 77 88 D DC CB BA A S30 - FUNZ IONALE POTENZ A TRIANGOLO S30_pot enza_TRIANGOLO.Sch Doc 1 1 24/05/2016A3Title Size D esign File N ame Rev Date: Sheet: ofRev. Date D escription FromRev. Hi storyTSR TELERUTTOREMORSETTIERA GENERALEMORSETTIERA 3 51 2 4 6P3 P5 P4 P2P1",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "Falla en el sistema de vapor",
+            "falla": "El sistema de vapor no está funcionando",
+            "solucion": "Verificar si la electroválvula de vapor (Ev) y el termostato están funcionando correctamente"
         },
         {
-            "codigo": "16",
-            "falla": "FILTRO DELTA EL 16MBFG5POMPA MACININO 1 MACININO 2TERMOSTATO BOILER TERMOSTATO CALDAIA INTERRUTTORE MM1 INTERRUTTORE MM2R_OUT S_OUT T_OUT N_OUTR_IN S_IN T_IN N_IN01 2 3 R S T NR1-R2  (BOILER-MM3) N3_N4 (POMPA/MM1/MM2) N1-N1_M3 (BOILER - MM3) N2 (CALDAIA)1234Tl Mo MoGStTB1RBTB2 TC1RCTC2 MM1 MM2MP IMM1 IMM2Asw Fi2Fi1IGR2 R1 IMM3 INTERRUTTORE MM3R2MMMM3N1 N1_M3 MACININO 3 INSERIRE  UN PONTIC ELLO  TRA LA POSIZIONE  1 E LA POSIZIONE 2 DELLA  MORSETTIERA  GENERALEBOILER RESISTANCE BOILER  RESISTANCE INSERT  A BRIDGE  BETWEEN THE  POSIT ION 1 AND THE  POSIT ION 2  OF THE  GENE RAL TERMINAL  BOARD     Schema elettrico - Wiring diagram - Schéma électrique -                  Elektrischer Schaltplan - Esquema eléctrico -  Esquema elétrico XV11 22 33 44 55 66 77 88 D DC CB BA A S30 - FUNZ IONALE POTENZA  MONOF ASE S30_pot enza_MONOF ASE.Sch Doc 1 1 24/05/2016A3Title Size D esign File N ame Rev Date: Sheet: ofRev. Date D escription FromRev. Hi storyL N TELERUTTOREMORSETTIERA GENERALE MORSETTIERA 3 51 2 4 6P3 P5 P4 P2P1",
-            "solucion": "Revisar manual para más detalles."
-        },
-        {
-            "codigo": "16",
-            "falla": "FILTRO DELTA EL 16MBFG5POMPA MACININO 1 MACININO 2TERMOSTATO BOILER TERMOSTATO CALDAIA INTERRUTTORE MM1 INTERRUTTORE MM2R S T N N2 (CALDAIA)N1 N3_N4 (POMPA/MM1/MM2)R1  (BOILER) S1(CALDAIA) T1 (POMPA)T2-T3 (MM1/MM2)Tl MoMoGStTB1RBTB2 TC1RCTC2 MM1 MM2MP IMM1 IMM2Asw Fi2Fi1IG IMM3 INTERRUTTORE MM3R2MMMM3N1-N1_M3 (BOILER - MM3) N1_M3R2  (MM3) N1_M3MACININO 3BOILER RESISTANCE BOILER  RESISTANCER2  (MM3)     Schema elettrico - Wiring diagram - Schéma électrique -                  Elektrischer Schaltplan - Esquema eléctrico -  Esquema elétrico XVI11 22 33 44 55 66 77 88 D DC CB BA A S30 - FUNZIONALE POTENZA MONOFASE UL S30_pot enza _MON OFASE_UL_T .SchDoc 1 1 7/7/2016A3Title v e R e m a N  e l i F  n g i s e D e z i S f o : t e e h S : e t a DRev. Date Description FromRev. HistoryL N TELERUTTOREMORSETTIERA GENERALEMORSETTIERA 3 51 2 4 6P3 P5 P4 P2P1 3 51 2 4",
-            "solucion": "Revisar manual para más detalles."
-        },
-        {
-            "codigo": "132",
-            "falla": "Elf2 Capp/CaffèElf1 HtEsm231MMx Eaf Gv MPFiGEva Gsol BoIn  0,6 mmIn  0,8 mm EvcEm1 3 2Ets*ts* CsEv Eac S30_Full",
-            "solucion": "Revisar manual para más detalles."
-        },
-        {
-            "codigo": "925",
-            "falla": "ACQUA FREDDA ACQUA CALDA ACQUA MISCELATA VAPORE ARIA SOLUBILE LATTE ACQUA LAVAGGIO LATTEEd ACQUA LAVAGGIO RICIRCOLODvIn  0.6 mm1 21 21",
-            "solucion": "Revisar manual para más detalles."
+            "codigo": "Falla en el dosificador volumétrico",
+            "falla": "El dosificador volumétrico no está funcionando",
+            "solucion": "Verificar si el motor del dosificador volumétrico y la electroválvula correspondiente están funcionando correctamente"
         }
     ],
     "Hielera__Clase_Manitowoc": [
         {
             "codigo": "E01",
-            "falla": "La máquina para hacer hielo no se enciende correctamente y permanece apagada durante 10 minutos.",
-            "solucion": "Revisa el panel de control para asegurarse de que las conexiones de agua y regulador de hielo estén funcionando correctamente."
-        },
-        {
-            "codigo": "E01",
-            "falla": "Aplicación de la configuración de hora no se realizó correctamente. Se recomienda utilizar el menú Configuración para ajustar esta aplicación.",
-            "solucion": "Revisar el menú Configuración y asegurarse de que todas las opciones estén activas."
+            "falla": "La máquina para hacer hielo no arranca",
+            "solucion": "Verificar si el botón de encendido está presionado y si la cortina de agua/amortiguadores de hielo están en su lugar en el evaporador"
         },
         {
             "codigo": "E02",
-            "falla": "La función de la claridad del hielo no se activó correctamente. Verificar la configuración de la máquina para hacer hielo.",
-            "solucion": "Revisar la configuración de la máquina para hacer hielo y asegurarse de que la opción de Claridad del Hielo esté activada."
+            "falla": "La válvula de entrada de agua no permite el flujo adecuado de agua",
+            "solucion": "Verificar si la válvula de entrada de agua está obstruida o si el filtro de la malla está sucio, y limpiar o reemplazar según sea necesario"
         },
         {
             "codigo": "E03",
-            "falla": "El sistema de recordatorio de limpieza no se activó correctamente. Verificar la configuración de la máquina para hacer hielo.",
-            "solucion": "Revisar la configuración de la máquina para hacer hielo y asegurarse de que el interruptor de recordatorio esté activado."
+            "falla": "La sonda de grosor de hielo no funciona correctamente",
+            "solucion": "Verificar si la sonda de grosor de hielo está configurada correctamente y si el cable de la sonda no restrinja el movimiento de la sonda, y ajustar o reemplazar según sea necesario"
+        },
+        {
+            "codigo": "E04",
+            "falla": "La válvula de descarga de agua tiene una pérdida",
+            "solucion": "Quitar la válvula de descarga de agua, desarmarla y limpiarla, y verificar si el muelle está dañado o si la junta plástica está desgastada, y reemplazar según sea necesario"
+        },
+        {
+            "codigo": "E05",
+            "falla": "El PTCR no funciona correctamente",
+            "solucion": "Verificar si el PTCR está dañado o si la resistencia del PTCR está fuera del rango permitido, y reemplazar según sea necesario"
+        },
+        {
+            "codigo": "E01",
+            "falla": "Pantalla LCD no se enciende",
+            "solucion": "Verificar si la máquina está encendida y si el cable de alimentación está correctamente conectado. Si el problema persiste, contactar con el fabricante."
+        },
+        {
+            "codigo": "E02",
+            "falla": "No produce hielo",
+            "solucion": "Verificar si el agua está congelada, si la máquina está configurada correctamente y si el sensor de temperatura está funcionando. Si el problema persiste, contactar con el fabricante."
+        },
+        {
+            "codigo": "E03",
+            "falla": "Pantalla LCD muestra un mensaje de error",
+            "solucion": "Verificar el mensaje de error y seguir las instrucciones de la máquina para solucionar el problema. Si el problema persiste, contactar con el fabricante."
+        },
+        {
+            "codigo": "Y51",
+            "falla": "Fallos de comunicación con el sistema de control",
+            "solucion": "Verificar si el cable de comunicación está correctamente conectado y si el sistema de control está funcionando correctamente. Si el problema persiste, contactar con el fabricante."
+        },
+        {
+            "codigo": "E03",
+            "falla": "Pérdida de energía",
+            "solucion": "Verificar la fuente de alimentación y asegurarse de que la máquina esté correctamente conectada"
+        },
+        {
+            "codigo": "E04",
+            "falla": "Temperatura alta del condensador",
+            "solucion": "Verificar el condensador y asegurarse de que esté limpio y libre de obstáculos"
+        },
+        {
+            "codigo": "E05",
+            "falla": "Fallo de alta presión",
+            "solucion": "Verificar el interruptor de desconexión por alta presión y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E07",
+            "falla": "Evaporador ávido de una única TVX o con poca carga",
+            "solucion": "Verificar la carga del evaporador y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E08",
+            "falla": "Fallo de TXV en el evaporador",
+            "solucion": "Verificar el TXV y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E09",
+            "falla": "Inundación del evaporador 1",
+            "solucion": "Verificar el nivel de agua en el evaporador y asegurarse de que esté dentro de los límites normales"
+        },
+        {
+            "codigo": "E10",
+            "falla": "Inundación del evaporador 2",
+            "solucion": "Verificar el nivel de agua en el evaporador y asegurarse de que esté dentro de los límites normales"
+        },
+        {
+            "codigo": "E11",
+            "falla": "Fallo del sistema de refrigeración",
+            "solucion": "Verificar el sistema de refrigeración y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E12",
+            "falla": "Fallo de cortina",
+            "solucion": "Verificar la cortina y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E15",
+            "falla": "Temperatura líquida baja",
+            "solucion": "Verificar la temperatura líquida y asegurarse de que esté dentro de los límites normales"
+        },
+        {
+            "codigo": "E16",
+            "falla": "Fallo del condensador remoto",
+            "solucion": "Verificar el condensador remoto y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E19",
+            "falla": "Fallo de la sonda de hielo",
+            "solucion": "Verificar la sonda de hielo y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E20",
+            "falla": "Fallo del sistema de agua",
+            "solucion": "Verificar el sistema de agua y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E21",
+            "falla": "Fallo del sensor T1",
+            "solucion": "Verificar el sensor T1 y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E22",
+            "falla": "Fallo del sensor T2",
+            "solucion": "Verificar el sensor T2 y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E23",
+            "falla": "Fallo del sensor T3",
+            "solucion": "Verificar el sensor T3 y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E24",
+            "falla": "Fallo del sensor T4",
+            "solucion": "Verificar el sensor T4 y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E25",
+            "falla": "Fallo de la sonda del depósito",
+            "solucion": "Verificar la sonda del depósito y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E26",
+            "falla": "Fallo de la sonda del depósito",
+            "solucion": "Verificar la sonda del depósito y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E27",
+            "falla": "Fallo de la sonda del depósito",
+            "solucion": "Verificar la sonda del depósito y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E28",
+            "falla": "AUCS no se encuentra",
+            "solucion": "Verificar la conexión del AUCS y asegurarse de que esté funcionando correctamente"
+        },
+        {
+            "codigo": "E31",
+            "falla": "Modo seguro",
+            "solucion": "Reiniciar la máquina y verificar que los sensores estén funcionando correctamente"
         }
     ],
     "taylor__Manual_C713op_Spanish": [
         {
             "codigo": "E01",
-            "falla": "La máquina no tiene agujeros en las juntas tóricas localizadas en el extremo del tubo de alimentación.",
-            "solucion": "Reemplazar los agujeros con un tubo correcto."
+            "falla": "Rotación incorrecta de la batidora",
+            "solucion": "Intercambiar dos líneas de alimentación eléctrica en el bloque de terminales principal del congelador para unidades trifásicas, o intercambiar las conexiones en el interior del motor de la batidora para unidades monofásicas"
         },
         {
             "codigo": "E02",
-            "falla": "El sistema no detecta datos corruptos durante la inicialización.",
-            "solucion": "Reiniciar el sistema o cambiar los parámetros de control."
+            "falla": "Falta de espacio libre adecuado alrededor del congelador",
+            "solucion": "Asegurarse de que haya un espacio libre mínimo de 3” (76 mm) en todos los costados del congelador para permitir el flujo adecuado del aire por el condensador"
         },
         {
-            "codigo": "VNRAM",
-            "falla": "La memoria NVRAM no está configurada correctamente.",
-            "solucion": "Configurar la memoria NVRAM para obtener información adicional sobre la falla."
+            "codigo": "E03",
+            "falla": "Uso de fusibles mayores que los especificados",
+            "solucion": "Utilizar fusibles según las especificaciones de la etiqueta de datos del congelador para evitar daños al equipo"
+        },
+        {
+            "codigo": "E04",
+            "falla": "No poner a tierra el congelador correctamente",
+            "solucion": "Asegurarse de que el congelador esté correctamente puesto a tierra para evitar electrocuciones"
+        },
+        {
+            "codigo": "E05",
+            "falla": "Uso de refrigerantes no autorizados",
+            "solucion": "Utilizar solo el refrigerante especificado en la etiqueta de datos para evitar invalidar la garantía de la compresora"
         },
         {
             "codigo": "E01",
-            "falla": "La máquina no se enciende correctamente",
-            "solucion": "Revisa la fuente de alimentación y asegúrate de que esté conectada a la red eléctrica. Verifica también si el interruptor de energía está configurado correctamente."
+            "falla": "Flujo de producto irregular",
+            "solucion": "Ajustar la palanca de extracción para proporcionar un caudal de 5 a 7,5 onzas (142 a 213 g) de producto cada 10 segundos."
+        },
+        {
+            "codigo": "E02",
+            "falla": "Obstrucción en el orificio de aire",
+            "solucion": "Limpiar el agujero del orificio de aire con agua caliente y jabón."
+        },
+        {
+            "codigo": "E03",
+            "falla": "Falta de lubricación en las juntas tóricas",
+            "solucion": "Lubricar las juntas tóricas del tubo de alimentación localizadas en el extremo que tiene un agujero pequeño en el costado."
+        },
+        {
+            "codigo": "E04",
+            "falla": "Bacterias en la mezcla",
+            "solucion": "Limpie y desinfecte la máquina minuciosamente con regularidad, incluyendo el desarmado y cepillado completo de la unidad."
+        },
+        {
+            "codigo": "E05",
+            "falla": "Cuchillas raspadoras dañadas o desgastadas",
+            "solucion": "Reemplazar las cuchillas raspadoras dañadas o desgastadas y asegurarse de que estén montadas correctamente en la hélice antes de instalar el conjunto de la batidora."
+        },
+        {
+            "codigo": "1",
+            "falla": "No se surte producto",
+            "solucion": "Verificar el nivel de mezcla, el interruptor de energía y la modalidad de operación"
+        },
+        {
+            "codigo": "2",
+            "falla": "El producto es demasiado suave",
+            "solucion": "Ajustar la tasa de extracción a 5 a 7,5 onzas (142 a 213 g) de producto (por peso) cada 10 segundos"
+        },
+        {
+            "codigo": "3",
+            "falla": "El producto es demasiado espeso",
+            "solucion": "Drenar el cilindro refrigerante y volver a cebar la máquina"
+        },
+        {
+            "codigo": "4",
+            "falla": "La mezcla en la tolva está demasiado caliente",
+            "solucion": "Limpie y desinfecte la tapa de la tolva y colóquela en la posición correcta"
+        },
+        {
+            "codigo": "5",
+            "falla": "La mezcla en la tolva está demasiado fría",
+            "solucion": "Llamar a un técnico de servicio autorizado para ajustar la temperatura de la tolva"
+        },
+        {
+            "codigo": "6",
+            "falla": "Las sondas de mezcla baja y condición sin mezcla no están funcionando",
+            "solucion": "Limpie las tolvas minuciosamente"
+        },
+        {
+            "codigo": "7",
+            "falla": "Se acumula producto en la parte superior de la puerta del congelador",
+            "solucion": "Reemplace la junta tórica o lubríquela correctamente"
+        },
+        {
+            "codigo": "8",
+            "falla": "Fugas excesivas de mezcla por la parte inferior del surtidor de la puerta",
+            "solucion": "Reemplace la junta tórica o lubríquela correctamente"
+        },
+        {
+            "codigo": "9",
+            "falla": "Fugas excesivas de mezcla a la bandeja de goteo larga",
+            "solucion": "Reemplace el sello o lubríquelo correctamente, instale la pieza correctamente, lubrique las piezas de manera correcta"
+        },
+        {
+            "codigo": "10",
+            "falla": "El eje motor está atorado en el acoplamiento motor",
+            "solucion": "Cepille regularmente la zona del cojinete de armazón trasero"
+        },
+        {
+            "codigo": "11",
+            "falla": "Las paredes del cilindro refrigerante están melladas",
+            "solucion": "Instale o reemplace el cojinete delantero, reemplace la puerta del congelador, reemplace el conjunto de la batidora"
+        },
+        {
+            "codigo": "12",
+            "falla": "El producto produce chasquidos al servirse",
+            "solucion": "Ajuste la tasa de extracción a 5 a 7,5 onzas (142 a 213 g) de producto (por peso) cada 10 segundos, drenar el cilindro refrigerante y volver a cebar la máquina"
+        },
+        {
+            "codigo": "13",
+            "falla": "No funciona el tablero de control cuando el interruptor de energía está en la posición de encendido",
+            "solucion": "Conecte la máquina a una toma eléctrica de pared, encienda el cortacircuito o reemplace el fusible"
         }
     ],
     "melitta__CT8_SP_V4_1_EN": [
         {
-            "codigo": "E01",
-            "falla": "Descripción de la falla: Servicio de reparación necesaria debido a la mala instalación del sistema.",
-            "solucion": "Reparar el sistema de fluidos y ajustar las bombas según el manual."
+            "codigo": "Sin códigos de error específicos",
+            "falla": "No se proporcionan códigos de error o fallas específicas en el texto dado",
+            "solucion": "Revisar el manual completo o contactar con el soporte técnico de Melitta para obtener ayuda con problemas específicos"
         },
         {
-            "codigo": "E07",
-            "falla": "El sistema de fluidos no se puede utilizar para ciertos productos, por lo que se recomienda contactar al servicio de reparación.",
-            "solucion": "Contactar al servicio de reparación para obtener instrucciones específicas."
-        },
-        {
-            "codigo": "E11",
-            "falla": "El sistema de hidráulicos no se puede utilizar en los modelos no adaptados a este sistema.",
-            "solucion": "Adaptar el modelo del sistema de hidráulicos según el manual de instrucciones."
-        },
-        {
-            "codigo": "E13",
-            "falla": "El sistema de temperatura no está funcionando correctamente, se recomienda contactar al servicio de reparación.",
-            "solucion": "Contactar al servicio de reparación para obtener instrucciones específicas."
+            "codigo": "Y51",
+            "falla": "Falla en la válvula solenoide 2/2 vías",
+            "solucion": "Reemplazar la válvula solenoide 2/2 vías con una nueva"
         },
         {
             "codigo": "E01",
-            "falla": "Descripción de la falla: Código de defecto o problema en el sistema",
-            "solucion": "Solución propuesta"
-        },
-        {
-            "codigo": "E02",
-            "falla": "Descripción de la falla: Código de defecto o problema en la parte de controlar",
-            "solucion": "Solución propuesta"
-        },
-        {
-            "codigo": "E03",
-            "falla": "Descripción de la falla: Código de defecto o problema en el sistema",
-            "solucion": "Solución propuesta"
-        },
-        {
-            "codigo": "E01",
-            "falla": "Descripción de la falla",
-            "solucion": "Propuesta de solución"
-        },
-        {
-            "codigo": "E02",
-            "falla": "Teoría detrás de la falla",
-            "solucion": "Reemplazo del componente defectuoso"
+            "falla": "Error en el sensor de temperatura",
+            "solucion": "Verificar y reemplazar el sensor de temperatura si es necesario"
         }
     ],
     "Melitta__Milk_Test_E": [
         {
-            "codigo": "E01",
-            "falla": "Máquina no está funcionando correctamente para realizar el test de millo.",
-            "solucion": "Verificar la alimentación y el sistema de calibración, así como ajustar las configuraciones de máquina según lo indicado en el manual."
+            "codigo": "Y93",
+            "falla": "Error en la prueba de leche fría con agua",
+            "solucion": "Realizar la prueba varias veces y tomar el valor promedio"
+        },
+        {
+            "codigo": "Y90",
+            "falla": "Error en la configuración de la bomba de leche",
+            "solucion": "Verificar y ajustar la configuración de la bomba de leche"
+        },
+        {
+            "codigo": "Y15",
+            "falla": "Error en la medición de caudal de leche",
+            "solucion": "Verificar y ajustar la configuración de medición de caudal de leche"
+        },
+        {
+            "codigo": "Y75",
+            "falla": "Error en la calibración de la bomba de leche",
+            "solucion": "Realizar la calibración de la bomba de leche según las especificaciones del fabricante"
         },
         {
             "codigo": "Y71",
-            "falla": "La máquina no tiene el modelo correcto del sistema CF- System.",
-            "solucion": "Revisar la información de modelaje y asegurarse de que se utilice el correcto."
+            "falla": "Error en la prueba de bomba sin sistema",
+            "solucion": "Realizar la prueba de bomba sin sistema según las especificaciones del fabricante"
         },
         {
-            "codigo": "DSD",
-            "falla": "El sistema Top Foam está funcionando correctamente.",
-            "solucion": "Verificar si el sistema Top Foam está configurado correctamente y si no hay problemas con la conexión a la fuente de agua."
+            "codigo": "Y70",
+            "falla": "Error en la medición de caudal de agua",
+            "solucion": "Verificar y ajustar la configuración de medición de caudal de agua"
         }
     ],
-    "freidora_empero__EMP.PLS.ODFE.020": [
-        {
-            "codigo": "E01",
-            "falla": "The appliance is not connected to another heat-sensitive appliance or furniture.",
-            "solucion": "Place the appliance at least 150 mm away from other heat sources, such as heaters or furniture. If placing near a heat source, use duct tape or insulation materials around the appliance to avoid temperature build-up."
-        }
-    ],
+    "freidora_empero__EMP.PLS.ODFE.020": [],
     "broiler__Nieco_JF94_final": [
         {
-            "codigo": "E01",
-            "falla": "Error al desengrasar el desengrasador correctamente.",
-            "solucion": "Desentregar la artesa de grasa del asador y recargar con estropajo o cepillo de nylon."
+            "codigo": "Falla_Alimentacion_Electrica",
+            "falla": "El asador no está recibiendo corriente cuando el interruptor está en la posición de encendido.",
+            "solucion": "Verifique que el asador esté enchufado, que la campana de ventilación esté encendida y que el interruptor de circuito en el tablero de la pared esté encendido."
         },
         {
-            "codigo": "E01",
-            "falla": "",
-            "solucion": ""
+            "codigo": "Falla_Ignicion_Quemadores",
+            "falla": "El asador tiene potencia pero los quemadores no se encienden.",
+            "solucion": "Verifique que la campana de ventilación esté encendida, que la tubería de gas esté bien conectada, que la válvula de gas manual (si está instalada) esté abierta, que los quemadores estén bien instalados, limpios y secos, y que la conexión del alambrado del sensor de llama sea correcta. Siga las instrucciones del encendido manual."
         },
         {
-            "codigo": "E01",
-            "falla": "El ventilador debe estar de bien funcionando.",
-            "solucion": "Verifique la campana, que la conecte con el motor y verifica si se está cocinado o no. Verifique que los bloques de terminales sean confiados en el motor y la caja de control."
-        }
-    ],
-    "La_Cimbali_M23": [
-        {
-            "codigo": "E01",
-            "falla": "El presostato no calienta correctamente o levanta demasiada presión al abrir el grifo.",
-            "solucion": "{\"Revisar contacto eléctrico del presostato, si está sulfatado limpiar y si el tubo de cobre está obstruido con sarro desarmar y purgar, reemplazar la pieza si la membrana interna está perforada.\""
-        }
-    ],
-    "ups__MOSTAZA__UPS_10_KVA__001_002095": [
-        {
-            "codigo": "E01",
-            "falla": "Error al conectar la pantalla con el sistema de control del UPS (Control desde el display)",
-            "solucion": "La pantalla se conectará directamente en el panel frontal de los controles. Asegúrate de que la pantalla esté configurada correctamente para este propósito."
-        }
-    ],
-    "Melitta__CT8_SM_V5.0_ES": [
-        {
-            "codigo": "E01",
-            "falla": "Descripción de la falla: Las personas que intervienen en el área de trabajo no deben tocar piezas calientes, conductoras de vapor o materiales auxiliares."
+            "codigo": "Luz_Falla_Ignicion_Parpadeando",
+            "falla": "La luz roja de falla de ignición en la caja de control derecha está parpadeando.",
+            "solucion": "Revise los puntos de falla de ignición de quemadores. Apague y encienda el asador para reiniciar la ignición. Siga las instrucciones del encendido manual."
         },
         {
-            "codigo": "1-4",
-            "falla": "La máquina no está protegida frente a salpicaduras y chorros de agua.",
-            "solucion": "Protege el aparato desde fuera del rango de flujo de agua"
+            "codigo": "Falla_Ignicion_Superficie_Caliente",
+            "falla": "La ignición de superficie caliente no calienta.",
+            "solucion": "Revise si hay alambres sueltos que conectan la ignición de superficie caliente. Siga las instrucciones del encendido manual."
         },
         {
-            "codigo": "E01",
-            "falla": "La válvula Y51 queda suprimida.",
-            "solucion": "Debilitar la válvula Y51."
+            "codigo": "Falla_Correa_Transportadora",
+            "falla": "El asador está encendido, pero la correa del transportador no funciona.",
+            "solucion": "Revise si hay algún atasco en la correa del transportador. Revise que la hoja separadora y los parallamas estén bien instalados."
         },
         {
-            "codigo": "E02",
-            "falla": "El motor reductor permanece en la máquina.",
-            "solucion": "Desmontar y reemplazar el motor reductor."
+            "codigo": "Falla_Correa_Alimentador",
+            "falla": "La correa del alimentador no se mueve.",
+            "solucion": "Asegúrese de que el alimentador esté bien ensamblado. Revise en busca de atascos. Asegúrese de que el pasador de mando esté engranado."
         },
         {
-            "codigo": "E01",
-            "falla": "Error de comunicación con el MST",
-            "solucion": "Verificar la conexión entre el MST y la tarjeta de control, asegurarse de que estén correctamente conectados."
+            "codigo": "Atasco_Correa_Alimentador",
+            "falla": "El asador o alimentador se atasca.",
+            "solucion": "Use los botones de marcha atrás de la correa para invertir la dirección de la cinta transportadora de la carne y ayudar a destrabarla. Revise en busca de atascos."
         },
         {
-            "codigo": "V5.0CONTENIDO",
-            "falla": "",
-            "solucion": ""
-        }
-    ],
-    "broiler__Nieco_JF93_GAS_ES_03.31.2015_Manual": [
-        {
-            "codigo": "E01",
-            "falla": "El dispositivo restrictivo debe pedirse con todos los conectores para aparatos móviles. No es necesario que se conecte a la placa de cizallamiento del asador.",
-            "solucion": "Para un acople correcto al asador, use la ferretería suministrada para conectar el dispositivo a los orificios en la placa de cizallamiento del pedestal del asador. Si es necesaria la desconexión de la restricción, reconéctela después que el aparato se haya regresado a su posición de instalación original."
+            "codigo": "Producto_Pegado",
+            "falla": "Las hamburguesas se están pegando al rodadero o a la hoja separadora.",
+            "solucion": "Asegúrese de que las hamburguesas no estén pegadas porque están congeladas. Limpie el rodadero o la hoja separadora muy profundamente."
         },
         {
-            "codigo": "E01",
-            "falla": "El asador no fue inicializado correctamente.",
-            "solucion": "Llene la pantalla con los números de los productos que quieras cambiar y presiona el botón cuadrado para guardar las modificaciones. Luego, use las flechas ascendentes y descendentes para configurar los tiempos prefijados en la pantalla."
+            "codigo": "Coccion_Incorrecta_Producto",
+            "falla": "Las hamburguesas se están cocinando muy poco o demasiado.",
+            "solucion": "Ajuste la velocidad de la correa del transportador."
         },
         {
-            "codigo": "E01",
-            "falla": "El cambio de configuración de los transistores debe ser previamente realizado por un profesional en el área de seguridad energética y electrónica.",
-            "solucion": "Realizar cambios de configuraciones de transistores aprobadas por ingenieros autorizados y certificados. En este caso, se recomienda la colaboración con un ingeniero técnico en el sector de la automatización y la seguridad electricidad para que los cambios se hagan correctamente."
+            "codigo": "Llama_Excesiva",
+            "falla": "Excesiva llama en el asador.",
+            "solucion": "Limpie los quemadores y los orificios. Limpie el catalizador si tiene uno instalado. Revise que la campana de ventilación funcione bien. Revise que el producto no esté demasiado cocinado."
         }
     ],
     "Cimbali__S30_Despiece_": [
         {
             "codigo": "E01",
-            "falla": "No se proporcionaron datos de código de error en el archivo de texto.",
-            "solucion": "El archivo no contiene información sobre un error o fallo. Se recomienda analizar el contenido del archivo de texto para obtener más detalles."
-        }
-    ],
-    "Liniers_Fallas_Recurrentes": [
-        {
-            "codigo": "Obstruccion Chicler Circuito Leche",
-            "falla": "Obstruccion total del chicler debido a la acumulacion de grasa de leche seca y sedimentos calcificados, lo que impide la dosificacion de aire, provoca que la bomba succione exclusivamente liquido sin capacidad de generar espuma y entrega el producto a temperatura inferior a la estandar.",
-            "solucion": "Desobstruccion fisica del chicler, limpieza profunda del conjunto de emulsion y restablecimiento del ciclo de lavado diario de descarte utilizando el agente quimico azul Rinsa por manguera de succion y picos de infusion."
+            "falla": "Falla en el sistema hidráulico",
+            "solucion": "Revisar y reemplazar componentes hidráulicos dañados, como tubos o válvulas"
         },
         {
-            "codigo": "Error Operativo Molino",
-            "falla": "La presencia de granos sueltos y restos de cafe sobre la superficie de la base del molino impide el asentamiento plano y completo de la tolva, lo que desactiva el switch electromagnetico de seguridad del motor e interrumpe el ciclo de molienda.",
-            "solucion": "Remocion completa de los residuos y granos de cafe sueltos en la base de encastre de la tolva previo a su montaje, asegurando el contacto pleno de los tres puntos de control y la activacion del switch de seguridad."
+            "codigo": "E02",
+            "falla": "Problemas con la bomba de leche",
+            "solucion": "Revisar y reemplazar la bomba de leche si está dañada, y asegurarse de que esté correctamente conectada"
+        },
+        {
+            "codigo": "E03",
+            "falla": "Falla en el circuito eléctrico",
+            "solucion": "Revisar y reemplazar componentes eléctricos dañados, como cables o fusibles"
+        },
+        {
+            "codigo": "E04",
+            "falla": "Problemas con la caldera",
+            "solucion": "Revisar y reemplazar la caldera si está dañada, y asegurarse de que esté correctamente conectada"
+        },
+        {
+            "codigo": "E05",
+            "falla": "Falla en el sistema de vapor",
+            "solucion": "Revisar y reemplazar componentes del sistema de vapor dañados, como tubos o válvulas"
+        },
+        {
+            "codigo": "E01",
+            "falla": "Falla en la caldera de café",
+            "solucion": "Reemplazar la caldera de café"
+        },
+        {
+            "codigo": "E02",
+            "falla": "Falla en el sistema de vapor",
+            "solucion": "Revisar y reemplazar el tubo de vapor si es necesario"
+        },
+        {
+            "codigo": "E03",
+            "falla": "Falla en el sistema de agua caliente",
+            "solucion": "Revisar y reemplazar el tubo de agua caliente si es necesario"
+        },
+        {
+            "codigo": "E04",
+            "falla": "Falla en el compresor del turbosteam",
+            "solucion": "Reemplazar el compresor del turbosteam"
+        },
+        {
+            "codigo": "E05",
+            "falla": "Falla en el sensor de presencia de la cubeta de lavado",
+            "solucion": "Reemplazar el sensor de presencia de la cubeta de lavado"
+        },
+        {
+            "codigo": "E06",
+            "falla": "Falla en la bomba de leche",
+            "solucion": "Reemplazar la bomba de leche"
+        },
+        {
+            "codigo": "E07",
+            "falla": "Falla en el sistema de enfriamiento",
+            "solucion": "Revisar y reemplazar el sistema de enfriamiento si es necesario"
+        },
+        {
+            "codigo": "E08",
+            "falla": "Falla en el controlador de temperatura",
+            "solucion": "Reemplazar el controlador de temperatura"
+        },
+        {
+            "codigo": "E09",
+            "falla": "Falla en el sistema de iluminación",
+            "solucion": "Revisar y reemplazar las luces si es necesario"
+        },
+        {
+            "codigo": "E10",
+            "falla": "Falla en el sistema de seguridad",
+            "solucion": "Revisar y reemplazar el sistema de seguridad si es necesario"
+        },
+        {
+            "codigo": "E01",
+            "falla": "No se produce café",
+            "solucion": "Verificar si el molinillo está bloqueado o si hay problemas con el sistema de molienda"
+        },
+        {
+            "codigo": "E02",
+            "falla": "El café sale muy suelto o muy compacto",
+            "solucion": "Ajustar la regulación del molinillo o verificar si hay problemas con el sistema de compactación"
+        },
+        {
+            "codigo": "E03",
+            "falla": "No se calienta el agua",
+            "solucion": "Verificar si hay problemas con el calentador o con el sistema de control de temperatura"
+        },
+        {
+            "codigo": "E04",
+            "falla": "Se produce ruido excesivo",
+            "solucion": "Verificar si hay problemas con el molinillo o con el sistema de ventilación"
+        },
+        {
+            "codigo": "E05",
+            "falla": "No se enciende la máquina",
+            "solucion": "Verificar si hay problemas con el interruptor o con el sistema de alimentación eléctrica"
+        }
+    ],
+    "La_Cimbali_M23": [
+        {
+            "codigo": "Presostato",
+            "falla": "La máquina no calienta o levanta demasiada presión haciendo saltar la válvula de seguridad.",
+            "solucion": "Revisar el contacto eléctrico del presostato. Si está sulfatado, limpiar. Si el tubo de cobre está obstruido con sarro, desarmar y purgar. Reemplazar la pieza si la membrana interna está perforada."
+        },
+        {
+            "codigo": "Bomba Volumétrica",
+            "falla": "Ruido metálico al erogar café y baja presión en el manómetro.",
+            "solucion": "Verificar entrada de agua. Si la canilla está abierta y el filtro de red está limpio, la bomba puede estar dañada por trabajar en vacío. Reemplazar cuerpo de bomba."
+        }
+    ],
+    "ups__MOSTAZA__UPS_10_KVA__001_002095": [],
+    "Melitta__CT8_SM_V5.0_ES": [
+        {
+            "codigo": "F112",
+            "falla": "Fusible F112 disparado (el visualizador no enciende) por conectar accidentalmente en el puerto SV 165.",
+            "solucion": "Reemplazar el fusible F112 utilizando el fusible de reserva F102 o un repuesto nuevo (nro. mat. 27508)."
+        },
+        {
+            "codigo": "(largo, largo, corto, corto, corto)",
+            "falla": "Código ID de la tarjeta de control desconocido (equipamiento incorrecto de la tarjeta de control MST).",
+            "solucion": "Reemplazar la tarjeta de control principal (MST)."
+        },
+        {
+            "codigo": "(corto, largo, largo, corto, corto)",
+            "falla": "Código ID de la tarjeta de control desconocido por equipamiento o red IO incorrectos, o cable de conexión faltante.",
+            "solucion": "Verificar la conexión física a la red IO o reemplazar la tarjeta de red IO."
+        },
+        {
+            "codigo": "(largo, largo, largo, largo, largo, largo)",
+            "falla": "Error general de Bus I2C debido a un cortocircuito en el cable de la platina o iluminación de la mesa de tazas defectuosa.",
+            "solucion": "Verificar el cable de conexión de la iluminación de la mesa de tazas o reemplazar la platina de iluminación defectuosa."
+        },
+        {
+            "codigo": "0012 - 0010",
+            "falla": "Error de Bus I2C por cortocircuito en el cableado de la iluminación de la mesa de tazas.",
+            "solucion": "Revisar y reparar el cableado de la iluminación de la mesa de tazas."
+        },
+        {
+            "codigo": "0030 - 0033",
+            "falla": "Cortocircuito en el sensor de conductividad de entrada de agua.",
+            "solucion": "Verificar el cableado del sensor de agua o reemplazar el sensor de conductividad."
+        },
+        {
+            "codigo": "0201 - 0001",
+            "falla": "Rotura del sensor de temperatura de la caldera de café (CBO).",
+            "solucion": "Reemplazar el sensor de temperatura B30 de la caldera de café."
+        },
+        {
+            "codigo": "0203 - 1100",
+            "falla": "Error de llenado de la caldera de vapor (SBO) al no mojarse el electrodo de nivel dentro del tiempo límite.",
+            "solucion": "Verificar el suministro de agua de red, el funcionamiento de la electroválvula de llenado Y12 y limpiar el electrodo de nivel."
+        },
+        {
+            "codigo": "0204 - 0104",
+            "falla": "Presión de vapor demasiado alta en la caldera SBO (>2,5 bares) con la calefacción desconectada.",
+            "solucion": "Verificar si hay obstrucción en el conducto hacia el sensor de presión/manómetro, o fallas en el electrodo de nivel/válvula de llenado que causen sobrellenado."
+        },
+        {
+            "codigo": "0204 - 0304",
+            "falla": "Tiempo de calentamiento de la caldera de vapor SBO agotado sin alcanzar la presión nominal.",
+            "solucion": "Comprobar el estado de los calentadores tubulares de la caldera de vapor, el limitador de temperatura de seguridad y el relé de calefacción."
+        },
+        {
+            "codigo": "0301 - 0204",
+            "falla": "El ajuste de posición del émbolo de la unidad de hervido ha fallado repetidamente.",
+            "solucion": "Verificar el motorreductor del émbolo, el sensor incremental D10 y limpiar mecánicamente la unidad de hervido."
+        },
+        {
+            "codigo": "0308 - 0104",
+            "falla": "Error al activar la neumática por falta de impulsos en el desagüe (la válvula neumática Y10 no abre o falta agua).",
+            "solucion": "Verificar el funcionamiento de la electroválvula neumática Y10, comprobar la presión de entrada de agua o la bomba en modo bidón."
+        },
+        {
+            "codigo": "0311 - 0300",
+            "falla": "Bloqueo del molino 1 o generación insuficiente de impulsos durante el molido.",
+            "solucion": "Desmontar el molino 1, limpiar los discos de molido de cualquier objeto extraño y verificar el motor del molino."
+        },
+        {
+            "codigo": "0312 - 0104",
+            "falla": "Fallo en la obturación de la cámara de hervido por problemas en el sistema neumático.",
+            "solucion": "Verificar la electroválvula de compresión Y10, la válvula de descarga Y11 y el estado del anillo obturador hinchable del émbolo."
+        },
+        {
+            "codigo": "0335 - 0104",
+            "falla": "Rotura del sensor de temperatura integrado en la lanza de vapor (Steam Control Plus).",
+            "solucion": "Reemplazar el sensor de temperatura integrado en la salida de la lanza de vapor SCP."
+        }
+    ],
+    "broiler__Nieco_JF93_GAS_ES_03.31.2015_Manual": [
+        {
+            "codigo": "E01",
+            "falla": "Los quemadores no se encienden",
+            "solucion": "Verificar que la campana de ventilación esté encendida, la tubería de gas esté bien conectada, la válvula de gas manual esté abierta, los quemadores estén bien instalados y limpios."
+        },
+        {
+            "codigo": "E02",
+            "falla": "Quemadores no funcionan correctamente",
+            "solucion": "Revisar y limpiar los quemadores y orificios, y verificar la conexión del alambrado del sensor de llama"
+        },
+        {
+            "codigo": "E03",
+            "falla": "El producto no se cocina adecuadamente",
+            "solucion": "Revisar la temperatura de cocido, ajustar la velocidad de la correa del transportador y limpiar el catalizador si está instalado."
+        },
+        {
+            "codigo": "E04",
+            "falla": "La correa del transportador está atascada",
+            "solucion": "Revisar la correa del transportador y limpiar el rodadero o la hoja separadora."
+        },
+        {
+            "codigo": "E05",
+            "falla": "El producto está demasiado cocinado",
+            "solucion": "Revisar la temperatura de cocido y ajustar la velocidad de la correa del transportador."
         }
     ]
 }

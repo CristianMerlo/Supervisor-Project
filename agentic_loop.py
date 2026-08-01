@@ -963,7 +963,7 @@ def post_with_retry(url, headers, json_payload, api_name):
             delay *= 2
     return res
 
-def consultar_agentic_loop(mensaje_usuario, historial, system_prompt):
+def consultar_agentic_loop(mensaje_usuario, historial, system_prompt, es_grupo=False):
     """Ejecuta el bucle de razonamiento usando Gemini (vía API compatible con OpenAI) o Groq como resguardo."""
     import config_manager
     model_gemini = config_manager.get_env_var("MODEL_GEMINI_TEXT", "gemini-2.5-flash")
@@ -1008,6 +1008,21 @@ REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS Y RAZONAMIENTO:
 3. NO alucines datos. Si no encuentras la información, admite que no la tienes y finaliza tu respuesta.
 4. RAZONAMIENTO ESTRUCTURADO (Chain of Thought - CoT): De forma obligatoria, antes de llamar a cualquier herramienta o emitir tu respuesta final, debes escribir tu análisis técnico paso a paso encerrado entre etiquetas <razonamiento> y </razonamiento>. Analiza allí qué datos te faltan, qué herramientas invocarás y qué hipótesis técnicas manejas sobre la falla.
 """
+
+    # Filtrar herramientas de recordatorios en chats grupales por privacidad de Cristian
+    current_tools = TOOLS_SCHEMA
+    if es_grupo:
+        recordatorios_tools = {
+            "tool_crear_recordatorio", 
+            "tool_listar_recordatorios", 
+            "tool_completar_recordatorio", 
+            "tool_eliminar_recordatorio"
+        }
+        current_tools = [t for t in TOOLS_SCHEMA if t["function"]["name"] not in recordatorios_tools]
+        system_prompt += """
+⚠️ ADVERTENCIA DE PRIVACIDAD:
+Estás interactuando en un CHAT GRUPAL. Las herramientas de recordatorios y pendientes personales de Cristian están completamente DESHABILITADAS. NO tienes permitido listar, crear, completar o eliminar recordatorios en este chat de grupo. Si algún usuario te pregunta por recordatorios, pendientes o tareas resueltas, indícale de forma cortés que esa información es confidencial y privada y que no tienes permitido acceder a ella ni mostrarla en este chat grupal.
+"""
     
     if historial:
         historial_texto = "Historial reciente de la conversación (para tu memoria):\n"
@@ -1040,7 +1055,7 @@ REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS Y RAZONAMIENTO:
         payload = {
             "model": active_model,
             "messages": messages,
-            "tools": TOOLS_SCHEMA,
+            "tools": current_tools,
             "tool_choice": "auto"
         }
         

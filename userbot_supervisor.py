@@ -1905,7 +1905,7 @@ REGLAS ESTRICTAS:
             historial = obtener_historial(remitente_id, limite=10)
             
             # Consultar Agentic Loop
-            respuesta_ia = consultar_agentic_loop(mensaje, historial, system_prompt)
+            respuesta_ia = consultar_agentic_loop(mensaje, historial, system_prompt, es_grupo=es_grupo)
             
             # Guardar en memoria local del userbot
             guardar_mensaje_memoria(remitente_id, "user", mensaje)

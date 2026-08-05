@@ -120,6 +120,15 @@ def procesar_carpeta_entrantes():
         try:
             logger.info(f"--- [ORQUESTADOR] Iniciando {pdf_path.name} ---")
             
+            import gestor_hashes
+            es_dup, hash_val, info_reg = gestor_hashes.es_reporte_duplicado(pdf_path)
+            if es_dup:
+                origen_previo = info_reg.get("origen", "otro canal") if info_reg else "otro canal"
+                logger.info(f"[SKIP-HASH-DUPLICATE] El archivo {pdf_path.name} ya fue procesado previamente vía {origen_previo}. Hash SHA-256: {hash_val[:10]}")
+                if pdf_path.exists():
+                    pdf_path.unlink()
+                continue
+
             # 1. Fase 1 y 2 (Parser y Reglas) - Retorna ahora también el texto extraído
             datos_extraidos, alertas_negocio, texto_pdf = motor_supervisor.procesar_reporte(str(pdf_path))
             
@@ -127,6 +136,9 @@ def procesar_carpeta_entrantes():
             fase3_sheets.inyectar_en_sabana(datos_extraidos, alertas_negocio, SHEET_URL)
             
             sigla = datos_extraidos.get("sigla", "")
+            
+            # Registrar firma SHA-256
+            gestor_hashes.registrar_reporte(str(pdf_path), origen="Gmail / Automático", sigla=sigla)
             if sigla:
                 try:
                     import seguimiento_ppm

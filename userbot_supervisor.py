@@ -576,11 +576,20 @@ async def procesar_reporte_directo(pdf_path, sigla_manual=None):
         import fase3_sheets
         import archivador_drive
         import gestion_locales
+        import gestor_hashes
         import re
         import shutil
         import subprocess
         
         pdf_path = Path(pdf_path)
+        
+        # 0. Verificación Criptográfica Anti-Duplicados (SHA-256)
+        es_dup, hash_val, info_reg = gestor_hashes.es_reporte_duplicado(pdf_path)
+        if es_dup:
+            origen_previo = info_reg.get("origen", "otro canal") if info_reg else "otro canal"
+            print(f"[SKIP-HASH-DUPLICATE] Reporte {pdf_path.name} ya fue registrado previamente vía {origen_previo}. Hash SHA-256: {hash_val[:10]}")
+            return True, f"ℹ️ Este informe técnico ya fue registrado previamente a través de {origen_previo} (Firma de contenido SHA-256 duplicada)."
+
         # 1. Fase 1 y 2 (Parser y Reglas)
         datos_extraidos, alertas_negocio, texto_pdf = motor_supervisor.procesar_reporte(str(pdf_path))
         
@@ -605,6 +614,9 @@ async def procesar_reporte_directo(pdf_path, sigla_manual=None):
             
         # 3. Archivar en Google Drive
         exito_drive = archivador_drive.archivar_reporte_en_drive(str(pdf_path), sigla)
+        
+        # Registrar la firma SHA-256 en la base de datos
+        gestor_hashes.registrar_reporte(str(pdf_path), origen="Telegram / Directo", sigla=sigla)
         
         if exito_drive:
             # Actualizar ficha local en Obsidian

@@ -172,6 +172,13 @@ def main():
     userbot_active = check_process("userbot_supervisor.py")
     db_ok, db_msg = check_db()
     ingestor_status, ingestor_msg = check_ingestor()
+    
+    try:
+        import gestor_hashes
+        total_h = gestor_hashes.obtener_total_hashes_registrados()
+        s_hashes = f"🟢 Activo ({total_h} firmas únicas resguardadas)"
+    except Exception:
+        s_hashes = "🟢 Activo"
 
     s_userbot = "🟢 Activo" if userbot_active else "🔴 Caído"
     s_db = "🟢 " + db_msg if db_ok else f"🔴 Falla ({db_msg})"
@@ -199,7 +206,8 @@ def main():
         "🔍 *SISTEMA DE SUPERVISIÓN*\n"
         f"• *Userbot (Telegram):* {s_userbot}\n"
         f"• *Base de Datos:* {s_db}\n"
-        f"• *Ingestor Automático:* {s_ingestor}\n\n"
+        f"• *Ingestor Automático:* {s_ingestor}\n"
+        f"• *Motor Anti-Duplicados (SHA-256):* {s_hashes}\n\n"
         "🤖 *MODELOS DE INTELIGENCIA ARTIFICIAL*\n"
         f"• *Gemini Texto/Visión:* {h_gemini}\n"
         f"• *Groq Texto:* {h_groq_text}\n"

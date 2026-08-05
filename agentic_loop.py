@@ -96,39 +96,40 @@ def tool_proponer_solucion(maquina, falla, solucion):
     except Exception as e:
         return f"Error proponiendo solución: {e}"
 
-def tool_generar_excel_kpi():
-    """Genera un archivo Excel con un balance de KPIs de mantenimiento y viáticos y lo envía al usuario."""
+def tool_consultar_obsidian(consulta):
+    """Consulta la bóveda local de Obsidian leyendo notas de locales, repuestos o antecedentes técnicos."""
     try:
-        import pandas as pd
-        import gspread
-        from google.oauth2.service_account import Credentials
-        from datetime import datetime
-        import os
+        import hermes_obsidian_client
+        res = hermes_obsidian_client.buscar_notas(consulta)
+        if not res:
+            from pathlib import Path
+            brain_dir = Path("/home/cristian/PROYECTOS/Supervisor-Project/brain")
+            coincidencias = []
+            if brain_dir.exists():
+                for f in brain_dir.rglob("*.md"):
+                    if consulta.lower() in f.name.lower():
+                        try:
+                            with open(f, "r", encoding="utf-8") as file:
+                                coincidencias.append(f"--- Nota: {f.name} ---\n" + file.read()[:1200])
+                        except Exception:
+                            pass
+            if coincidencias:
+                return "\n\n".join(coincidencias[:3])
+            return f"No se encontraron notas ni registros para '{consulta}' en la bóveda de Obsidian."
         
-        SCOPES = ["https://www.googleapis.com/auth/spreadsheets", "https://www.googleapis.com/auth/drive"]
-        ruta_credenciales = "/home/cristian/Documentos/Supervisor/credentials.json"
-        SHEET_URL = os.environ.get("GOOGLE_SHEET_URL")
-        
-        creds = Credentials.from_service_account_file(ruta_credenciales, scopes=SCOPES)
-        cliente = gspread.authorize(creds)
-        sabana = cliente.open_by_url(SHEET_URL)
-        
-        # Obtener Historial
-        hoja_historial = sabana.worksheet("Historial_Mantenimiento")
-        registros = hoja_historial.get_all_records()
-        df = pd.DataFrame(registros)
-        
-        # Limpiar datos para el excel
-        if not df.empty:
-            df["FECHA_REPORTE"] = pd.to_datetime(df["FECHA_REPORTE"], errors="coerce")
-            df = df.sort_values(by="FECHA_REPORTE", ascending=False)
-            
-        ruta_excel = f"/home/cristian/Documentos/Supervisor/Reporte_Mantenimiento_{datetime.now().strftime('%Y%m%d')}.xlsx"
-        df.to_excel(ruta_excel, index=False, engine="openpyxl")
-        
-        return f"¡He generado el archivo Excel con éxito! Aquí tienes el reporte analítico.\n\n[ARCHIVO_ADJUNTO] {ruta_excel}"
+        if isinstance(res, list):
+            output = f"Resultados encontrados en Obsidian para '{consulta}':\n"
+            for item in res[:5]:
+                filename = item.get("filename", "")
+                matches = item.get("matches", [])
+                output += f"\n📄 **{filename}**\n"
+                for m in matches[:2]:
+                    context = m.get("context", "")
+                    output += f"  - {context}\n"
+            return output
+        return str(res)[:2000]
     except Exception as e:
-        return f"Error generando el Excel: {str(e)}"
+        return f"Error consultando Obsidian: {e}"
 
 def tool_consultar_correos(asunto_o_contenido):
     """Busca en la base de datos de correos recibidos por asunto, contenido o remitente."""
@@ -719,14 +720,14 @@ TOOLS_SCHEMA = [
     {
         "type": "function",
         "function": {
-            "name": "tool_generar_excel_kpi",
-            "description": "¡IMPORTANTE! Usa esta herramienta ÚNICAMENTE cuando el usuario pida armar o generar un Excel (.xlsx) con el reporte de mantenimiento o KPIs. Descarga los datos y se los envía como archivo.",
+            "name": "tool_consultar_obsidian",
+            "description": "Busca notas, manuales, fichas de locales o antecedentes técnicos dentro de la bóveda local de Obsidian.",
             "parameters": {
                 "type": "object",
                 "properties": {
-                    "confirmar": {"type": "boolean", "description": "Pasa true para confirmar la generación."}
+                    "consulta": {"type": "string", "description": "Término o nombre del local/máquina a buscar en la bóveda de Obsidian"}
                 },
-                "required": ["confirmar"]
+                "required": ["consulta"]
             }
         }
     },
@@ -852,8 +853,8 @@ def execute_tool(tool_name, arguments_str):
             return tool_consultar_error(args.get("equipo", ""), args.get("codigo_error", ""))
         elif tool_name == "tool_proponer_solucion":
             return tool_proponer_solucion(args.get("maquina", ""), args.get("falla", ""), args.get("solucion", ""))
-        elif tool_name == "tool_generar_excel_kpi":
-            return tool_generar_excel_kpi()
+        elif tool_name == "tool_consultar_obsidian":
+            return tool_consultar_obsidian(args.get("consulta", ""))
         elif tool_name == "tool_consultar_correos":
             return tool_consultar_correos(args.get("asunto_o_contenido", ""))
         elif tool_name == "tool_analizar_adjuntos_correo":
@@ -928,22 +929,6 @@ def consultar_agentic_loop(mensaje_usuario, historial, system_prompt, es_grupo=F
         except Exception:
             pass
             
-    # Cargar Correcciones Semánticas Few-Shot Dinámicas
-    try:
-        import sys
-        ruta_dir = "/home/cristian/Documentos/Supervisor"
-        if ruta_dir not in sys.path:
-            sys.path.append(ruta_dir)
-        import gestion_correcciones
-        correcciones = gestion_correcciones.obtener_correcciones_relevantes(mensaje_usuario, limit=2)
-        if correcciones:
-            corr_prompt = "\n⚠️ CORRECCIONES DE HISTORIAL DE DECISIONES DEL SUPERVISOR (Úsalas como Few-Shot dinámico):\n"
-            for q, r_inc, corr in correcciones:
-                corr_prompt += f"- Ante la pregunta/situación: '{q}'\n  Evita responder como: '{r_inc}'\n  Respuesta correcta aprobada por el Supervisor: '{corr}'\n"
-            system_prompt += corr_prompt
-    except Exception as e_corr:
-        print(f"Error cargando Few-Shot dinámico: {e_corr}")
-    
     # Inyección vital para evitar loops y alucinaciones
     system_prompt += """
 REGLAS VITALES DE COMPORTAMIENTO PARA HERRAMIENTAS Y RAZONAMIENTO:

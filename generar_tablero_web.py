@@ -322,6 +322,21 @@ def generar_tablero():
     with open(HTML_LOCAL, "w", encoding="utf-8") as f:
         f.write(html_content)
         
+    # Actualizar repositorio GitHub online
+    repo_online = Path("/home/cristian/PROYECTOS/Tablero-de-Control-de-Repuestos")
+    if repo_online.exists():
+        try:
+            dst_online = repo_online / "index.html"
+            with open(dst_online, "w", encoding="utf-8") as f:
+                f.write(html_content)
+            import subprocess
+            subprocess.Popen(["git", "add", "index.html"], cwd=str(repo_online))
+            subprocess.Popen(["git", "commit", "-m", "Auto-update online dashboard"], cwd=str(repo_online))
+            subprocess.Popen(["git", "push", "origin", "main"], cwd=str(repo_online))
+            print("🚀 [GITHUB ONLINE] Tablero sincronizado y enviado a GitHub Pages.")
+        except Exception as e_gh:
+            print(f"Error sincronizando GitHub Pages: {e_gh}")
+        
     print(f"✅ Tablero visual generado exitosamente en: {HTML_OUT}")
 
 if __name__ == "__main__":

@@ -180,6 +180,16 @@ def main():
     except Exception:
         s_hashes = "🟢 Activo"
 
+    profile_dir = Path("/home/cristian/.config/chrome_mostaza_profile")
+    log_corp = BASE_DIR / "correo_corporativo_web.log"
+    if profile_dir.exists():
+        if log_corp.exists() and (time.time() - os.path.getmtime(log_corp)) / 60 < 45:
+            s_corp_mail = "🟢 Activo (Monitoreo Outlook Web OK)"
+        else:
+            s_corp_mail = "🟢 Activo (Perfil Guardado OK)"
+    else:
+        s_corp_mail = "🔴 Sesión no configurada"
+
     s_userbot = "🟢 Activo" if userbot_active else "🔴 Caído"
     s_db = "🟢 " + db_msg if db_ok else f"🔴 Falla ({db_msg})"
     if ingestor_status == "ACTIVO": s_ingestor = f"🟢 {ingestor_msg}"
@@ -205,6 +215,7 @@ def main():
         f"• *Espacio en Disco:* {disk_status}\n\n"
         "🔍 *SISTEMA DE SUPERVISIÓN*\n"
         f"• *Userbot (Telegram):* {s_userbot}\n"
+        f"• *Correo Corporativo (OWA):* {s_corp_mail}\n"
         f"• *Base de Datos:* {s_db}\n"
         f"• *Ingestor Automático:* {s_ingestor}\n"
         f"• *Motor Anti-Duplicados (SHA-256):* {s_hashes}\n\n"

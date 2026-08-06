@@ -31,7 +31,7 @@ import llm_fallback
 # Cargar .env
 load_dotenv(str(BASE_DIR / ".env"))
 
-CLIENT_ID = "04b07795-8ddb-461a-bbee-02f9e1bf7b46" # Microsoft CLI Public App ID
+CLIENT_ID = "9e5f94bc-e8a4-4e73-b8be-63364c29d753" # Thunderbird Official Pre-authorized App ID
 SCOPES = "https://graph.microsoft.com/Mail.ReadWrite offline_access"
 GRAPH_URL = "https://graph.microsoft.com/v1.0"
 

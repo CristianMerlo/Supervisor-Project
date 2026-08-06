@@ -611,6 +611,12 @@ async def procesar_reporte_directo(pdf_path, sigla_manual=None):
             seguimiento_ppm.actualizar_datos_hidricos(sigla, datos_extraidos)
         except Exception as e_hidrico:
             logging.info(f"[PROCESAR-DIRECTO] Error actualizando Agua Seguimiento: {e_hidrico}")
+
+        try:
+            import gestor_pedidos_repuestos
+            gestor_pedidos_repuestos.cerrar_pedido_por_informe_pdf(sigla, datos_extraidos)
+        except Exception as e_rep_close:
+            logging.info(f"[PROCESAR-DIRECTO] Error cerrando pedido repuestos por PDF: {e_rep_close}")
             
         # 3. Archivar en Google Drive
         exito_drive = archivador_drive.archivar_reporte_en_drive(str(pdf_path), sigla)

@@ -141,6 +141,12 @@ def procesar_carpeta_entrantes():
             gestor_hashes.registrar_reporte(str(pdf_path), origen="Gmail / Automático", sigla=sigla)
             if sigla:
                 try:
+                    import gestor_pedidos_repuestos
+                    gestor_pedidos_repuestos.cerrar_pedido_por_informe_pdf(sigla, datos_extraidos)
+                except Exception as e_rep_close:
+                    logger.error(f"   [!] Error cerrando pedido repuestos por PDF: {e_rep_close}")
+
+                try:
                     import seguimiento_ppm
                     logger.info(f"   [SHEETS] Actualizando Sistema Hídrico en Agua Seguimiento para {sigla}...")
                     seguimiento_ppm.actualizar_datos_hidricos(sigla, datos_extraidos)

@@ -187,12 +187,72 @@ def procesar_correo_repuesto(remitente, asunto, cuerpo, fecha_str=None):
             f"🛠️ *Repuesto / Equipo:* {repuesto}\n"
             f"👤 *Aviso de Depósito:* {remitente}\n"
             f"📌 *Asunto:* {asunto}\n\n"
-            "🟢 *Estado:* _Confirmado por Depósito. Ya se puede pasar a retirar._\n"
-            "📲 *Acción:* Listo para coordinar técnico e instalación."
+            "🟢 *Estado:* _Confirmado por Depósito. Listo para ser retirado._\n"
+            "📲 *Acción:* Notificar al franquiciado / local para pasar a retirar el repuesto por depósito."
         )
         notificador_telegram.enviar_alerta(msg_alerta, agente="Antigravity", destinatario_id=215173956)
         
     return True, f"Pedido #{pedido_id} actualizado a {ETAPAS.get(nueva_etapa)}"
+
+def cerrar_pedido_por_informe_pdf(sigla_local, datos_extraidos):
+    """
+    Cierra el círculo (Etapa 5: ✅ INSTALADO) cuando ingresa un informe técnico PDF
+    que confirma la visita del técnico y la instalación del repuesto en la sucursal.
+    """
+    if not sigla_local or sigla_local == "GENERAL":
+        return False
+        
+    conn = obtener_conexion()
+    c = conn.cursor()
+    
+    # Buscar pedidos pendientes en etapa 1..4 para esta sucursal
+    c.execute("""
+        SELECT id, equipo_repuesto, etapa_actual FROM pedidos_repuestos 
+        WHERE sigla_local = ? AND etapa_actual < 5
+        ORDER BY id ASC
+    """, (sigla_local.upper(),))
+    
+    pedidos_activos = c.fetchall()
+    if not pedidos_activos:
+        conn.close()
+        return False
+        
+    fecha_now = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    tecnico = datos_extraidos.get("tecnico", "Técnico de servicio")
+    repuestos_info = datos_extraidos.get("repuestos", "") or datos_extraidos.get("observaciones", "")
+    
+    for p in pedidos_activos:
+        pid = p["id"]
+        equipo = p["equipo_repuesto"]
+        
+        c.execute("""
+            UPDATE pedidos_repuestos 
+            SET etapa_actual = 5, fecha_instalado = ?, ultimo_remitente = ?
+            WHERE id = ?
+        """, (fecha_now, f"PDF Servicio ({tecnico})", pid))
+        
+        resumen_cierre = f"Informe PDF recibido ({tecnico}): Repuesto {equipo} instalado en sucursal {sigla_local}."
+        c.execute("""
+            INSERT INTO historial_trazabilidad (id_pedido, fecha, remitente, asunto, etapa_detectada, resumen_ia)
+            VALUES (?, ?, ?, ?, ?, ?)
+        """, (pid, fecha_now, tecnico, f"Informe PDF Instalación [{sigla_local}]", 5, resumen_cierre))
+        
+        print(f"✅ [CÍRCULO CERRADO] Pedido #{pid} ({equipo} en {sigla_local}) marcado como INSTALADO vía Informe PDF de {tecnico}.")
+        
+        # Notificar a Cristian
+        msg_cierre = (
+            "✅ *[CÍRCULO CERRADO - REPUESTO INSTALADO]* 🛠️\n\n"
+            f"📍 *Local:* {sigla_local}\n"
+            f"🛠️ *Repuesto / Equipo:* {equipo}\n"
+            f"👤 *Técnico:* {tecnico}\n"
+            f"📄 *Origen:* Informe Técnico PDF procesado exitosamente.\n\n"
+            "🎉 *Estado Final:* _El repuesto fue instalado y el servicio quedó concluido._"
+        )
+        notificador_telegram.enviar_alerta(msg_cierre, agente="Antigravity", destinatario_id=215173956)
+        
+    conn.commit()
+    conn.close()
+    return True
 
 def obtener_resumen_pedidos_telegram(sigla_filtro=None):
     """Genera un reporte formateado para Telegram de los pedidos en curso."""

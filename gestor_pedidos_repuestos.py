@@ -252,6 +252,13 @@ def cerrar_pedido_por_informe_pdf(sigla_local, datos_extraidos):
         
     conn.commit()
     conn.close()
+    
+    try:
+        import generar_tablero_web
+        generar_tablero_web.generar_tablero()
+    except Exception:
+        pass
+        
     return True
 
 def obtener_resumen_pedidos_telegram(sigla_filtro=None):

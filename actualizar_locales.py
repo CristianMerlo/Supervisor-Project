@@ -78,7 +78,7 @@ FFLO|FFLOR|Cecilia Riccadonna|Raúl Ayala|FLORES|flores@mostazaweb.com.ar|AV RIV
 FMPRI|FMPRI|Cecilia Riccadonna|Raúl Ayala|PRIMERA JUNTA|primerajunta@mostazaweb.com.ar|AV RIVADAVIA 5576|CABALLITO|CABA|Auto Mostaza|BIG B POINTS S.A
 FLIN|FLINR|Cecilia Riccadonna|Raúl Ayala|LINIERS|liniers@mostazaweb.com.ar|AV RIVADAVIA 11576|LINIERS|CABA|A la calle|PARADOR 71
 FMONC|FMONC|Cecilia Riccadonna|Raúl Ayala|ONCE|once@mostazaweb.com.ar|AV RIVADAVIA 2261|ONCE|CABA|A la calle|EVOLUCION DRF SRL
-FMTER|-|Cecilia Riccadonna|Raúl Ayala|TERRADA|-|Av. Rivadavia 7299|Flores|CABA|-|-
+FMTER|FMRYT|Cecilia Riccadonna|Raúl Ayala|TERRADA|-|Av. Rivadavia 7299|Flores|CABA|-|-
 FBOL|FMBLV|Cecilia Riccadonna|Raúl Ayala|BOLIVAR|bolivar@mostazaweb.com.ar|DOMINGO FAUSTINO SARMIENTO 770|BOLIVAR|BUENOS AIRES|A la calle|COMERCIAL BOLIVAR S.A
 FMJUN|FMJUN|Cecilia Riccadonna|Raúl Ayala|JUNIN|junin@mostazaweb.com.ar|-|-|BUENOS AIRES|A la calle|COMERCIAL BOLIVAR S.A
 FRGA|-|Cecilia Riccadonna|Raúl Ayala|RIO GALLEGOS|riogallegos@mostazaweb.com.ar|Alberdi 174|Rio Gallegos|SANTA CRUZ|A la calle|ANDES FOOD SA

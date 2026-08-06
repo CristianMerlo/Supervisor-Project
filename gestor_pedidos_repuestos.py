@@ -79,6 +79,26 @@ def obtener_conexion():
     conn.commit()
     return conn
 
+def resolver_nombre_local(sigla_raw):
+    """Resuelve el nombre completo del local y su sigla oficial desde supervisor_local.db."""
+    if not sigla_raw or sigla_raw.upper() in ["GENERAL", "DESCONOCIDO"]:
+        return "GENERAL", "General"
+    try:
+        conn = sqlite3.connect("/home/cristian/Documentos/Supervisor/supervisor_local.db")
+        c = conn.cursor()
+        s_clean = sigla_raw.upper().strip()
+        c.execute("SELECT sigla, nombre FROM locales WHERE sigla = ?", (s_clean,))
+        row = c.fetchone()
+        if not row:
+            c.execute("SELECT sigla, nombre FROM locales WHERE sigla LIKE ? OR nombre LIKE ?", (f"%{s_clean}%", f"%{s_clean}%"))
+            row = c.fetchone()
+        conn.close()
+        if row:
+            return row[0], row[1].title()
+    except Exception:
+        pass
+    return sigla_raw.upper(), sigla_raw.title()
+
 def extraer_sigla(texto):
     """Extrae siglas de locales (ej: [FURQ], FURQ, Urquiza)."""
     m = re.search(r'\[?([A-Z]{3,5})\]?', texto.upper())
@@ -179,11 +199,14 @@ def procesar_correo_repuesto(remitente, asunto, cuerpo, fecha_str=None):
     
     print(f"📦 [SEGUIMIENTO REPUESTOS] Pedido #{pedido_id} | Local: {sigla} | Repuesto: {repuesto} | Etapa: {ETAPAS.get(nueva_etapa)}")
     
+    sigla_oficial, nombre_local = resolver_nombre_local(sigla)
+    display_local = f"{nombre_local} ({sigla_oficial})" if sigla_oficial != "GENERAL" else "General"
+
     # 🚨 SI ALCANZA ETAPA 4 (LISTO EN DEPÓSITO), NOTIFICAR A CRISTIAN CON ALERTA ACCIONABLE
     if nueva_etapa == 4 and etapa_anterior < 4:
         msg_alerta = (
             "📦 *[REPUESTO LISTO EN DEPÓSITO]* 🚀\n\n"
-            f"📍 *Local:* {sigla}\n"
+            f"📍 *Local:* {display_local}\n"
             f"🛠️ *Repuesto / Equipo:* {repuesto}\n"
             f"👤 *Aviso de Depósito:* {remitente}\n"
             f"📌 *Asunto:* {asunto}\n\n"

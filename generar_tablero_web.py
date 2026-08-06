@@ -21,6 +21,26 @@ DB_PATH = Path("/home/cristian/Documentos/Supervisor/pedidos_repuestos.db")
 HTML_OUT = Path("/home/cristian/Documentos/Supervisor/web_repuestos_tablero.html")
 HTML_LOCAL = BASE_DIR / "web_repuestos_tablero.html"
 
+def resolver_nombre_local(sigla_raw):
+    """Obtiene el nombre completo del local desde la BD supervisor_local.db."""
+    if not sigla_raw or sigla_raw.upper() in ["GENERAL", "DESCONOCIDO"]:
+        return "General (GENERAL)"
+    try:
+        conn = sqlite3.connect("/home/cristian/Documentos/Supervisor/supervisor_local.db")
+        c = conn.cursor()
+        s_clean = sigla_raw.upper().strip()
+        c.execute("SELECT nombre, sigla FROM locales WHERE sigla = ?", (s_clean,))
+        row = c.fetchone()
+        if not row:
+            c.execute("SELECT nombre, sigla FROM locales WHERE sigla LIKE ? OR nombre LIKE ?", (f"%{s_clean}%", f"%{s_clean}%"))
+            row = c.fetchone()
+        conn.close()
+        if row:
+            return f"{row[0].title()} ({row[1]})"
+    except Exception:
+        pass
+    return sigla_raw.upper()
+
 def generar_tablero():
     if not DB_PATH.exists():
         pedidos_data = []
@@ -36,6 +56,9 @@ def generar_tablero():
         for r in rows:
             etapa = r["etapa"]
             avance = etapa * 20
+            sigla_val = r["sigla"]
+            nombre_display = resolver_nombre_local(sigla_val)
+            
             accion = "Sin acción requerida"
             if etapa == 1: accion = "Pendiente cotización Mantenimiento"
             elif etapa == 2: accion = "Pendiente aprobación Operaciones/Regional"
@@ -45,7 +68,7 @@ def generar_tablero():
             
             pedidos_data.append({
                 "id": r["id"],
-                "sigla": r["sigla"],
+                "sigla": nombre_display,
                 "equipo": r["equipo"],
                 "etapa": etapa,
                 "fecha": r["fecha"],

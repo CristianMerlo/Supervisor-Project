@@ -185,6 +185,17 @@ def generar_tablero():
         .s3 {{ background: rgba(59, 130, 246, 0.15); color: #93c5fd; }}
         .s4 {{ background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }}
         .s5 {{ background: rgba(100, 116, 139, 0.15); color: #cbd5e1; }}
+
+        /* Adaptación Responsiva para Celulares y Tablets */
+        @media (max-width: 768px) {{
+            body {{ padding: 12px; }}
+            header {{ flex-direction: column; align-items: flex-start; gap: 14px; }}
+            .controls {{ width: 100%; flex-direction: column; gap: 8px; }}
+            input, select {{ width: 100%; }}
+            .stats-grid {{ grid-template-columns: repeat(2, 1fr); gap: 10px; }}
+            .table-container {{ overflow-x: auto; -webkit-overflow-scrolling: touch; }}
+            table {{ min-width: 650px; }}
+        }}
     </style>
 </head>
 <body>

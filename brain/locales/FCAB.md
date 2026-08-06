@@ -1,13 +1,14 @@
 # Estado del Local: CABILDO (FCAB)
 
 ## Resumen de Estado Actual
-- **Última Actualización:** 2026-07-26 14:01:43
-- **Estado de la Cafetera:** Desconocido
-- **Dureza del Agua (PPM):** 0 (VERDE_NORMAL)
-- **Contador de Shots:** 0
-- **Modelo de Cafetera:**  
+- **Última Actualización:** 2026-08-04 14:12:06
+- **Estado de la Cafetera:** Operativa
+- **Dureza del Agua (PPM):** 146 (AMARILLO_ADVERTENCIA)
+- **Contador de Shots:** 344809
+- **Modelo de Cafetera:**  (SN: 1970911)
 
 ## Historial de Intervenciones Recientes
+- **[2026-08-04] Ticket #133903** por *Ana Guerrero*: PPM: 146 | Shots: 344809 | Estado Cafetera: Operativa | Repuestos: Ninguno
 - **[2026-07-26] Ticket #132413** por *Tomas Vera*: PPM: 0 | Shots: 0 | Estado Cafetera: Desconocido | Repuestos: Ninguno
 - **[2026-07-19] Ticket #131357** por *Tomas Vera*: PPM: 0 | Shots: 0 | Estado Cafetera: Desconocido | Repuestos: Ninguno
 - **[2026-07-16] Ticket #130956** por *Tomas Vera*: PPM: 0 | Shots: 0 | Estado Cafetera: Desconocido | Repuestos: Ninguno

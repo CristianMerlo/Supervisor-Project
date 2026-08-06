@@ -132,7 +132,7 @@ def check_models_status():
     else:
         status_groq_vision = "🔴 Sin API Key"
         
-    return status_gemini, status_groq_text, status_groq_vision
+    return status_gemini, status_groq_text
 
 def main():
     print("[Reporte Sistema] Iniciando chequeo de salud del servidor...")
@@ -203,7 +203,7 @@ def main():
     s_generador = check_url(url_generador)
 
     # Chequear Modelos de Inteligencia Artificial (Heartbeat)
-    h_gemini, h_groq_text, h_groq_vision = check_models_status()
+    h_gemini, h_groq_text = check_models_status()
 
     # 4. Construir Reporte
     reporte = (
@@ -221,8 +221,7 @@ def main():
         f"• *Motor Anti-Duplicados (SHA-256):* {s_hashes}\n\n"
         "🤖 *MODELOS DE INTELIGENCIA ARTIFICIAL*\n"
         f"• *Gemini Texto/Visión:* {h_gemini}\n"
-        f"• *Groq Texto:* {h_groq_text}\n"
-        f"• *Groq Visión:* {h_groq_vision}\n\n"
+        f"• *Groq Texto:* {h_groq_text}\n\n"
         "📱 *APLICACIONES WEB (PWA)*\n"
         f"• *Buscador de Locales:* {s_buscador}\n"
         f"• *Generador de Informes:* {s_generador}\n\n"

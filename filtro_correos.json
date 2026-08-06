@@ -33,13 +33,24 @@
     "boletin",
     "newsletter",
     "microsoftoffice365",
-    "mailer-daemon"
+    "mailer-daemon",
+    "netsuite",
+    "netsuite.com",
+    "system@sent-via.netsuite.com",
+    "cabify",
+    "cabify.com"
   ],
   "blacklist_asuntos": [
     "automatic reply",
     "out of office",
     "respuesta automatica",
     "fuera de la oficina",
-    "undelivered"
+    "undelivered",
+    "orden de venta n°",
+    "orden de compra n°",
+    "se aprobó su orden de venta",
+    "el orden de compra que envió se rechazó",
+    "tu viaje por $",
+    "cabify-sale"
   ]
 }

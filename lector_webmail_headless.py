@@ -200,6 +200,13 @@ Escribe un resumen breve y ejecutivo de 2 oraciones en español indicando el tem
                           (msg_id, remitente, asunto, fecha_actual, cuerpo_preview, "CORPORATIVO", resumen))
                 conn.commit()
                 
+                # Evaluar si corresponde al circuito de Seguimiento de Repuestos
+                try:
+                    import gestor_pedidos_repuestos
+                    gestor_pedidos_repuestos.procesar_correo_repuesto(remitente, asunto, cuerpo_preview, fecha_actual)
+                except Exception as e_rep:
+                    print(f"Error evaluando repuestos: {e_rep}")
+                
                 # Notificar Telegram
                 msg_tg = (
                     "📧 *[Correo Corporativo] NUEVO MAIL RECIBIDO*\n"

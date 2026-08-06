@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tablero de Seguimiento de Pedidos de Repuestos - Mostaza</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0f172a;
+            --bg-card: #1e293b;
+            --accent: #ef4444;
+            --accent-glow: rgba(239, 68, 68, 0.3);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #334155;
+            --stage-1: #eab308;
+            --stage-2: #f97316;
+            --stage-3: #3b82f6;
+            --stage-4: #22c55e;
+            --stage-5: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 24px;
+        }
+
+        .title-group h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #f8fafc 0%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .title-group p {
+            font-size: 0.875rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 12px;
+        }
+
+        input, select {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: 8px;
+            outline: none;
+            font-size: 0.875rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .stat-card .val {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .stat-card.stage-4 .val { color: var(--stage-4); }
+        .stat-card.stage-3 .val { color: var(--stage-3); }
+        .stat-card.stage-2 .val { color: var(--stage-2); }
+        .stat-card.stage-1 .val { color: var(--stage-1); }
+
+        .table-container {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.875rem;
+        }
+
+        th {
+            background: #111827;
+            padding: 14px 16px;
+            color: var(--text-muted);
+            font-weight: 600;
+            border-bottom: 1px solid var(--border);
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid var(--border);
+            vertical-align: middle;
+        }
+
+        tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+
+        .badge-sigla {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .progress-bar-bg {
+            background: #334155;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+            width: 100%;
+            margin-top: 6px;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            border-radius: 4px;
+            transition: width 0.3s ease;
+        }
+
+        .pill-status {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .s1 { background: rgba(234, 179, 8, 0.15); color: #fde047; }
+        .s2 { background: rgba(249, 115, 22, 0.15); color: #fdba74; }
+        .s3 { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
+        .s4 { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid #22c55e; }
+        .s5 { background: rgba(100, 116, 139, 0.15); color: #cbd5e1; }
+
+        .btn-action {
+            background: var(--stage-4);
+            color: #052e16;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        .btn-action:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="title-group">
+            <h1>📦 Tablero de Control de Repuestos</h1>
+            <p>Seguimiento del circuito de 5 etapas por sucursal y equipo</p>
+        </div>
+        <div class="controls">
+            <input type="text" id="searchInput" placeholder="Buscar local o repuesto..." onkeyup="filterTable()">
+            <select id="stageFilter" onchange="filterTable()">
+                <option value="ALL">Todas las Etapas</option>
+                <option value="1">1. Solicitado</option>
+                <option value="2">2. Presupuestado</option>
+                <option value="3">3. Aprobado</option>
+                <option value="4">4. Listo en Depósito</option>
+            </select>
+        </div>
+    </header>
+
+    <div class="stats-grid">
+        <div class="stat-card stage-4">
+            <span>🟢 Listo en Depósito (Accionables)</span>
+            <span class="val" id="cntStage4">0</span>
+        </div>
+        <div class="stat-card stage-3">
+            <span>🔵 Aprobados (En Depósito)</span>
+            <span class="val" id="cntStage3">0</span>
+        </div>
+        <div class="stat-card stage-2">
+            <span>🟠 Presupuestados (Pend. Aprobación)</span>
+            <span class="val" id="cntStage2">0</span>
+        </div>
+        <div class="stat-card stage-1">
+            <span>🟡 Solicitados (Pend. Cotizar)</span>
+            <span class="val" id="cntStage1">0</span>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Local</th>
+                    <th>Equipo / Repuesto</th>
+                    <th>Avance del Circuito</th>
+                    <th>Etapa Actual</th>
+                    <th>Última Actualización</th>
+                    <th>Acción Requerida</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                <!-- Se puebla dinámicamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // Datos mock/dinámicos iniciales
+        let pedidos = [
+            { id: 101, sigla: "FURQ", equipo: "Bomba de Agua Cimbali M26", etapa: 4, fecha: "2026-08-06 14:10", avance: 80, accion: "Coordinar retiro e instalación" },
+            { id: 102, sigla: "FAVM", equipo: "Electroválvula Cafetera Melitta", etapa: 3, fecha: "2026-08-05 18:20", avance: 60, accion: "Esperando confirmación depósito" },
+            { id: 103, sigla: "FMCYM", equipo: "Motor Broiler Nieco MPB94", etapa: 2, fecha: "2026-08-04 11:15", avance: 40, accion: "Pendiente aprobación regional" },
+            { id: 104, sigla: "FMSVP", equipo: "Termostato Freidora Frymaster", etapa: 1, fecha: "2026-08-06 10:00", avance: 20, accion: "Pendiente cotización Maxi/Kevin" }
+        ];
+
+        function renderTable(items) {
+            const tbody = document.getElementById("tableBody");
+            tbody.innerHTML = "";
+
+            let c1=0, c2=0, c3=0, c4=0;
+
+            items.forEach(p => {
+                if (p.etapa === 1) c1++;
+                if (p.etapa === 2) c2++;
+                if (p.etapa === 3) c3++;
+                if (p.etapa === 4) c4++;
+
+                const row = document.createElement("tr");
+
+                let stageClass = `s${p.etapa}`;
+                let stageName = "";
+                let barColor = "#eab308";
+                if(p.etapa === 1) { stageName = "🟡 1. Solicitado"; barColor = "#eab308"; }
+                if(p.etapa === 2) { stageName = "🟠 2. Presupuestado"; barColor = "#f97316"; }
+                if(p.etapa === 3) { stageName = "🔵 3. Aprobado"; barColor = "#3b82f6"; }
+                if(p.etapa === 4) { stageName = "🟢 4. Listo en Depósito"; barColor = "#22c55e"; }
+                if(p.etapa === 5) { stageName = "✅ 5. Instalado"; barColor = "#64748b"; }
+
+                row.innerHTML = `
+                    <td>#${p.id}</td>
+                    <td><span class="badge-sigla">${p.sigla}</span></td>
+                    <td><strong>${p.equipo}</strong></td>
+                    <td style="width: 200px;">
+                        <span style="font-size: 0.75rem; color: var(--text-muted);">${p.avance}%</span>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" style="width: ${p.avance}%; background: ${barColor};"></div>
+                        </div>
+                    </td>
+                    <td><span class="pill-status ${stageClass}">${stageName}</span></td>
+                    <td style="color: var(--text-muted); font-size: 0.8rem;">${p.fecha}</td>
+                    <td>${p.etapa === 4 ? `<button class="btn-action">Asignar Técnico</button>` : `<span style="color: var(--text-muted); font-size: 0.8rem;">${p.accion}</span>`}</td>
+                `;
+                tbody.appendChild(row);
+            });
+
+            document.getElementById("cntStage1").innerText = c1;
+            document.getElementById("cntStage2").innerText = c2;
+            document.getElementById("cntStage3").innerText = c3;
+            document.getElementById("cntStage4").innerText = c4;
+        }
+
+        function filterTable() {
+            const query = document.getElementById("searchInput").value.toLowerCase();
+            const stage = document.getElementById("stageFilter").value;
+
+            const filtered = pedidos.filter(p => {
+                const matchQuery = p.sigla.toLowerCase().includes(query) || p.equipo.toLowerCase().includes(query);
+                const matchStage = stage === "ALL" || p.etapa.toString() === stage;
+                return matchQuery && matchStage;
+            });
+
+            renderTable(filtered);
+        }
+
+        // Render inicial
+        renderTable(pedidos);
+    </script>
+</body>
+</html>

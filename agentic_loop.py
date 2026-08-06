@@ -131,6 +131,14 @@ def tool_consultar_obsidian(consulta):
     except Exception as e:
         return f"Error consultando Obsidian: {e}"
 
+def tool_consultar_pedidos_repuestos(sigla_local=None):
+    """Consulta el estado del circuito de 5 etapas de los pedidos de repuestos pendientes o en proceso."""
+    try:
+        import gestor_pedidos_repuestos
+        return gestor_pedidos_repuestos.obtener_resumen_pedidos_telegram(sigla_local)
+    except Exception as e:
+        return f"Error consultando pedidos de repuestos: {e}"
+
 def tool_consultar_correos(asunto_o_contenido):
     """Busca en la base de datos de correos recibidos por asunto, contenido o remitente."""
     try:
@@ -734,6 +742,20 @@ TOOLS_SCHEMA = [
     {
         "type": "function",
         "function": {
+            "name": "tool_consultar_pedidos_repuestos",
+            "description": "Consulta el estado del circuito de 5 etapas de los pedidos de repuestos pendientes o en proceso.",
+            "parameters": {
+                "type": "object",
+                "properties": {
+                    "sigla_local": {"type": "string", "description": "Sigla opcional del local (ej: FURQ, FAVM) o dejar vacia para ver todos"}
+                },
+                "required": []
+            }
+        }
+    },
+    {
+        "type": "function",
+        "function": {
             "name": "tool_proponer_solucion",
             "description": "Extrae de la conversación una falla y su solución definitiva confirmada y la envía al Supervisor para su revisión. NUNCA inventes soluciones. Úsala solo cuando un técnico valide que arregló el equipo.",
             "parameters": {
@@ -855,6 +877,8 @@ def execute_tool(tool_name, arguments_str):
             return tool_proponer_solucion(args.get("maquina", ""), args.get("falla", ""), args.get("solucion", ""))
         elif tool_name == "tool_consultar_obsidian":
             return tool_consultar_obsidian(args.get("consulta", ""))
+        elif tool_name == "tool_consultar_pedidos_repuestos":
+            return tool_consultar_pedidos_repuestos(args.get("sigla_local"))
         elif tool_name == "tool_consultar_correos":
             return tool_consultar_correos(args.get("asunto_o_contenido", ""))
         elif tool_name == "tool_analizar_adjuntos_correo":

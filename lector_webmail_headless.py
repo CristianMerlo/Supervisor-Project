@@ -200,6 +200,29 @@ Escribe un resumen breve y ejecutivo de 2 oraciones en español indicando el tem
                           (msg_id, remitente, asunto, fecha_actual, cuerpo_preview, "CORPORATIVO", resumen))
                 conn.commit()
                 
+                # Descargar adjuntos PDF hacia la carpeta /entrantes para la ingesta automática
+                try:
+                    dir_entrantes = Path("/home/cristian/Documentos/Supervisor/entrantes")
+                    dir_entrantes.mkdir(parents=True, exist_ok=True)
+                    
+                    # Si el correo indica adjuntos PDF o la palabra PDF / informe
+                    if "pdf" in item_text.lower() or "adjunto" in item_text.lower() or "informe" in item_text.lower():
+                        item.click()
+                        time.sleep(2)
+                        
+                        # Buscar botones o links de descarga de archivos PDF en el panel de lectura
+                        pdf_links = page.query_selector_all("a[href*='.pdf'], button[aria-label*='.pdf'], div[aria-label*='.pdf']")
+                        for pdf_btn in pdf_links:
+                            with page.expect_download(timeout=5000) as download_info:
+                                pdf_btn.click()
+                            download = download_info.value
+                            dest_path = dir_entrantes / download.suggested_filename
+                            download.save_as(str(dest_path))
+                            print(f"📥 [PDF DEPOSITADO EN ENTRANTES] {download.suggested_filename} desde Correo Corporativo.")
+                except Exception as e_pdf:
+                    # Ignorar si no había descarga directa o falló el click
+                    pass
+                
                 # Evaluar si corresponde al circuito de Seguimiento de Repuestos
                 try:
                     import gestor_pedidos_repuestos

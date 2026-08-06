@@ -1,0 +1,45 @@
+{
+  "descripcion": "Configuración de reglas de filtrado anti-spam para cmerlo@mostazaweb.com.ar",
+  "solo_no_leidos": true,
+  "whitelist_dominios": [
+    "mostazaweb.com.ar",
+    "cimbali.com",
+    "melitta.com",
+    "taylor-company.com",
+    "nieco.com",
+    "frymaster.com"
+  ],
+  "keywords_asunto_prioritario": [
+    "mantenimiento",
+    "presupuesto",
+    "service",
+    "urgente",
+    "factura",
+    "ablandador",
+    "cafetera",
+    "molino",
+    "ticket",
+    "falla",
+    "repuesto",
+    "informe",
+    "visita",
+    "ppm"
+  ],
+  "blacklist_remitentes": [
+    "noreply",
+    "no-reply",
+    "notifications",
+    "notificaciones",
+    "boletin",
+    "newsletter",
+    "microsoftoffice365",
+    "mailer-daemon"
+  ],
+  "blacklist_asuntos": [
+    "automatic reply",
+    "out of office",
+    "respuesta automatica",
+    "fuera de la oficina",
+    "undelivered"
+  ]
+}
